@@ -1,0 +1,43 @@
+<CodeSystem xmlns="http://hl7.org/fhir">
+    <meta>
+        <tag>
+            <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
+            <code value="REMOTE"/>
+        </tag>
+    </meta>
+    <url value="http://netzwerk-universitaetsmedizin.de/fhir/CodeSystem/feasibility"/>
+    <!-- version managed by bpe -->
+    <version value="${version}"/>
+    <name value="Codex_Feasibility"/>
+    <title value="Codex Feasibility"/>
+    <!-- status managed by bpe -->
+    <status value="unknown"/>
+    <experimental value="false"/>
+    <date value="2021-01-09"/>
+    <publisher value="Codex"/>
+    <description value="CodeSystem with standard values for feasibility processes"/>
+    <caseSensitive value="true"/>
+    <hierarchyMeaning value="grouped-by"/>
+    <versionNeeded value="false"/>
+    <content value="complete"/>
+    <concept>
+        <code value="measure-reference"/>
+        <display value="Measure Reference"/>
+        <definition value="Codex Measure Reference to define the feasibility query"/>
+    </concept>
+    <concept>
+        <code value="measure-report-reference"/>
+        <display value="MeasureReport Reference"/>
+        <definition value="Codex MeasureReport Reference to specify the feasibility query result"/>
+    </concept>
+    <concept>
+        <code value="single"/>
+        <display value="Single DIC Result"/>
+        <definition value="The MeasureReport group represents the result from a single DIC."/>
+    </concept>
+    <concept>
+        <code value="aggregated"/>
+        <display value="Aggregated Result"/>
+        <definition value="The MeasureReport group represents the aggregated result from multiple DICs."/>
+    </concept>
+</CodeSystem>

@@ -1,0 +1,188 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <type value="transaction"/>
+    <entry>
+        <fullUrl value="urn:uuid:bb73165c-c7b9-4342-8e28-531f07fa7735"/>
+        <resource>
+            <Organization xmlns="http://hl7.org/fhir">
+                <meta>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
+                        <code value="REMOTE"/>
+                    </tag>
+                </meta>
+                <extension url="http://highmed.org/fhir/StructureDefinition/extension-certificate-thumbprint">
+                    <valueString value="TODO"/>
+                </extension>
+                <identifier>
+                    <system value="http://highmed.org/fhir/NamingSystem/organization-identifier"/>
+                    <value value="Test_ZARS"/>
+                </identifier>
+                <active value="true"/>
+                <type>
+                    <coding>
+                        <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                        <code value="MeDIC"/>
+                    </coding>
+                </type>
+                <name value="Test ZARS"/>
+            </Organization>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="Organization"/>
+            <ifNoneExist value="identifier=http://highmed.org/fhir/NamingSystem/organization-identifier|Test_ZARS"/>
+        </request>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:cf62edc2-cc5d-43ed-ac0e-caf09f7326c3"/>
+        <resource>
+            <Organization xmlns="http://hl7.org/fhir">
+                <meta>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
+                        <code value="REMOTE"/>
+                    </tag>
+                </meta>
+                <extension url="http://highmed.org/fhir/StructureDefinition/extension-certificate-thumbprint">
+                    <valueString value="TODO"/>
+                </extension>
+                <identifier>
+                    <system value="http://highmed.org/fhir/NamingSystem/organization-identifier"/>
+                    <value value="Test_DIC_1"/>
+                </identifier>
+                <active value="true"/>
+                <type>
+                    <coding>
+                        <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                        <code value="MeDIC"/>
+                    </coding>
+                </type>
+                <name value="Test DIC 1"/>
+                <endpoint>
+                    <reference value="urn:uuid:ad0a4700-6f4c-4f4b-bf70-3a7a3f24f2fa"/>
+                    <type value="Endpoint"/>
+                </endpoint>
+            </Organization>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="Organization"/>
+            <ifNoneExist value="identifier=http://highmed.org/fhir/NamingSystem/organization-identifier|Test_DIC_1"/>
+        </request>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:55901940-02db-40bf-9a6e-bdfdd0ddb7bf"/>
+        <resource>
+            <Organization xmlns="http://hl7.org/fhir">
+                <meta>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
+                        <code value="REMOTE"/>
+                    </tag>
+                </meta>
+                <extension url="http://highmed.org/fhir/StructureDefinition/extension-certificate-thumbprint">
+                    <valueString value="TODO"/>
+                </extension>
+                <identifier>
+                    <system value="http://highmed.org/fhir/NamingSystem/organization-identifier"/>
+                    <value value="Test_DIC_2"/>
+                </identifier>
+                <active value="true"/>
+                <type>
+                    <coding>
+                        <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                        <code value="MeDIC"/>
+                    </coding>
+                </type>
+                <name value="Test DIC 2"/>
+                <endpoint>
+                    <reference value="urn:uuid:6b2ba3fb-b8eb-4677-86fa-9e5285736b92"/>
+                    <type value="Endpoint"/>
+                </endpoint>
+            </Organization>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="Organization"/>
+            <ifNoneExist value="identifier=http://highmed.org/fhir/NamingSystem/organization-identifier|Test_DIC_2"/>
+        </request>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:ad0a4700-6f4c-4f4b-bf70-3a7a3f24f2fa"/>
+        <resource>
+            <Endpoint xmlns="http://hl7.org/fhir">
+                <meta>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
+                        <code value="REMOTE"/>
+                    </tag>
+                </meta>
+                <identifier>
+                    <system value="http://highmed.org/fhir/NamingSystem/endpoint-identifier"/>
+                    <value value="Test_DIC_1_Endpoint"/>
+                </identifier>
+                <status value="active"/>
+                <connectionType>
+                    <system value="http://terminology.hl7.org/CodeSystem/endpoint-connection-type"/>
+                    <code value="hl7-fhir-rest"/>
+                </connectionType>
+                <managingOrganization>
+                    <reference value="urn:uuid:cf62edc2-cc5d-43ed-ac0e-caf09f7326c3"/>
+                    <type value="Organization"/>
+                </managingOrganization>
+                <payloadType>
+                    <coding>
+                        <system value="http://hl7.org/fhir/resource-types"/>
+                        <code value="Task"/>
+                    </coding>
+                </payloadType>
+                <address value="https://dic-1/fhir"/>
+            </Endpoint>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="Endpoint"/>
+            <ifNoneExist
+                    value="identifier=http://highmed.org/fhir/NamingSystem/endpoint-identifier|Test_DIC_1_Endpoint"/>
+        </request>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:6b2ba3fb-b8eb-4677-86fa-9e5285736b92"/>
+        <resource>
+            <Endpoint xmlns="http://hl7.org/fhir">
+                <meta>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
+                        <code value="REMOTE"/>
+                    </tag>
+                </meta>
+                <identifier>
+                    <system value="http://highmed.org/fhir/NamingSystem/endpoint-identifier"/>
+                    <value value="Test_DIC_2_Endpoint"/>
+                </identifier>
+                <status value="active"/>
+                <connectionType>
+                    <system value="http://terminology.hl7.org/CodeSystem/endpoint-connection-type"/>
+                    <code value="hl7-fhir-rest"/>
+                </connectionType>
+                <managingOrganization>
+                    <reference value="urn:uuid:55901940-02db-40bf-9a6e-bdfdd0ddb7bf"/>
+                    <type value="Organization"/>
+                </managingOrganization>
+                <payloadType>
+                    <coding>
+                        <system value="http://hl7.org/fhir/resource-types"/>
+                        <code value="Task"/>
+                    </coding>
+                </payloadType>
+                <address value="https://dic-2/fhir"/>
+            </Endpoint>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="Endpoint"/>
+            <ifNoneExist
+                    value="identifier=http://highmed.org/fhir/NamingSystem/endpoint-identifier|Test_DIC_2_Endpoint"/>
+        </request>
+    </entry>
+</Bundle>

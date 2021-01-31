@@ -1,0 +1,161 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:87058ec4-c6f5-4dfa-9119-6b223e6e5445",
+      "resource": {
+        "resourceType": "Task",
+        "meta": {
+          "profile": [
+            "http://netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-request-simple-feasibility"
+          ]
+        },
+        "instantiatesUri": "http://highmed.org/bpe/Process/requestSimpleFeasibility/0.1.0",
+        "status": "requested",
+        "intent": "order",
+        "authoredOn": "2021",
+        "requester": {
+          "type": "Organization",
+          "identifier": {
+            "system": "http://highmed.org/fhir/NamingSystem/organization-identifier",
+            "value": "Test_ZARS"
+          }
+        },
+        "restriction": {
+          "recipient": [
+            {
+              "type": "Organization",
+              "identifier": {
+                "system": "http://highmed.org/fhir/NamingSystem/organization-identifier",
+                "value": "Test_ZARS"
+              }
+            }
+          ]
+        },
+        "input": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://highmed.org/fhir/CodeSystem/bpmn-message",
+                  "code": "message-name"
+                }
+              ]
+            },
+            "valueString": "requestSimpleFeasibilityMessage"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://netzwerk-universitaetsmedizin.de/fhir/CodeSystem/feasibility",
+                  "code": "measure-reference"
+                }
+              ]
+            },
+            "valueReference": {
+              "reference": "urn:uuid:7a142223-616f-41a1-97da-2ae726031b71"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "Task"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:7a142223-616f-41a1-97da-2ae726031b71",
+      "resource": {
+        "resourceType": "Measure",
+        "meta": {
+          "tag": [
+            {
+              "system": "http://highmed.org/fhir/CodeSystem/authorization-role",
+              "code": "LOCAL"
+            },
+            {
+              "system": "http://highmed.org/fhir/CodeSystem/authorization-role",
+              "code": "REMOTE"
+            }
+          ]
+        },
+        "status": "active",
+        "library": [
+          "https://zars/fhir/Library/30561ba6-106f-4d52-bb8d-e49e20a40d40"
+        ],
+        "scoring": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-scoring",
+              "code": "cohort"
+            }
+          ]
+        },
+        "group": [
+          {
+            "population": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                      "code": "initial-population"
+                    }
+                  ]
+                },
+                "criteria": {
+                  "language": "text/cql",
+                  "expression": "InInitialPopulation"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "Measure"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:85bd7a06-1bff-40b3-99a9-77a624b47e6b",
+      "resource": {
+        "resourceType": "Library",
+        "meta": {
+          "tag": [
+            {
+              "system": "http://highmed.org/fhir/CodeSystem/authorization-role",
+              "code": "LOCAL"
+            },
+            {
+              "system": "http://highmed.org/fhir/CodeSystem/authorization-role",
+              "code": "REMOTE"
+            }
+          ]
+        },
+        "url": "https://zars/fhir/Library/30561ba6-106f-4d52-bb8d-e49e20a40d40",
+        "status": "active",
+        "type": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/library-type",
+              "code": "logic-library"
+            }
+          ]
+        },
+        "content": [
+          {
+            "contentType": "text/cql",
+            "data": "bGlicmFyeSBSZXRyaWV2ZQp1c2luZyBGSElSIHZlcnNpb24gJzQuMC4wJwppbmNsdWRlIEZISVJIZWxwZXJzIHZlcnNpb24gJzQuMC4wJwoKY29udGV4dCBQYXRpZW50CgpkZWZpbmUgSW5Jbml0aWFsUG9wdWxhdGlvbjoKICBQYXRpZW50LmdlbmRlciA9ICdtYWxlJwoK"
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "Library"
+      }
+    }
+  ]
+}

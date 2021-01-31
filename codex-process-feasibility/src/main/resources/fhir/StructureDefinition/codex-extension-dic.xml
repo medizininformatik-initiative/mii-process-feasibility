@@ -1,0 +1,70 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+    <meta>
+        <tag>
+            <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
+            <code value="REMOTE"/>
+        </tag>
+    </meta>
+    <url value="http://netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/dic"/>
+    <!-- version managed by bpe -->
+    <version value="${version}"/>
+    <name value="Dic"/>
+    <!-- status managed by bpe -->
+    <status value="unknown"/>
+    <experimental value="false"/>
+    <date value="2021-01-13"/>
+    <fhirVersion value="4.0.1"/>
+    <kind value="complex-type"/>
+    <abstract value="false"/>
+    <context>
+        <type value="element"/>
+        <expression value="MeasureReport.group"/>
+    </context>
+    <type value="Extension"/>
+    <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+    <derivation value="constraint"/>
+    <differential>
+        <element id="Extension">
+            <path value="Extension"/>
+            <short value="Dic"/>
+            <definition value="Used to denote the dic organizations from which the results originate."/>
+        </element>
+        <element id="Extension.url">
+            <path value="Extension.url"/>
+            <fixedUri value="http://netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/dic"/>
+        </element>
+        <element id="Extension.value[x]">
+            <path value="Extension.value[x]"/>
+            <short value="Dic"/>
+            <definition
+                    value="Organization reference to denote the dic organizations from which the results originate."/>
+            <min value="1"/>
+            <type>
+                <code value="Reference"/>
+                <targetProfile value="http://highmed.org/fhir/StructureDefinition/highmed-organization"/>
+            </type>
+        </element>
+        <element id="Extension.value[x].reference">
+            <path value="Extension.value[x].reference"/>
+            <max value="0"/>
+        </element>
+        <element id="Extension.value[x].type">
+            <path value="Extension.value[x].type"/>
+            <min value="1"/>
+            <fixedUri value="Organization"/>
+        </element>
+        <element id="Extension.value[x].identifier">
+            <path value="Extension.value[x].identifier"/>
+            <min value="1"/>
+        </element>
+        <element id="Extension.value[x].identifier.system">
+            <path value="Extension.value[x].identifier.system"/>
+            <min value="1"/>
+            <fixedUri value="http://highmed.org/fhir/NamingSystem/organization-identifier"/>
+        </element>
+        <element id="Extension.value[x].identifier.value">
+            <path value="Extension.value[x].identifier.value"/>
+            <min value="1"/>
+        </element>
+    </differential>
+</StructureDefinition>

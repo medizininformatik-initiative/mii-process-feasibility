@@ -1,0 +1,457 @@
+version: '3.9'
+services:
+
+  # ---- Ingress --------------------------------------------------------------
+  ingress:
+    image: haproxy:2.3
+    restart: on-failure
+    ports:
+    - 443:443
+    volumes:
+    - type: bind
+      source: ./ingress/conf
+      target: /usr/local/etc/haproxy
+      read_only: true
+    networks:
+      internet:
+        ipv4_address: 172.10.0.2
+
+  # ---- ZARS - FHIR Inbox ----------------------------------------------------
+  zars-fhir-proxy:
+    image: ghcr.io/highmed/fhir_proxy:0.4.0
+    volumes:
+    - type: bind
+      source: ./zars/fhir/proxy/ssl
+      target: /usr/local/apache2/ssl
+    environment:
+      HTTPS_SERVER_NAME_PORT: zars:443
+      APP_SERVER_IP: zars-fhir-app
+    networks:
+      internet:
+        ipv4_address: 172.10.0.3
+        aliases:
+        - zars
+      zars-fhir-frontend:
+    depends_on:
+    - ingress
+    - zars-fhir-app
+
+  zars-fhir-app:
+    image: highmed/fhir
+    restart: on-failure
+    volumes:
+    - type: bind
+      source: ./zars/fhir/app/conf
+      target: /opt/fhir/conf
+    - type: bind
+      source: ./zars/fhir/app/log
+      target: /opt/fhir/log
+    environment:
+      TZ: Europe/Berlin
+    networks:
+    - zars-fhir-frontend
+    - zars-fhir-backend
+    depends_on:
+    - zars-fhir-db
+
+  zars-fhir-db:
+    image: postgres:13
+    restart: on-failure
+    ports:
+    - 5432:5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d fhir" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/zars-fhir-postgres_password
+      POSTGRES_USER: liquibase_user
+      POSTGRES_DB: fhir
+    networks:
+    - zars-fhir-backend
+    volumes:
+    - type: volume
+      source: zars-fhir-db-data
+      target: /var/lib/postgresql/data
+    secrets:
+    - zars-fhir-postgres_password
+
+  # ---- ZARS - BPE -----------------------------------------------------------
+  zars-bpe-app:
+    image: highmed/bpe
+    restart: on-failure
+    volumes:
+    - type: bind
+      source: ./zars/bpe/app/conf
+      target: /opt/bpe/conf
+      read_only: true
+    - type: bind
+      source: ./zars/bpe/app/plugin
+      target: /opt/bpe/plugin
+      read_only: true
+    - type: bind
+      source: ./zars/bpe/app/process
+      target: /opt/bpe/process
+      read_only: true
+    - type: bind
+      source: ./zars/bpe/app/log
+      target: /opt/bpe/log
+    - type: bind
+      source: ./zars/bpe/app/last_event
+      target: /opt/bpe/last_event
+    environment:
+      TZ: Europe/Berlin
+    networks:
+      zars-bpe-frontend:
+      zars-bpe-backend:
+      internet: # TODO: replace with proxy or NAT
+        ipv4_address: 172.10.0.103
+    depends_on:
+    - zars-bpe-db
+    - zars-fhir-proxy
+
+  zars-bpe-db:
+    image: postgres:13
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d bpe" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/zars-bpe-postgres_password
+      POSTGRES_USER: liquibase_user
+      POSTGRES_DB: bpe
+    networks:
+    - zars-bpe-backend
+    volumes:
+    - type: volume
+      source: zars-bpe-db-data
+      target: /var/lib/postgresql/data
+    secrets:
+    - zars-bpe-postgres_password
+
+  # ---- DIC-1 - FHIR ---------------------------------------------------------
+  dic-1-fhir-proxy:
+    image: ghcr.io/highmed/fhir_proxy:0.4.0
+    restart: on-failure
+    volumes:
+    - type: bind
+      source: ./dic-1/fhir/proxy/ssl
+      target: /usr/local/apache2/ssl
+    environment:
+      HTTPS_SERVER_NAME_PORT: dic-1:443
+      APP_SERVER_IP: dic-1-fhir-app
+    networks:
+      internet:
+        ipv4_address: 172.10.0.4
+        aliases:
+        - dic-1
+      dic-1-fhir-frontend:
+    depends_on:
+    - dic-1-fhir-app
+
+  dic-1-fhir-app:
+    image: highmed/fhir
+    restart: on-failure
+    volumes:
+    - type: bind
+      source: ./dic-1/fhir/app/conf
+      target: /opt/fhir/conf
+    - type: bind
+      source: ./dic-1/fhir/app/log
+      target: /opt/fhir/log
+    environment:
+      TZ: Europe/Berlin
+    networks:
+    - dic-1-fhir-frontend
+    - dic-1-fhir-backend
+    depends_on:
+    - dic-1-fhir-db
+
+  dic-1-fhir-db:
+    image: postgres:13
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d fhir" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/dic-1-fhir-postgres_password
+      POSTGRES_USER: liquibase_user
+      POSTGRES_DB: fhir
+    networks:
+    - dic-1-fhir-backend
+    volumes:
+    - type: volume
+      source: dic-1-fhir-db-data
+      target: /var/lib/postgresql/data
+    secrets:
+    - dic-1-fhir-postgres_password
+
+  # ---- DIC-1 - BPE ----------------------------------------------------------
+  dic-1-bpe-app:
+    image: highmed/bpe
+    restart: on-failure
+    volumes:
+    - type: bind
+      source: ./dic-1/bpe/app/conf
+      target: /opt/bpe/conf
+      read_only: true
+    - type: bind
+      source: ./dic-1/bpe/app/plugin
+      target: /opt/bpe/plugin
+      read_only: true
+    - type: bind
+      source: ./dic-1/bpe/app/process
+      target: /opt/bpe/process
+      read_only: true
+    - type: bind
+      source: ./dic-1/bpe/app/log
+      target: /opt/bpe/log
+    - type: bind
+      source: ./dic-1/bpe/app/last_event
+      target: /opt/bpe/last_event
+    ports:
+    - 5005:5005
+    environment:
+      EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      TZ: Europe/Berlin
+    networks:
+      dic-1-bpe-frontend:
+      dic-1-bpe-backend:
+      internet: # TODO: replace with proxy or NAT
+        ipv4_address: 172.10.0.104
+    depends_on:
+    - dic-1-fhir-proxy
+    - dic-1-bpe-db
+    - dic-1-store
+
+  dic-1-bpe-db:
+    image: postgres:13
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d bpe" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/dic-1-bpe-postgres_password
+      POSTGRES_USER: liquibase_user
+      POSTGRES_DB: bpe
+    networks:
+    - dic-1-bpe-backend
+    volumes:
+    - type: volume
+      source: dic-1-bpe-db-data
+      target: /var/lib/postgresql/data
+    secrets:
+    - dic-1-bpe-postgres_password
+
+  # ---- DIC-1 - FHIR Data Store ----------------------------------------------
+  dic-1-store:
+    image: samply/blaze:0.10.3
+    restart: on-failure
+    ports:
+    - 8071:8080
+    environment:
+      BASE_URL: http://localhost:8071
+      LOG_LEVEL: debug
+    networks:
+    - dic-1-bpe-backend
+    volumes:
+    - type: volume
+      source: dic-1-store-data
+      target: /app/data
+
+  # ---- DIC-2 - FHIR ---------------------------------------------------------
+  dic-2-fhir-proxy:
+    image: ghcr.io/highmed/fhir_proxy:0.4.0
+    restart: on-failure
+    volumes:
+    - type: bind
+      source: ./dic-2/fhir/proxy/ssl
+      target: /usr/local/apache2/ssl
+    environment:
+      HTTPS_SERVER_NAME_PORT: dic-2:443
+      APP_SERVER_IP: dic-2-fhir-app
+    networks:
+      internet:
+        ipv4_address: 172.10.0.5
+        aliases:
+        - dic-2
+      dic-2-fhir-frontend:
+    depends_on:
+    - dic-2-fhir-app
+
+  dic-2-fhir-app:
+    image: highmed/fhir
+    restart: on-failure
+    volumes:
+    - type: bind
+      source: ./dic-2/fhir/app/conf
+      target: /opt/fhir/conf
+    - type: bind
+      source: ./dic-2/fhir/app/log
+      target: /opt/fhir/log
+    environment:
+      TZ: Europe/Berlin
+    networks:
+    - dic-2-fhir-frontend
+    - dic-2-fhir-backend
+    depends_on:
+    - dic-2-fhir-db
+
+  dic-2-fhir-db:
+    image: postgres:13
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d fhir" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/dic-2-fhir-postgres_password
+      POSTGRES_USER: liquibase_user
+      POSTGRES_DB: fhir
+    networks:
+    - dic-2-fhir-backend
+    volumes:
+    - type: volume
+      source: dic-2-fhir-db-data
+      target: /var/lib/postgresql/data
+    secrets:
+    - dic-2-fhir-postgres_password
+
+  # ---- DIC-2 - BPE ----------------------------------------------------------
+  dic-2-bpe-app:
+    image: highmed/bpe
+    restart: on-failure
+    volumes:
+    - type: bind
+      source: ./dic-2/bpe/app/conf
+      target: /opt/bpe/conf
+      read_only: true
+    - type: bind
+      source: ./dic-2/bpe/app/plugin
+      target: /opt/bpe/plugin
+      read_only: true
+    - type: bind
+      source: ./dic-2/bpe/app/process
+      target: /opt/bpe/process
+      read_only: true
+    - type: bind
+      source: ./dic-2/bpe/app/log
+      target: /opt/bpe/log
+    - type: bind
+      source: ./dic-2/bpe/app/last_event
+      target: /opt/bpe/last_event
+    environment:
+      TZ: Europe/Berlin
+    networks:
+      dic-2-bpe-frontend:
+      dic-2-bpe-backend:
+      internet: # TODO: replace with proxy or NAT
+        ipv4_address: 172.10.0.105
+    depends_on:
+    - dic-2-fhir-proxy
+    - dic-2-bpe-db
+    - dic-2-store
+
+  dic-2-bpe-db:
+    image: postgres:13
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d bpe" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/dic-2-bpe-postgres_password
+      POSTGRES_USER: liquibase_user
+      POSTGRES_DB: bpe
+    networks:
+    - dic-2-bpe-backend
+    volumes:
+    - type: volume
+      source: dic-2-bpe-db-data
+      target: /var/lib/postgresql/data
+    secrets:
+    - dic-2-bpe-postgres_password
+
+  # ---- DIC-2 - FHIR Data Store ----------------------------------------------
+  dic-2-store:
+    image: samply/blaze:0.10.3
+    restart: on-failure
+    ports:
+    - 8072:8080
+    environment:
+      BASE_URL: http://localhost:8072
+      LOG_LEVEL: debug
+    networks:
+    - dic-2-bpe-backend
+    volumes:
+    - type: volume
+      source: dic-2-store-data
+      target: /app/data
+
+secrets:
+  zars-fhir-postgres_password:
+    file: ./zars/fhir/db/conf/postgres_password
+  zars-bpe-postgres_password:
+    file: ./zars/bpe/db/conf/postgres_password
+
+  dic-1-fhir-postgres_password:
+    file: ./dic-1/fhir/db/conf/postgres_password
+  dic-1-bpe-postgres_password:
+    file: ./dic-1/bpe/db/conf/postgres_password
+
+  dic-2-fhir-postgres_password:
+    file: ./dic-2/fhir/db/conf/postgres_password
+  dic-2-bpe-postgres_password:
+    file: ./dic-2/bpe/db/conf/postgres_password
+
+networks:
+  internet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.0/24
+
+  zars-fhir-frontend:
+  zars-fhir-backend:
+  zars-bpe-frontend:
+  zars-bpe-backend:
+
+  dic-1-fhir-frontend:
+  dic-1-fhir-backend:
+  dic-1-bpe-frontend:
+  dic-1-bpe-backend:
+
+  dic-2-fhir-frontend:
+  dic-2-fhir-backend:
+  dic-2-bpe-frontend:
+  dic-2-bpe-backend:
+
+volumes:
+  zars-fhir-db-data:
+    name: "zars-fhir-db-data"
+  zars-bpe-db-data:
+    name: "zars-bpe-db-data"
+
+  dic-1-fhir-db-data:
+    name: "dic-1-fhir-db-data"
+  dic-1-bpe-db-data:
+    name: "dic-1-bpe-db-data"
+  dic-1-store-data:
+    name: "dic-1-store-data"
+
+  dic-2-fhir-db-data:
+    name: "dic-2-fhir-db-data"
+  dic-2-bpe-db-data:
+    name: "dic-2-bpe-db-data"
+  dic-2-store-data:
+    name: "dic-2-store-data"

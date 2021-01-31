@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+                  id="Definitions_0drkcb5" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler"
+                  exporterVersion="4.4.0">
+    <bpmn:process id="executeSimpleFeasibility" isExecutable="true" camunda:versionTag="0.1.0">
+        <bpmn:startEvent id="StartEvent" name="start">
+            <bpmn:outgoing>SequenceFlow_14cn0vs</bpmn:outgoing>
+            <bpmn:messageEventDefinition id="MessageEventDefinition_0sjtzj6" messageRef="Message_1yz2a31"/>
+        </bpmn:startEvent>
+        <bpmn:sequenceFlow id="SequenceFlow_14cn0vs" sourceRef="StartEvent" targetRef="downloadFeasibilityResources"/>
+        <bpmn:serviceTask id="downloadFeasibilityResources" name="download feasibility resources"
+                          camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.DownloadFeasibilityResources">
+            <bpmn:incoming>SequenceFlow_14cn0vs</bpmn:incoming>
+            <bpmn:outgoing>Flow_11cnoe1</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:endEvent id="EndEvent" name="send result to requester">
+            <bpmn:extensionElements>
+                <camunda:inputOutput>
+                    <camunda:inputParameter name="messageName">resultSingleDicSimpleFeasibilityMessage
+                    </camunda:inputParameter>
+                    <camunda:inputParameter name="versionTag">0.1.0</camunda:inputParameter>
+                    <camunda:inputParameter name="processDefinitionKey">requestSimpleFeasibility
+                    </camunda:inputParameter>
+                    <camunda:inputParameter name="profile">
+                        http://netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility
+                    </camunda:inputParameter>
+                </camunda:inputOutput>
+            </bpmn:extensionElements>
+            <bpmn:incoming>SequenceFlow_0ascyjc</bpmn:incoming>
+            <bpmn:messageEventDefinition id="MessageEventDefinition_13swtie" messageRef="Message_1dr71re"
+                                         camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicResponse"/>
+        </bpmn:endEvent>
+        <bpmn:sequenceFlow id="SequenceFlow_0ascyjc" sourceRef="selectResponseTarget" targetRef="EndEvent"/>
+        <bpmn:serviceTask id="selectResponseTarget" name="select response target"
+                          camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SelectResponseTarget">
+            <bpmn:incoming>Flow_11lpcfm</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_0ascyjc</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:serviceTask id="evaluateMeasure" name="evaluate measure"
+                          camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.EvaluateMeasure">
+            <bpmn:incoming>Flow_1cad9ed</bpmn:incoming>
+            <bpmn:outgoing>Flow_0nb4jh0</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:sequenceFlow id="Flow_11cnoe1" sourceRef="downloadFeasibilityResources"
+                           targetRef="storeFeasibilityResources"/>
+        <bpmn:serviceTask id="storeFeasibilityResources" name="store feasibility resources"
+                          camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreFeasibilityResources">
+            <bpmn:incoming>Flow_11cnoe1</bpmn:incoming>
+            <bpmn:outgoing>Flow_1cad9ed</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:sequenceFlow id="Flow_1cad9ed" sourceRef="storeFeasibilityResources" targetRef="evaluateMeasure"/>
+        <bpmn:sequenceFlow id="Flow_0nb4jh0" sourceRef="evaluateMeasure" targetRef="storeMeasureReport"/>
+        <bpmn:serviceTask id="storeMeasureReport" name="store measure report"
+                          camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreMeasureReport">
+            <bpmn:incoming>Flow_0nb4jh0</bpmn:incoming>
+            <bpmn:outgoing>Flow_11lpcfm</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:sequenceFlow id="Flow_11lpcfm" sourceRef="storeMeasureReport" targetRef="selectResponseTarget"/>
+    </bpmn:process>
+    <bpmn:message id="Message_1yz2a31" name="executeSimpleFeasibilityMessage"/>
+    <bpmn:message id="Message_1dr71re" name="resultSingleDicSimpleFeasibilityMessage"/>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="executeSimpleFeasibility">
+            <bpmndi:BPMNEdge id="Flow_11lpcfm_di" bpmnElement="Flow_11lpcfm">
+                <di:waypoint x="760" y="122"/>
+                <di:waypoint x="810" y="122"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_0nb4jh0_di" bpmnElement="Flow_0nb4jh0">
+                <di:waypoint x="610" y="122"/>
+                <di:waypoint x="660" y="122"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1cad9ed_di" bpmnElement="Flow_1cad9ed">
+                <di:waypoint x="470" y="122"/>
+                <di:waypoint x="510" y="122"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_11cnoe1_di" bpmnElement="Flow_11cnoe1">
+                <di:waypoint x="330" y="122"/>
+                <di:waypoint x="370" y="122"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_0ascyjc_di" bpmnElement="SequenceFlow_0ascyjc">
+                <di:waypoint x="910" y="122"/>
+                <di:waypoint x="972" y="122"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_14cn0vs_di" bpmnElement="SequenceFlow_14cn0vs">
+                <di:waypoint x="188" y="122"/>
+                <di:waypoint x="230" y="122"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="StartEvent_1fzso6r_di" bpmnElement="StartEvent">
+                <dc:Bounds x="152" y="104" width="36" height="36"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="160" y="147" width="22" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ServiceTask_0b8j3ka_di" bpmnElement="downloadFeasibilityResources">
+                <dc:Bounds x="230" y="82" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="EndEvent_10xdh63_di" bpmnElement="EndEvent">
+                <dc:Bounds x="972" y="104" width="36" height="36"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="958" y="147" width="67" height="27"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ServiceTask_15aifhd_di" bpmnElement="selectResponseTarget">
+                <dc:Bounds x="810" y="82" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ServiceTask_0u5pb4i_di" bpmnElement="evaluateMeasure">
+                <dc:Bounds x="510" y="82" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_01mo7df_di" bpmnElement="storeFeasibilityResources">
+                <dc:Bounds x="370" y="82" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_0yfzrja_di" bpmnElement="storeMeasureReport">
+                <dc:Bounds x="660" y="82" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn:definitions>
