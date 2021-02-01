@@ -98,17 +98,17 @@ public class ConfigGenerator {
 
     public void copyDockerTestFhirConfigProperties() {
         Path dockerMedic1FhirConfigPropertiesFile = Paths
-                .get("../../codex-processes-docker-test-setup/dic-1/fhir/app/conf/config.properties");
+                .get("../../codex-processes-ap2-docker-test-setup/dic-1/fhir/app/conf/config.properties");
         logger.info("Copying config.properties to {}", dockerMedic1FhirConfigPropertiesFile);
         writeProperties(dockerMedic1FhirConfigPropertiesFile, dockerDic1FhirConfigProperties);
 
         Path dockerMedic2FhirConfigPropertiesFile = Paths
-                .get("../../codex-processes-docker-test-setup/dic-2/fhir/app/conf/config.properties");
+                .get("../../codex-processes-ap2-docker-test-setup/dic-2/fhir/app/conf/config.properties");
         logger.info("Copying config.properties to {}", dockerMedic2FhirConfigPropertiesFile);
         writeProperties(dockerMedic2FhirConfigPropertiesFile, dockerDic2FhirConfigProperties);
 
         Path dockerZarsFhirConfigPropertiesFile = Paths
-                .get("../../codex-processes-docker-test-setup/zars/fhir/app/conf/config.properties");
+                .get("../../codex-processes-ap2-docker-test-setup/zars/fhir/app/conf/config.properties");
         logger.info("Copying config.properties to {}", dockerZarsFhirConfigPropertiesFile);
         writeProperties(dockerZarsFhirConfigPropertiesFile, dockerZarsFhirConfigProperties);
     }

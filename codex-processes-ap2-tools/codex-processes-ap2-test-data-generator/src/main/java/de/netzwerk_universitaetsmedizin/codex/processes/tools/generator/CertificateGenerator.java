@@ -416,7 +416,7 @@ public class CertificateGenerator {
 
     public void copyDockerTestCertificates() {
         X509Certificate testCaCertificate = ca.getCertificate();
-        Path baseFolder = Paths.get("..", "..", "codex-processes-docker-test-setup", "certs");
+        Path baseFolder = Paths.get("..", "..", "codex-processes-ap2-docker-test-setup", "certs");
         Path caCertFile = baseFolder.resolve("ca.pem");
         logger.info("Copying Test CA certificate file to {}", caCertFile.toString());
         writeCertificate(caCertFile, testCaCertificate);
@@ -427,8 +427,8 @@ public class CertificateGenerator {
         writeP12File(bpeClientP12File, clientCertFiles.getP12KeyStore());
 
         List<String> commonNames = Arrays.asList("dic-1", "dic-2", "zars");
-        commonNames.forEach(cn -> copyProxyFiles("codex-processes-docker-test-setup/" + cn, cn));
-        commonNames.forEach(cn -> copyClientCertFiles("codex-processes-docker-test-setup/" + cn, cn + "-client"));
+        commonNames.forEach(cn -> copyProxyFiles("codex-processes-ap2-docker-test-setup/" + cn, cn));
+        commonNames.forEach(cn -> copyClientCertFiles("codex-processes-ap2-docker-test-setup/" + cn, cn + "-client"));
     }
 
     private void copyProxyFiles(String dockerTestFolder, String commonName) {

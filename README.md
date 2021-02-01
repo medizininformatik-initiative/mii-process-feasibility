@@ -1,6 +1,6 @@
 # CODEX Processes
 
-Business processes for the NUM CODEX project as plugins for the [HiGHmed Data Sharing Framework][1].
+Business processes for the NUM CODEX project (AP2) as plugins for the [HiGHmed Data Sharing Framework][1].
 
 ## Build
 
@@ -30,8 +30,8 @@ mvn clean package
 
 ## Usage
 
-You can test the processes by following the [README](codex-processes-docker-test-setup/README.md) in
-the `codex-processes-docker-test-setup` directory.
+You can test the processes by following the [README](codex-processes-ap2-docker-test-setup/README.md) in
+the `codex-processes-ap2-docker-test-setup` directory.
 
 ## License
 

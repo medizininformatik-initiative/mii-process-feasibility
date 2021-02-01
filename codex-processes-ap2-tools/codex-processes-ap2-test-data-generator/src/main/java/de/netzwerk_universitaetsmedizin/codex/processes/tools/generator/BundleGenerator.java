@@ -121,15 +121,15 @@ public class BundleGenerator {
     }
 
     public void copyDockerTestBundles() {
-        Path dic1BundleFile = Paths.get("../../codex-processes-docker-test-setup/dic-1/fhir/app/conf/bundle.xml");
+        Path dic1BundleFile = Paths.get("../../codex-processes-ap2-docker-test-setup/dic-1/fhir/app/conf/bundle.xml");
         logger.info("Copying fhir bundle to {}", dic1BundleFile);
         writeBundle(dic1BundleFile, dic1Bundle);
 
-        Path dic2BundleFile = Paths.get("../../codex-processes-docker-test-setup/dic-2/fhir/app/conf/bundle.xml");
+        Path dic2BundleFile = Paths.get("../../codex-processes-ap2-docker-test-setup/dic-2/fhir/app/conf/bundle.xml");
         logger.info("Copying fhir bundle to {}", dic2BundleFile);
         writeBundle(dic2BundleFile, dic2Bundle);
 
-        Path dic3BundleFile = Paths.get("../../codex-processes-docker-test-setup/zars/fhir/app/conf/bundle.xml");
+        Path dic3BundleFile = Paths.get("../../codex-processes-ap2-docker-test-setup/zars/fhir/app/conf/bundle.xml");
         logger.info("Copying fhir bundle to {}", dic3BundleFile);
         writeBundle(dic3BundleFile, zarsBundle);
 

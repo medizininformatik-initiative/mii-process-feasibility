@@ -8,7 +8,7 @@
 
     <parent>
         <groupId>de.netzwerk-universitaetsmedizin.codex</groupId>
-        <artifactId>codex-processes</artifactId>
+        <artifactId>codex-processes-ap2</artifactId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
@@ -69,7 +69,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-docker-test-setup/dic-1/bpe/app/process
+                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/app/process
                             </outputDirectory>
                         </configuration>
                     </execution>
@@ -86,7 +86,7 @@
                                     <artifactId>hapi-fhir-client</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-docker-test-setup/dic-1/bpe/app/plugin</outputDirectory>
+                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/app/plugin</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -103,7 +103,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-docker-test-setup/dic-2/bpe/app/process
+                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/app/process
                             </outputDirectory>
                         </configuration>
                     </execution>
@@ -120,7 +120,7 @@
                                     <artifactId>hapi-fhir-client</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-docker-test-setup/dic-2/bpe/app/plugin</outputDirectory>
+                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/app/plugin</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -137,7 +137,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-docker-test-setup/zars/bpe/app/process</outputDirectory>
+                            <outputDirectory>../codex-processes-ap2-docker-test-setup/zars/bpe/app/process</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -153,7 +153,7 @@
                                     <artifactId>hapi-fhir-client</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-docker-test-setup/zars/bpe/app/plugin</outputDirectory>
+                            <outputDirectory>../codex-processes-ap2-docker-test-setup/zars/bpe/app/plugin</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -164,42 +164,42 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>../codex-processes-docker-test-setup/dic-1/bpe/app/plugin</directory>
+                            <directory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/app/plugin</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-docker-test-setup/dic-1/bpe/app/process</directory>
+                            <directory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/app/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-docker-test-setup/dic-2/bpe/app/plugin</directory>
+                            <directory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/app/plugin</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-docker-test-setup/dic-2/bpe/app/process</directory>
+                            <directory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/app/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-docker-test-setup/zars/bpe/app/plugin</directory>
+                            <directory>../codex-processes-ap2-docker-test-setup/zars/bpe/app/plugin</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-docker-test-setup/zars/bpe/app/process</directory>
+                            <directory>../codex-processes-ap2-docker-test-setup/zars/bpe/app/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
