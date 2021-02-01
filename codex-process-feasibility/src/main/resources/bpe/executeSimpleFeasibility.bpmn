@@ -25,7 +25,7 @@
                     <camunda:inputParameter name="processDefinitionKey">requestSimpleFeasibility
                     </camunda:inputParameter>
                     <camunda:inputParameter name="profile">
-                        http://netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility
+                        https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility
                     </camunda:inputParameter>
                 </camunda:inputOutput>
             </bpmn:extensionElements>

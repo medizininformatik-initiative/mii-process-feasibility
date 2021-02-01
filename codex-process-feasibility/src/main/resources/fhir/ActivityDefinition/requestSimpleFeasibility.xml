@@ -35,7 +35,7 @@
         </extension>
         <extension url="task-profile">
             <valueCanonical
-                    value="http://netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-request-simple-feasibility"/>
+                    value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-request-simple-feasibility"/>
         </extension>
     </extension>
     <extension url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization">
@@ -68,7 +68,7 @@
         </extension>
         <extension url="task-profile">
             <valueCanonical
-                    value="http://netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility"/>
+                    value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility"/>
         </extension>
     </extension>
     <url value="http://highmed.org/bpe/Process/requestSimpleFeasibility"/>

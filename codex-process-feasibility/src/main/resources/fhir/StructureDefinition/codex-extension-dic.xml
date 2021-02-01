@@ -5,7 +5,7 @@
             <code value="REMOTE"/>
         </tag>
     </meta>
-    <url value="http://netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/dic"/>
+    <url value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/dic"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
     <name value="Dic"/>
@@ -31,7 +31,7 @@
         </element>
         <element id="Extension.url">
             <path value="Extension.url"/>
-            <fixedUri value="http://netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/dic"/>
+            <fixedUri value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/dic"/>
         </element>
         <element id="Extension.value[x]">
             <path value="Extension.value[x]"/>

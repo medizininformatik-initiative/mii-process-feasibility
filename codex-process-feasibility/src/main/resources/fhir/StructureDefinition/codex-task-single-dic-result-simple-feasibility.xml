@@ -5,7 +5,7 @@
             <code value="REMOTE"/>
         </tag>
     </meta>
-    <url value="http://netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility"/>
+    <url value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
     <name value="TaskSingleDicResultSimpleFeasibility"/>
@@ -75,7 +75,7 @@
                     <valueString value="TaskInputParameterType"/>
                 </extension>
                 <strength value="required"/>
-                <valueSet value="http://netzwerk-universitaetsmedizin.de/fhir/ValueSet/feasibility"/>
+                <valueSet value="https://www.netzwerk-universitaetsmedizin.de/fhir/ValueSet/feasibility"/>
             </binding>
         </element>
         <element id="Task.input:measure-report.type.coding">
@@ -86,7 +86,7 @@
         <element id="Task.input:measure-report.type.coding.system">
             <path value="Task.input.type.coding.system"/>
             <min value="1"/>
-            <fixedUri value="http://netzwerk-universitaetsmedizin.de/fhir/CodeSystem/feasibility"/>
+            <fixedUri value="https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/feasibility"/>
         </element>
         <element id="Task.input:measure-report.type.coding.code">
             <path value="Task.input.type.coding.code"/>

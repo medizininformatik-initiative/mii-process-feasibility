@@ -5,7 +5,7 @@
             <code value="REMOTE"/>
         </tag>
     </meta>
-    <url value="http://netzwerk-universitaetsmedizin.de/fhir/CodeSystem/feasibility"/>
+    <url value="https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/feasibility"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
     <name value="Codex_Feasibility"/>

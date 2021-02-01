@@ -41,7 +41,7 @@
         </extension>
         <extension url="task-profile">
             <valueCanonical
-                    value="http://netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/task-execute-simple-feasibility"/>
+                    value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/task-execute-simple-feasibility"/>
         </extension>
     </extension>
     <url value="http://highmed.org/bpe/Process/executeSimpleFeasibility"/>
