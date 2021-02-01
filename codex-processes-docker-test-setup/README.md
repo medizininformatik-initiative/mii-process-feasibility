@@ -26,6 +26,12 @@ Before you can start any site, you have to run maven in order to build plugins, 
 ./rebuild.sh
 ```
 
+If you use Linux, you have to set some rights on directories where containers should write into:
+
+```sh
+./set-rights.sh
+```
+
 If you changed a lot of things and like to start fresh, it's a good idea to delete all volumes:
 
 ```sh
@@ -59,7 +65,7 @@ zars, but also the other sites, you have to use the domain name `zars` here. Wit
 resolver, which will resolve the host `zars` to localhost. An alternative would be to create an entry in
 your `/etc/hosts`. The next line in the command is about Client and CA Certificates.
 
-After that, you can start the ZARS Business Process Engine:
+After that, you can start the ZARS Business Process Engine in a separate terminal:
 
 ```sh
 docker-compose up zars-bpe-app
@@ -87,6 +93,32 @@ After that, you can start the DIC-1 Business Process Engine and Blaze:
 ```sh
 docker-compose up dic-1-bpe-app
 ```
+
+Continue with DIC-2.
+
+After that we can POST the first Task to the ZARS:
+
+```sh
+curl --resolve zars:443:127.0.0.1 \
+  --cacert certs/ca.pem --cert-type P12 --cert certs/test-user.p12:password \
+  -H accept:application/fhir+json \
+  -H content-type:application/fhir+json \
+  -d @data/feasibility-bundle.json \
+  -s https://zars/fhir/ |\
+  jq .
+```
+
+After exporting the Task ID to $TASK_ID, you can fetch the task:
+
+```sh
+curl --resolve zars:443:127.0.0.1 \
+  --cacert certs/ca.pem --cert-type P12 --cert certs/test-user.p12:password \
+  -H accept:application/fhir+json \
+  -s "https://zars/fhir/Task/${TASK_ID}" |\
+  jq .
+```
+
+The task should be completed and contain an output with the reference of the MeasureReport created.
 
 ## Debugging
 
