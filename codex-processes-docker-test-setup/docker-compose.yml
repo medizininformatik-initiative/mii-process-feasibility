@@ -214,10 +214,7 @@ services:
     - type: bind
       source: ./dic-1/bpe/app/last_event
       target: /opt/bpe/last_event
-    ports:
-    - 5005:5005
     environment:
-      EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       TZ: Europe/Berlin
     networks:
       dic-1-bpe-frontend:
