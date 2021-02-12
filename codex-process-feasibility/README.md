@@ -10,6 +10,8 @@ As you can see in the figure above, the feasibility query process starts with a 
 
 ## Request and Execute Process in Detail
 
+### Distribute Query
+
 Messages, queries and results are represented by FHIR resources. The following three figures show the entire FHIR resource flow. In difference to the figure above, only one DIZ is represented, but both, the ZARS and the DIZ are divided into its individual components. On the ZARS side the components are the FHIR communication server and the BPE, were the DIZ contains an additional Blaze FHIR server.
 
 ![fig-1](./docs/codex-feasibility-process-02.png)
@@ -17,6 +19,8 @@ Messages, queries and results are represented by FHIR resources. The following t
 Like in the high-level overview, the process starts with the `request` message (1). Beside the FHIR [Task][1] resource for the message, two other FHIR resources will be sent to the ZARS FHIR server. The first one is the [Measure][2] resource specifying the population criteria that are defined in the second resource, the [Library][3]. All three resources are put into a transaction [Bundle][4] in order to create all together in one transaction.
 
 After the ZARS FHIR server receives the resources, it notifies the ZARS BPE via websocket subscription by transmitting the Task resource (2). The incoming Task resource starts the `request` process that implements the query distribution to all appropriate DIZ'es. To each DIZ, an `execute` message (3) is sent via a Task resource.
+
+### Execute Query
 
 After arriving at the DIZ FHIR communication server, the `execute` Task resource is transferred to the DIZ BPE via  websocket subscription (4), starting the `execute` process.
 
@@ -27,6 +31,8 @@ In each DIZ, the `execute` process starts by fetching the Measure and Library re
 In the next step, the `execute` process stores the Measure and Library resources (6) to the Blaze FHIR server in order to be able to execute the [$evaluate-measure][5] operation. The resulting [MeasureReport][6] resource is transferred back to the DIZ BPE (7).
 
 After receiving the MeasureReport, the DIZ BPE stores it on the DIZ FHIR communication server (8) in order to make it available for the ZARS.
+
+### Retrieve Results
 
 In its last step, the `execute` process sends a `result` message (9) to the ZARS. The `result` message references the MeasureReport, so that it can be retrieved by the ZARS.
 
