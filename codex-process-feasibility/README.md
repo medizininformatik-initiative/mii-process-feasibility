@@ -40,7 +40,7 @@ As last step, the original `request` Task is updated with a reference to the Mea
 
 ![fig-1](./docs/requestSimpleFeasibility.png)
 
-In the [Business Process Model and Notation][7] (BPMN) model of the `request` process, the start message it the `request` message. After selecting the request targets (the DIZ'es), the `execute` messages are send in the next step. After that a subprocess is started for each target, which will wait for the `result` messages to arrive.
+In the [Business Process Model and Notation][7] (BPMN) model of the `request` process, the start message is the `request` message. After selecting the request targets (the DIZ'es), the `execute` messages are send in the next step. After that a subprocess is started for each target, which will wait for the `result` messages to arrive.
 
 __TODO:__ [Support Live Result Updates](https://github.com/num-codex/codex-processes-ap2/issues/6)
 
