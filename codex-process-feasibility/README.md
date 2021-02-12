@@ -18,7 +18,7 @@ Like in the high-level overview, the process starts with the `request` message 
 
 After the ZARS FHIR server receives the resources, it notifies the ZARS BPE via websocket subscription by transmitting the Task resource (2). The incoming Task resource starts the `request` process that implements the query distribution to all appropriate DIZ'es. To each DIZ, an `execute` message (3) is sent via a Task resource.
 
-After arriving at the DIZ FHIR communication server, the `execure` Task resource is transferred to the DIZ BPE via  websocket subscription (4), starting the `execute` prozess.
+After arriving at the DIZ FHIR communication server, the `execute` Task resource is transferred to the DIZ BPE via  websocket subscription (4), starting the `execute` process.
 
 ![fig-1](./docs/codex-feasibility-process-03.png)
 
