@@ -40,7 +40,7 @@ As last step, the original `request` Task is updated with a reference to the Mea
 
 ![fig-1](./docs/requestSimpleFeasibility.png)
 
-In the BPMN model of the `request` process, the start message it the `request` message. After selecting the request targets (the DIZ'es), the `execute` messages are send in the next step. After that a subprocess is started for each target, which will wait for the `result` messages to arrive.
+In the [Business Process Model and Notation][7] (BPMN) model of the `request` process, the start message it the `request` message. After selecting the request targets (the DIZ'es), the `execute` messages are send in the next step. After that a subprocess is started for each target, which will wait for the `result` messages to arrive.
 
 __TODO:__ [Support Live Result Updates](https://github.com/num-codex/codex-processes-ap2/issues/6)
 
@@ -56,3 +56,4 @@ The BPMN model of the `execute` process is strait forward an already explained i
 [4]: <https://www.hl7.org/fhir/bundle.html>
 [5]: <https://www.hl7.org/fhir/operation-measure-evaluate-measure.html>
 [6]: <https://www.hl7.org/fhir/measurereport.html>
+[7]: <https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation>
