@@ -1,6 +1,6 @@
 # NUM CODEX Feasibility Process
 
-The feasibility process is used to run a distributed feasibility query. A feasibility query contains multiple criteria and returns one population count per organization. The feasibility query is requested by one organization (usually the Zentrale Antrags- und Registerstelle (ZARS)) and executed in multiple organizations (usually Datenintegrationszentren (DIZ)).
+A distributed feasibility query runs based on the feasibility process. A feasibility query contains multiple criteria and returns one population count per organization. An organization (usually the Zentrale Antrags- und Registerstelle (ZARS)) requests a feasibility query to start off the process. Once started multiple organizations (usually Datenintegrationszentren (DIZ)) execute this query and report results back.
 
 ## High-Level Overview
 
