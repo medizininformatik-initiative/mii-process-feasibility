@@ -60,7 +60,7 @@ __TODO:__ [Support Live Result Updates](https://github.com/num-codex/codex-proce
 
 ![fig-1](./docs/executeSimpleFeasibility.png)
 
-The BPMN model of the `execute` process is strait forward an already explained in detail above.
+The BPMN model of the `execute` process is straightforward and already explained in detail above.
 
 [1]: <https://www.hl7.org/FHIR/task.html>
 [2]: <https://www.hl7.org/fhir/measure.html>
