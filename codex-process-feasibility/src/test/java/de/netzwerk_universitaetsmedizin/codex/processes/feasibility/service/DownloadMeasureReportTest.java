@@ -14,7 +14,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
@@ -27,6 +26,8 @@ import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.varia
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -54,8 +55,8 @@ public class DownloadMeasureReportTest {
     @Test
     public void testDoExecute_MissingMeasureReportReference() {
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK)).thenReturn(task);
-        when(taskHelper.getFirstInputParameterReferenceValue(Mockito.eq(task), Mockito.eq(CODESYSTEM_FEASIBILITY),
-                Mockito.eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE)))
+        when(taskHelper.getFirstInputParameterReferenceValue(eq(task), eq(CODESYSTEM_FEASIBILITY),
+                eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE)))
                 .thenReturn(Optional.empty());
 
         Assert.assertThrows(RuntimeException.class, () -> service.execute(execution));
@@ -67,12 +68,12 @@ public class DownloadMeasureReportTest {
 
         final String measureReportId = "12345";
         final Reference measureReportRef = new Reference().setReference("http://localhost/MeasureReport/" + measureReportId);
-        when(taskHelper.getFirstInputParameterReferenceValue(Mockito.eq(task), Mockito.eq(CODESYSTEM_FEASIBILITY),
-                Mockito.eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE)))
+        when(taskHelper.getFirstInputParameterReferenceValue(eq(task), eq(CODESYSTEM_FEASIBILITY),
+                eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE)))
                 .thenReturn(Optional.of(measureReportRef));
         when(clientProvider.getLocalWebserviceClient())
                 .thenReturn(localWebserviceClient);
-        when(clientProvider.getRemoteWebserviceClient(Mockito.anyString()))
+        when(clientProvider.getRemoteWebserviceClient(anyString()))
                 .thenReturn(localWebserviceClient);
 
         final CodeableConcept coding = new CodeableConcept();
@@ -80,7 +81,7 @@ public class DownloadMeasureReportTest {
                 .setCode(coding);
         final MeasureReport measureReport = new MeasureReport()
                 .setGroup(List.of(measureReportGroup));
-        when(localWebserviceClient.read(ArgumentMatchers.<Class<MeasureReport>>any(), Mockito.eq(measureReportId)))
+        when(localWebserviceClient.read(ArgumentMatchers.<Class<MeasureReport>>any(), eq(measureReportId)))
                 .thenReturn(measureReport);
         final Reference requesterRef = new Reference().setReference("http://localhost.requester/");
         when(task.getRequester()).thenReturn(requesterRef);

@@ -18,7 +18,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -30,6 +29,9 @@ import java.util.List;
 
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_ID;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -135,12 +137,12 @@ public class EvaluateMeasureTest {
     public void testDoExecute() throws Exception {
         when(execution.getVariable(VARIABLE_MEASURE_ID)).thenReturn("id-115517");
         when(storeClient.operation()).thenReturn(storeOperation);
-        when(storeOperation.onInstance(Mockito.anyString())
-                .named(Mockito.anyString())
-                .withParameter(Mockito.any(), Mockito.eq("periodStart"), Mockito.any(DateType.class))
-                .andParameter(Mockito.eq("periodEnd"), Mockito.any(DateType.class))
+        when(storeOperation.onInstance(anyString())
+                .named(anyString())
+                .withParameter(any(), eq("periodStart"), any(DateType.class))
+                .andParameter(eq("periodEnd"), any(DateType.class))
                 .useHttpGet()
-                .returnResourceType(Mockito.any())
+                .returnResourceType(any())
                 .execute())
                 .thenReturn(measureReport);
 

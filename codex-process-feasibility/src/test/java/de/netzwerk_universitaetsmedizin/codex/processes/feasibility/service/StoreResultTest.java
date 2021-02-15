@@ -1,6 +1,5 @@
 package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 
-import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.MeasureReport;
@@ -10,11 +9,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
+import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_AGGREGATED_MEASURE_REPORT;
 import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,9 +44,8 @@ public class StoreResultTest {
 
         when(execution.getVariable(VARIABLE_AGGREGATED_MEASURE_REPORT)).thenReturn(measureReport);
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK)).thenReturn(task);
-        when(taskHelper.createOutput(Mockito.eq(ConstantsFeasibility.CODESYSTEM_FEASIBILITY),
-                Mockito.eq(ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
-                Mockito.any(Reference.class)))
+        when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
+                any(Reference.class)))
                 .thenReturn(output);
 
         service.execute(execution);

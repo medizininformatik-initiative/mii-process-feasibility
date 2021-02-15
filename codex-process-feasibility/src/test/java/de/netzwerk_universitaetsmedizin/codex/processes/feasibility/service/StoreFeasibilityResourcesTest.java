@@ -12,12 +12,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_ID;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,7 +49,7 @@ public class StoreFeasibilityResourcesTest {
                                 .setLocation("http://localhost/some-location/" + id))
         ));
 
-        when(storeClient.transaction().withBundle(Mockito.any(IBaseBundle.class)).execute())
+        when(storeClient.transaction().withBundle(any(IBaseBundle.class)).execute())
                 .thenReturn(transactionResponse);
 
         service.doExecute(execution);

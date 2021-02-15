@@ -13,7 +13,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Optional;
@@ -23,6 +22,7 @@ import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
 import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,8 +47,8 @@ public class SelectResponseTargetTest {
     @Test
     public void testDoExecute() throws Exception {
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK)).thenReturn(task);
-        when(taskHelper.getFirstInputParameterStringValue(Mockito.eq(task), Mockito.eq(CODESYSTEM_HIGHMED_BPMN),
-                Mockito.eq(CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY)))
+        when(taskHelper.getFirstInputParameterStringValue(eq(task), eq(CODESYSTEM_HIGHMED_BPMN),
+                eq(CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY)))
                 .thenReturn(Optional.of("correlation-key"));
 
         final Reference reference = new Reference()
@@ -59,7 +59,7 @@ public class SelectResponseTargetTest {
         when(task.getRequester()).thenReturn(reference);
 
         service.execute(execution);
-        verify(execution).setVariable(Mockito.eq(BPMN_EXECUTION_VARIABLE_TARGET), targetsValuesCaptor.capture());
+        verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGET), targetsValuesCaptor.capture());
         assertEquals("correlation-key", targetsValuesCaptor.getValue().getValue().getCorrelationKey());
         assertEquals("requester-id", targetsValuesCaptor.getValue().getValue().getTargetOrganizationIdentifierValue());
     }

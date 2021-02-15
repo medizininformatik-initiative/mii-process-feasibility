@@ -1,6 +1,5 @@
 package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 
-import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
@@ -17,15 +16,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Optional;
 
+import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
+import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
 import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -53,8 +56,8 @@ public class DownloadFeasibilityResourcesTest {
     @Test
     public void testDoExecute_NoMeasureReference() {
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK)).thenReturn(task);
-        when(taskHelper.getFirstInputParameterReferenceValue(task, ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
-                ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
+        when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
+                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
                 .thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
@@ -70,14 +73,14 @@ public class DownloadFeasibilityResourcesTest {
 
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
-        when(taskHelper.getFirstInputParameterReferenceValue(task, ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
-                ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
+        when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
+                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
                 .thenReturn(Optional.of(measureRef));
         when(clientProvider.getLocalWebserviceClient())
                 .thenReturn(localWebserviceClient);
-        when(clientProvider.getRemoteWebserviceClient(Mockito.anyString()))
+        when(clientProvider.getRemoteWebserviceClient(anyString()))
                 .thenReturn(localWebserviceClient);
-        when(localWebserviceClient.searchWithStrictHandling(Mockito.any(), Mockito.anyMap()))
+        when(localWebserviceClient.searchWithStrictHandling(any(), anyMap()))
                 .thenReturn(measureOnlyBundle);
         when(localWebserviceClient.getBaseUrl()).thenReturn("http://localhost");
 
@@ -104,14 +107,14 @@ public class DownloadFeasibilityResourcesTest {
 
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
-        when(taskHelper.getFirstInputParameterReferenceValue(task, ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
-                ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
+        when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
+                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
                 .thenReturn(Optional.of(measureRef));
         when(clientProvider.getLocalWebserviceClient())
                 .thenReturn(localWebserviceClient);
-        when(clientProvider.getRemoteWebserviceClient(Mockito.anyString()))
+        when(clientProvider.getRemoteWebserviceClient(anyString()))
                 .thenReturn(localWebserviceClient);
-        when(localWebserviceClient.searchWithStrictHandling(Mockito.any(), Mockito.anyMap()))
+        when(localWebserviceClient.searchWithStrictHandling(any(), anyMap()))
                 .thenReturn(measureOnlyBundle);
         when(localWebserviceClient.getBaseUrl()).thenReturn("http://localhost");
 
@@ -138,14 +141,14 @@ public class DownloadFeasibilityResourcesTest {
 
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
-        when(taskHelper.getFirstInputParameterReferenceValue(task, ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
-                ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
+        when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
+                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
                 .thenReturn(Optional.of(measureRef));
         when(clientProvider.getLocalWebserviceClient())
                 .thenReturn(localWebserviceClient);
-        when(clientProvider.getRemoteWebserviceClient(Mockito.anyString()))
+        when(clientProvider.getRemoteWebserviceClient(anyString()))
                 .thenReturn(localWebserviceClient);
-        when(localWebserviceClient.searchWithStrictHandling(Mockito.any(), Mockito.anyMap()))
+        when(localWebserviceClient.searchWithStrictHandling(any(), anyMap()))
                 .thenReturn(measureOnlyBundle);
         when(localWebserviceClient.getBaseUrl()).thenReturn("http://localhost");
 
@@ -176,17 +179,17 @@ public class DownloadFeasibilityResourcesTest {
 
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
-        when(taskHelper.getFirstInputParameterReferenceValue(task, ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
-                ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
+        when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
+                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
                 .thenReturn(Optional.of(measureRef));
         when(clientProvider.getLocalWebserviceClient())
                 .thenReturn(localWebserviceClient);
-        when(clientProvider.getRemoteWebserviceClient(Mockito.anyString()))
+        when(clientProvider.getRemoteWebserviceClient(anyString()))
                 .thenReturn(localWebserviceClient);
-        when(localWebserviceClient.searchWithStrictHandling(Mockito.any(), Mockito.anyMap()))
+        when(localWebserviceClient.searchWithStrictHandling(any(), anyMap()))
                 .thenReturn(measureOnlyBundle);
         when(localWebserviceClient.getBaseUrl()).thenReturn("http://localhost");
-        
+
         service.execute(execution);
 
         verify(execution).setVariable(VARIABLE_MEASURE, measure);
