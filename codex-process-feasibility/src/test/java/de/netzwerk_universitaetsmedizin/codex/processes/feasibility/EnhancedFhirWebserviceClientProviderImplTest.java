@@ -1,6 +1,7 @@
 package de.netzwerk_universitaetsmedizin.codex.processes.feasibility;
 
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
+import org.highmed.fhir.client.FhirWebserviceClient;
 import org.hl7.fhir.r4.model.IdType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,10 +9,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class EnhancedFhirWebserviceClientProviderImplTest {
+
+    @Mock
+    private FhirWebserviceClient client;
 
     @Mock
     private FhirWebserviceClientProvider clientProvider;
@@ -22,15 +28,21 @@ public class EnhancedFhirWebserviceClientProviderImplTest {
     @Test
     public void testGetWebserviceClient_Local() {
         final IdType idType = new IdType("Something/id-123456");
-        enhancedFhirWebserviceClientProvider.getWebserviceClient(idType);
-        verify(clientProvider).getLocalWebserviceClient();
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
+
+        final FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getWebserviceClient(idType);
+
+        assertSame(client, webserviceClient);
     }
 
     @Test
     public void testGetWebserviceClient_Remote() {
         final IdType idType = new IdType("http://remote.host/Something/id-123456");
-        enhancedFhirWebserviceClientProvider.getWebserviceClient(idType);
-        verify(clientProvider).getRemoteWebserviceClient("http://remote.host");
+        when(clientProvider.getRemoteWebserviceClient("http://remote.host")).thenReturn(client);
+
+        final FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getWebserviceClient(idType);
+
+        assertSame(client, webserviceClient);
     }
 
     @Test

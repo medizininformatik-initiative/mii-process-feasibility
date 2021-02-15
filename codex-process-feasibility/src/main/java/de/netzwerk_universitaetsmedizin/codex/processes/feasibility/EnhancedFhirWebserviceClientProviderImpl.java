@@ -6,7 +6,7 @@ import org.hl7.fhir.r4.model.IdType;
 
 public class EnhancedFhirWebserviceClientProviderImpl implements EnhancedFhirWebserviceClientProvider {
 
-    private FhirWebserviceClientProvider fhirClientProvider;
+    private final FhirWebserviceClientProvider fhirClientProvider;
 
     public EnhancedFhirWebserviceClientProviderImpl(FhirWebserviceClientProvider fhirClientProvider) {
         this.fhirClientProvider = fhirClientProvider;

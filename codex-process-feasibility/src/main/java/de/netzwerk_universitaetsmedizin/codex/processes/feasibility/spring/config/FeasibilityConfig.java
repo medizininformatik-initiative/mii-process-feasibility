@@ -18,7 +18,6 @@ import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.Stor
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.organization.OrganizationProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,21 +25,31 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FeasibilityConfig {
 
-    @Autowired
-    private FhirWebserviceClientProvider fhirClientProvider;
+    private final FhirWebserviceClientProvider fhirClientProvider;
 
-    @Autowired
-    @Qualifier("store")
-    private IGenericClient storeClient;
+    private final EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider;
 
-    @Autowired
-    private OrganizationProvider organizationProvider;
+    private final IGenericClient storeClient;
 
-    @Autowired
-    private TaskHelper taskHelper;
+    private final OrganizationProvider organizationProvider;
 
-    @Autowired
-    private FhirContext fhirContext;
+    private final TaskHelper taskHelper;
+
+    private final FhirContext fhirContext;
+
+    public FeasibilityConfig(FhirWebserviceClientProvider fhirClientProvider,
+                             EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider,
+                             @Qualifier("store") IGenericClient storeClient,
+                             OrganizationProvider organizationProvider,
+                             TaskHelper taskHelper,
+                             FhirContext fhirContext) {
+        this.fhirClientProvider = fhirClientProvider;
+        this.enhancedFhirClientProvider = enhancedFhirClientProvider;
+        this.storeClient = storeClient;
+        this.organizationProvider = organizationProvider;
+        this.taskHelper = taskHelper;
+        this.fhirContext = fhirContext;
+    }
 
     @Bean
     public EnhancedFhirWebserviceClientProvider enhancedFhirWebserviceClientProvider() {
@@ -82,7 +91,7 @@ public class FeasibilityConfig {
 
     @Bean
     public DownloadFeasibilityResources downloadFeasibilityResources() {
-        return new DownloadFeasibilityResources(enhancedFhirWebserviceClientProvider(), taskHelper, organizationProvider);
+        return new DownloadFeasibilityResources(enhancedFhirClientProvider, taskHelper, organizationProvider);
     }
 
     @Bean
