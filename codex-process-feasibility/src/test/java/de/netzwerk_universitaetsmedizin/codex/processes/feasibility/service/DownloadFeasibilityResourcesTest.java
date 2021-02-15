@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
+import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,7 +52,7 @@ public class DownloadFeasibilityResourcesTest {
 
     @Test
     public void testDoExecute_NoMeasureReference() {
-        when(execution.getVariable(Mockito.eq("task"))).thenReturn(task);
+        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK)).thenReturn(task);
         when(taskHelper.getFirstInputParameterReferenceValue(task, ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
                 ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
                 .thenReturn(Optional.empty());
@@ -67,7 +68,7 @@ public class DownloadFeasibilityResourcesTest {
         final Bundle measureOnlyBundle = new Bundle(new Enumeration<>(new Bundle.BundleTypeEnumFactory()));
         measureOnlyBundle.setType(Bundle.BundleType.BATCHRESPONSE);
 
-        when(execution.getVariable(Mockito.eq("task")))
+        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterReferenceValue(task, ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
                 ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
@@ -101,7 +102,7 @@ public class DownloadFeasibilityResourcesTest {
         measureOnlyBundle.addEntry(patientEntry);
         measureOnlyBundle.addEntry(measureEntry);
 
-        when(execution.getVariable(Mockito.eq("task")))
+        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterReferenceValue(task, ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
                 ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
@@ -135,7 +136,7 @@ public class DownloadFeasibilityResourcesTest {
         measureOnlyBundle.addEntry(measureEntry);
         measureOnlyBundle.addEntry(patientEntry);
 
-        when(execution.getVariable(Mockito.eq("task")))
+        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterReferenceValue(task, ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
                 ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
@@ -173,7 +174,7 @@ public class DownloadFeasibilityResourcesTest {
         measureOnlyBundle.addEntry(measureEntry);
         measureOnlyBundle.addEntry(libraryEntry);
 
-        when(execution.getVariable(Mockito.eq("task")))
+        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterReferenceValue(task, ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
                 ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))

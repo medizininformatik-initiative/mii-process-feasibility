@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_AGGREGATED_MEASURE_REPORT;
+import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +41,7 @@ public class StoreResultTest {
         final Task.TaskOutputComponent output = new Task.TaskOutputComponent();
 
         when(execution.getVariable(VARIABLE_AGGREGATED_MEASURE_REPORT)).thenReturn(measureReport);
-        when(execution.getVariable("task")).thenReturn(task);
+        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK)).thenReturn(task);
         when(taskHelper.createOutput(Mockito.eq(ConstantsFeasibility.CODESYSTEM_FEASIBILITY),
                 Mockito.eq(ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
                 Mockito.any(Reference.class)))

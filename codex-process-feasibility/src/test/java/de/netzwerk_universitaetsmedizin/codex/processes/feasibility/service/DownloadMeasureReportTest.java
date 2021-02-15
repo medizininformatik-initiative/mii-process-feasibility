@@ -25,6 +25,7 @@ import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.varia
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_SINGLE_RESULT;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.EXTENSION_DIC_URI;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
+import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,7 +53,7 @@ public class DownloadMeasureReportTest {
 
     @Test
     public void testDoExecute_MissingMeasureReportReference() {
-        when(execution.getVariable(Mockito.eq("task"))).thenReturn(task);
+        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK)).thenReturn(task);
         when(taskHelper.getFirstInputParameterReferenceValue(Mockito.eq(task), Mockito.eq(CODESYSTEM_FEASIBILITY),
                 Mockito.eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE)))
                 .thenReturn(Optional.empty());
@@ -62,7 +63,7 @@ public class DownloadMeasureReportTest {
 
     @Test
     public void testDoExecute() throws Exception {
-        when(execution.getVariable(Mockito.eq("task"))).thenReturn(task);
+        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK)).thenReturn(task);
 
         final String measureReportId = "12345";
         final Reference measureReportRef = new Reference().setReference("http://localhost/MeasureReport/" + measureReportId);

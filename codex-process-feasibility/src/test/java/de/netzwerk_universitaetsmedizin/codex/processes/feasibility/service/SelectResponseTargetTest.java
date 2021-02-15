@@ -19,6 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Optional;
 
 import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TARGET;
+import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
 import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY;
 import static org.junit.Assert.assertEquals;
@@ -45,7 +46,7 @@ public class SelectResponseTargetTest {
 
     @Test
     public void testDoExecute() throws Exception {
-        when(execution.getVariable(Mockito.eq("task"))).thenReturn(task);
+        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK)).thenReturn(task);
         when(taskHelper.getFirstInputParameterStringValue(Mockito.eq(task), Mockito.eq(CODESYSTEM_HIGHMED_BPMN),
                 Mockito.eq(CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY)))
                 .thenReturn(Optional.of("correlation-key"));
