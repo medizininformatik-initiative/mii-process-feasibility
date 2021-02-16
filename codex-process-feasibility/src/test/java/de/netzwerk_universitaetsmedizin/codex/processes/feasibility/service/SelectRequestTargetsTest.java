@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TARGETS;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,7 +40,8 @@ public class SelectRequestTargetsTest {
 
     @Test
     public void testDoExecute_NoTargets() {
-        when(orgProvider.getRemoteIdentifiers()).thenReturn(new ArrayList<>());
+        when(orgProvider.getRemoteIdentifiers())
+                .thenReturn(new ArrayList<>());
         service.doExecute(execution);
 
         verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGETS), targetsValuesCaptor.capture());
@@ -48,38 +50,37 @@ public class SelectRequestTargetsTest {
 
     @Test
     public void testDoExecute_SingleTarget() {
-        final Identifier id = new Identifier();
-        id.setValue("http://localhost/id-140423");
+        final Identifier id = new Identifier()
+                .setValue("http://localhost/foo");
 
-        when(orgProvider.getRemoteIdentifiers()).thenReturn(new ArrayList<>(List.of(id)));
+        when(orgProvider.getRemoteIdentifiers())
+                .thenReturn(new ArrayList<>(List.of(id)));
         service.doExecute(execution);
 
         verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGETS), targetsValuesCaptor.capture());
         assertEquals(1, targetsValuesCaptor.getValue().getValue().getEntries().size());
-    }
-
-    @Test
-    public void testDoExecute_SingleTargetWithoutValue() {
-        final Identifier id = new Identifier();
-
-        when(orgProvider.getRemoteIdentifiers()).thenReturn(new ArrayList<>(List.of(id)));
-        service.doExecute(execution);
-
-        verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGETS), targetsValuesCaptor.capture());
-        assertEquals(1, targetsValuesCaptor.getValue().getValue().getEntries().size());
+        assertEquals("http://localhost/foo", targetsValuesCaptor.getValue().getValue().getEntries().get(0)
+                .getTargetOrganizationIdentifierValue());
     }
 
     @Test
     public void testDoExecute_MultipleTargets() {
-        final Identifier idA = new Identifier();
-        idA.setValue("http://localhost/id-140423");
-        final Identifier idB = new Identifier();
-        idB.setValue("http://localhost/id-140556");
+        final Identifier idA = new Identifier()
+                .setValue("http://localhost/foo");
+        final Identifier idB = new Identifier()
+                .setValue("http://localhost/bar");
 
-        when(orgProvider.getRemoteIdentifiers()).thenReturn(new ArrayList<>(List.of(idA, idB)));
+        when(orgProvider.getRemoteIdentifiers())
+                .thenReturn(new ArrayList<>(List.of(idA, idB)));
         service.doExecute(execution);
 
         verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGETS), targetsValuesCaptor.capture());
         assertEquals(2, targetsValuesCaptor.getValue().getValue().getEntries().size());
+        assertEquals("http://localhost/foo", targetsValuesCaptor.getValue().getValue().getEntries().get(0)
+                .getTargetOrganizationIdentifierValue());
+        assertEquals("http://localhost/bar", targetsValuesCaptor.getValue().getValue().getEntries().get(1)
+                .getTargetOrganizationIdentifierValue());
+        assertNotEquals(targetsValuesCaptor.getValue().getValue().getEntries().get(0).getCorrelationKey(),
+                targetsValuesCaptor.getValue().getValue().getEntries().get(1).getCorrelationKey());
     }
 }

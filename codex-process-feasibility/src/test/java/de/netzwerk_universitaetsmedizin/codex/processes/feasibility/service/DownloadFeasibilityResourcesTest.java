@@ -71,9 +71,9 @@ public class DownloadFeasibilityResourcesTest {
 
     @Test
     public void testDoExecute_BundleWithTooFewResultEntries() {
-        final String measureId = "id-151003";
-        final IdType measureRefId = new IdType("http://remote.host/Measure/" + measureId);
-        final Reference measureRef = new Reference(measureRefId);
+        String measureId = "foo";
+        IdType measureRefId = new IdType("Measure/" + measureId);
+        Reference measureRef = new Reference(measureRefId);
 
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
@@ -91,17 +91,17 @@ public class DownloadFeasibilityResourcesTest {
 
     @Test
     public void testDoExecute_FirstBundleEntryIsNoMeasure() {
-        final String measureId = "id-151003";
-        final IdType measureRefId = new IdType("http://remote.host/Measure/" + measureId);
-        final Reference measureRef = new Reference(measureRefId);
+        String measureId = "foo";
+        IdType measureRefId = new IdType("Measure/" + measureId);
+        Reference measureRef = new Reference(measureRefId);
 
-        final Bundle.BundleEntryComponent patientEntryA = new Bundle.BundleEntryComponent()
-                .setResource(new Patient().setId("id-170524"));
+        Bundle.BundleEntryComponent patientEntryA = new Bundle.BundleEntryComponent()
+                .setResource(new Patient().setId("foo"));
 
-        final Bundle.BundleEntryComponent patientEntryB = new Bundle.BundleEntryComponent()
-                .setResource(new Patient().setId("id-123456"));
+        Bundle.BundleEntryComponent patientEntryB = new Bundle.BundleEntryComponent()
+                .setResource(new Patient().setId("foo"));
 
-        final Bundle measureOnlyBundle = new Bundle()
+        Bundle measureOnlyBundle = new Bundle()
                 .addEntry(patientEntryA)
                 .addEntry(patientEntryB);
 
@@ -121,17 +121,17 @@ public class DownloadFeasibilityResourcesTest {
 
     @Test
     public void testDoExecute_SecondBundleEntryIsNoLibrary() {
-        final String measureId = "id-151003";
-        final IdType measureRefId = new IdType("http://remote.host/Measure/" + measureId);
-        final Reference measureRef = new Reference(measureRefId);
+        String measureId = "foo";
+        IdType measureRefId = new IdType("Measure/" + measureId);
+        Reference measureRef = new Reference(measureRefId);
 
-        final Bundle.BundleEntryComponent measureEntryA = new Bundle.BundleEntryComponent()
-                .setResource(new Measure().setId("id-170418"));
+        Bundle.BundleEntryComponent measureEntryA = new Bundle.BundleEntryComponent()
+                .setResource(new Measure().setId("foo"));
 
-        final Bundle.BundleEntryComponent measureEntryB = new Bundle.BundleEntryComponent()
-                .setResource(new Measure().setId("id-123456"));
+        Bundle.BundleEntryComponent measureEntryB = new Bundle.BundleEntryComponent()
+                .setResource(new Measure().setId("foo"));
 
-        final Bundle measureOnlyBundle = new Bundle()
+        Bundle measureOnlyBundle = new Bundle()
                 .addEntry(measureEntryA)
                 .addEntry(measureEntryB);
 
@@ -150,58 +150,22 @@ public class DownloadFeasibilityResourcesTest {
     }
 
     @Test
-    public void testDoExecuteLocal() throws Exception {
-        final String measureId = "id-151003";
-        final IdType measureRefId = new IdType("Measure/" + measureId);
-        final Reference measureRef = new Reference(measureRefId);
+    public void testDoExecute() throws Exception {
+        String measureId = "foo";
+        IdType measureRefId = new IdType("Measure/" + measureId);
+        Reference measureRef = new Reference(measureRefId);
 
-        final Resource measure = new Measure();
-        measure.setId("id-170418");
-        final Bundle.BundleEntryComponent measureEntry = new Bundle.BundleEntryComponent()
-                .setResource(measure);
-
-        final Resource library = new Library();
-        library.setId("id-170912");
-        final Bundle.BundleEntryComponent libraryEntry = new Bundle.BundleEntryComponent()
-                .setResource(library);
-
-        final Bundle measureOnlyBundle = new Bundle()
-                .addEntry(measureEntry)
-                .addEntry(libraryEntry);
-
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
-                .thenReturn(task);
-        when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
-                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
-                .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClient(measureRefId))
-                .thenReturn(webserviceClient);
-        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(measureId)))
-                .thenReturn(measureOnlyBundle);
-
-        service.execute(execution);
-
-        verify(execution).setVariable(VARIABLE_MEASURE, measure);
-        verify(execution).setVariable(VARIABLE_LIBRARY, library);
-    }
-
-    @Test
-    public void testDoExecuteRemote() throws Exception {
-        final String measureId = "id-151003";
-        final IdType measureRefId = new IdType("http://remote.host/Measure/" + measureId);
-        final Reference measureRef = new Reference(measureRefId);
-
-        final Resource measure = new Measure();
-        measure.setId("id-170418");
-        final Bundle.BundleEntryComponent measureEntry = new Bundle.BundleEntryComponent();
+        Resource measure = new Measure()
+                .setId("foo");
+        Bundle.BundleEntryComponent measureEntry = new Bundle.BundleEntryComponent();
         measureEntry.setResource(measure);
 
-        final Resource library = new Library();
-        library.setId("id-170912");
-        final Bundle.BundleEntryComponent libraryEntry = new Bundle.BundleEntryComponent();
+        Resource library = new Library()
+                .setId("foo");
+        Bundle.BundleEntryComponent libraryEntry = new Bundle.BundleEntryComponent();
         libraryEntry.setResource(library);
 
-        final Bundle measureOnlyBundle = new Bundle()
+        Bundle measureOnlyBundle = new Bundle()
                 .addEntry(measureEntry)
                 .addEntry(libraryEntry);
 

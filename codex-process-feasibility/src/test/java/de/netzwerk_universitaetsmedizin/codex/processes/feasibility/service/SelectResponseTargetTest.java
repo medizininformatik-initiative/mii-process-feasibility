@@ -46,9 +46,10 @@ public class SelectResponseTargetTest {
 
     @Test
     public void testDoExecute() throws Exception {
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK)).thenReturn(task);
-        when(taskHelper.getFirstInputParameterStringValue(eq(task), eq(CODESYSTEM_HIGHMED_BPMN),
-                eq(CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY)))
+        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
+                .thenReturn(task);
+        when(taskHelper.getFirstInputParameterStringValue(task, CODESYSTEM_HIGHMED_BPMN,
+                CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY))
                 .thenReturn(Optional.of("correlation-key"));
 
         final Reference reference = new Reference()
@@ -56,12 +57,14 @@ public class SelectResponseTargetTest {
                         .setSystem("http://localhost/systems/sample-system")
                         .setValue("requester-id"));
 
-        when(task.getRequester()).thenReturn(reference);
+        when(task.getRequester())
+                .thenReturn(reference);
 
         service.execute(execution);
         verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGET), targetsValuesCaptor.capture());
         assertEquals("correlation-key", targetsValuesCaptor.getValue().getValue().getCorrelationKey());
-        assertEquals("requester-id", targetsValuesCaptor.getValue().getValue().getTargetOrganizationIdentifierValue());
+        assertEquals("requester-id", targetsValuesCaptor.getValue().getValue()
+                .getTargetOrganizationIdentifierValue());
     }
 
 }

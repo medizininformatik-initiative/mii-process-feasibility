@@ -37,13 +37,16 @@ public class StoreResultTest {
 
     @Test
     public void testDoExecute() throws Exception {
+        final String measureReportId = "foo";
         final MeasureReport measureReport = new MeasureReport();
-        measureReport.setId("id-150316");
+        measureReport.setId(measureReportId);
 
         final Task.TaskOutputComponent output = new Task.TaskOutputComponent();
 
-        when(execution.getVariable(VARIABLE_AGGREGATED_MEASURE_REPORT)).thenReturn(measureReport);
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK)).thenReturn(task);
+        when(execution.getVariable(VARIABLE_AGGREGATED_MEASURE_REPORT))
+                .thenReturn(measureReport);
+        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
+                .thenReturn(task);
         when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
                 any(Reference.class)))
                 .thenReturn(output);

@@ -9,13 +9,13 @@ import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Reference;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Answers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -29,8 +29,8 @@ import java.util.List;
 
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_ID;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,6 +58,7 @@ public class EvaluateMeasureTest {
     private static final String CODE_SYSTEM_MEASURE_POPULATION = "http://terminology.hl7.org/CodeSystem/measure-population";
     private static final String CODE_INITIAL_POPULATION = "initial-population";
 
+    @SuppressWarnings("unused")
     public EvaluateMeasureTest(String name, boolean expectedToFail, MeasureReport measureReport) {
         this.expectedToFail = expectedToFail;
         this.measureReport = measureReport;
@@ -135,19 +136,22 @@ public class EvaluateMeasureTest {
 
     @Test
     public void testDoExecute() throws Exception {
-        when(execution.getVariable(VARIABLE_MEASURE_ID)).thenReturn("id-115517");
-        when(storeClient.operation()).thenReturn(storeOperation);
-        when(storeOperation.onInstance(anyString())
-                .named(anyString())
-                .withParameter(any(), eq("periodStart"), any(DateType.class))
+        final String measureId = "foo";
+        when(execution.getVariable(VARIABLE_MEASURE_ID))
+                .thenReturn(measureId);
+        when(storeClient.operation())
+                .thenReturn(storeOperation);
+        when(storeOperation.onInstance("Measure/" + measureId)
+                .named("evaluate-measure")
+                .withParameter(ArgumentMatchers.<Class<org.hl7.fhir.r4.model.Parameters>>any(), eq("periodStart"), any(DateType.class))
                 .andParameter(eq("periodEnd"), any(DateType.class))
                 .useHttpGet()
-                .returnResourceType(any())
+                .returnResourceType(MeasureReport.class)
                 .execute())
                 .thenReturn(measureReport);
 
         if (expectedToFail) {
-            Assert.assertThrows(RuntimeException.class, () -> service.doExecute(execution));
+            assertThrows(RuntimeException.class, () -> service.doExecute(execution));
         } else {
             service.execute(execution);
             verify(execution).setVariable(VARIABLE_MEASURE_REPORT, measureReport);

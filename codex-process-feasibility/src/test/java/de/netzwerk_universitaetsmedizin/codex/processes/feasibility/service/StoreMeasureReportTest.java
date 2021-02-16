@@ -40,11 +40,11 @@ public class StoreMeasureReportTest {
         when(clientProvider.getLocalWebserviceClient()).thenReturn(localWebserviceClient);
         when(localWebserviceClient.withMinimalReturn()).thenReturn(returnMinimal);
         MeasureReport measureReport = new MeasureReport();
-        when(returnMinimal.create(measureReport)).thenReturn(new IdType("id-094601"));
+        when(returnMinimal.create(measureReport)).thenReturn(new IdType("foo"));
         when(execution.getVariable(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
 
         service.doExecute(execution);
 
-        verify(execution).setVariable(VARIABLE_MEASURE_REPORT_ID, "id-094601");
+        verify(execution).setVariable(VARIABLE_MEASURE_REPORT_ID, "foo");
     }
 }
