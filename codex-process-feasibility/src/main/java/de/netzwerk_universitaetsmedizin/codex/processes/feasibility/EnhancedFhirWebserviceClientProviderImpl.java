@@ -32,17 +32,19 @@ public class EnhancedFhirWebserviceClientProviderImpl implements EnhancedFhirWeb
     }
 
     @Override
-    public FhirWebserviceClient getRemoteWebserviceClient(IdType idType) {
-        return this.fhirClientProvider.getRemoteWebserviceClient(idType);
+    public FhirWebserviceClient getRemoteWebserviceClient(IdType organizationReference) {
+        return this.fhirClientProvider.getRemoteWebserviceClient(organizationReference);
     }
 
     @Override
-    public FhirWebserviceClient getRemoteWebserviceClient(String s, String s1) {
-        return this.fhirClientProvider.getRemoteWebserviceClient(s, s1);
+    public FhirWebserviceClient getRemoteWebserviceClient(String organizationIdentifierSystem,
+                                                          String organizationIdentifierValue) {
+        return this.fhirClientProvider.getRemoteWebserviceClient(organizationIdentifierSystem,
+                organizationIdentifierValue);
     }
 
     @Override
-    public FhirWebserviceClient getRemoteWebserviceClient(String s) {
-        return this.fhirClientProvider.getRemoteWebserviceClient(s);
+    public FhirWebserviceClient getRemoteWebserviceClient(String webserviceUrl) {
+        return this.fhirClientProvider.getRemoteWebserviceClient(webserviceUrl);
     }
 }
