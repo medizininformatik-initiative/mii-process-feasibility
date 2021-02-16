@@ -12,6 +12,7 @@ import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Task;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -28,12 +29,19 @@ import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.varia
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
 import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
+import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
+import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR;
+import static org.hl7.fhir.r4.model.Task.TaskStatus.FAILED;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DownloadFeasibilityResourcesTest {
+
+    private static final String MEASURE_ID = "id-142416";
 
     @Mock
     private EnhancedFhirWebserviceClientProvider clientProvider;
@@ -47,13 +55,17 @@ public class DownloadFeasibilityResourcesTest {
     @Mock
     private DelegateExecution execution;
 
-    @Mock
-    private Task task;
-
-    private static final String MEASURE_ID = "id-142416";
-
     @InjectMocks
     private DownloadFeasibilityResources service;
+
+    private Task task;
+    private Task.TaskOutputComponent taskOutputComponent;
+
+    @Before
+    public void setUp() {
+        task = new Task();
+        taskOutputComponent = new Task.TaskOutputComponent();
+    }
 
     private Map<String, List<String>> createSearchQueryParts(String measureId) {
         return Map.of("_id", Collections.singletonList(measureId), "_include",
@@ -66,9 +78,13 @@ public class DownloadFeasibilityResourcesTest {
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
                 .thenReturn(Optional.empty());
+        when(taskHelper.createOutput(CODESYSTEM_HIGHMED_BPMN, CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR,
+                "Process null has fatal error in step null, reason: Missing measure reference."))
+                .thenReturn(taskOutputComponent);
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
-        verify(task).setStatus(Task.TaskStatus.FAILED);
+        assertSame(FAILED, task.getStatus());
+        assertEquals(taskOutputComponent, task.getOutputFirstRep());
     }
 
     @Test
@@ -85,21 +101,23 @@ public class DownloadFeasibilityResourcesTest {
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(new Bundle());
+        when(taskHelper.createOutput(CODESYSTEM_HIGHMED_BPMN, CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR,
+                "Process null has fatal error in step null, reason: Returned search-set contained less then two entries"))
+                .thenReturn(taskOutputComponent);
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
-        verify(task).setStatus(Task.TaskStatus.FAILED);
+        assertSame(FAILED, task.getStatus());
+        assertEquals(taskOutputComponent, task.getOutputFirstRep());
     }
 
     @Test
     public void testDoExecute_FirstBundleEntryIsNoMeasure() {
         IdType measureRefId = new IdType("Measure/" + MEASURE_ID);
         Reference measureRef = new Reference(measureRefId);
-        
-        Bundle bundle = new Bundle()
-                .addEntry(new Bundle.BundleEntryComponent()
-                        .setResource(new Patient().setId("foo")))
-                .addEntry(new Bundle.BundleEntryComponent()
-                        .setResource(new Patient().setId("foo")));
+
+        Bundle bundle = new Bundle();
+        bundle.addEntry().setResource(new Patient().setId("foo"));
+        bundle.addEntry().setResource(new Patient().setId("foo"));
 
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
@@ -110,9 +128,13 @@ public class DownloadFeasibilityResourcesTest {
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);
+        when(taskHelper.createOutput(CODESYSTEM_HIGHMED_BPMN, CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR,
+                "Process null has fatal error in step null, reason: Returned search-set did not contain Measure at index 0"))
+                .thenReturn(taskOutputComponent);
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
-        verify(task).setStatus(Task.TaskStatus.FAILED);
+        assertSame(FAILED, task.getStatus());
+        assertEquals(taskOutputComponent, task.getOutputFirstRep());
     }
 
     @Test
@@ -120,11 +142,9 @@ public class DownloadFeasibilityResourcesTest {
         IdType measureRefId = new IdType("Measure/" + MEASURE_ID);
         Reference measureRef = new Reference(measureRefId);
 
-        Bundle bundle = new Bundle()
-                .addEntry(new Bundle.BundleEntryComponent()
-                        .setResource(new Measure().setId("foo")))
-                .addEntry(new Bundle.BundleEntryComponent()
-                        .setResource(new Measure().setId("foo")));
+        Bundle bundle = new Bundle();
+        bundle.addEntry().setResource(new Measure().setId("foo"));
+        bundle.addEntry().setResource(new Measure().setId("foo"));
 
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
@@ -135,9 +155,13 @@ public class DownloadFeasibilityResourcesTest {
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);
+        when(taskHelper.createOutput(CODESYSTEM_HIGHMED_BPMN, CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR,
+                "Process null has fatal error in step null, reason: Returned search-set did not contain Library at index 1"))
+                .thenReturn(taskOutputComponent);
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
-        verify(task).setStatus(Task.TaskStatus.FAILED);
+        assertSame(FAILED, task.getStatus());
+        assertEquals(taskOutputComponent, task.getOutputFirstRep());
     }
 
     @Test
@@ -147,11 +171,9 @@ public class DownloadFeasibilityResourcesTest {
 
         Resource measure = new Measure().setId("foo");
         Resource library = new Library().setId("foo");
-        Bundle bundle = new Bundle()
-                .addEntry(new Bundle.BundleEntryComponent()
-                        .setResource(measure))
-                .addEntry(new Bundle.BundleEntryComponent()
-                        .setResource(library));
+        Bundle bundle = new Bundle();
+        bundle.addEntry().setResource(measure);
+        bundle.addEntry().setResource(library);
 
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
