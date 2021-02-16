@@ -26,15 +26,10 @@ import org.springframework.context.annotation.Configuration;
 public class FeasibilityConfig {
 
     private final FhirWebserviceClientProvider fhirClientProvider;
-
     private final EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider;
-
     private final IGenericClient storeClient;
-
     private final OrganizationProvider organizationProvider;
-
     private final TaskHelper taskHelper;
-
     private final FhirContext fhirContext;
 
     public FeasibilityConfig(FhirWebserviceClientProvider fhirClientProvider,

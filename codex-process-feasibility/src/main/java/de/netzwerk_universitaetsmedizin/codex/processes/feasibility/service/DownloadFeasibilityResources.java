@@ -28,7 +28,8 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate implem
 
     private final OrganizationProvider organizationProvider;
 
-    public DownloadFeasibilityResources(EnhancedFhirWebserviceClientProvider clientProvider, TaskHelper taskHelper, OrganizationProvider organizationProvider) {
+    public DownloadFeasibilityResources(EnhancedFhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
+                                        OrganizationProvider organizationProvider) {
         super(clientProvider, taskHelper);
         this.organizationProvider = organizationProvider;
     }
@@ -44,8 +45,9 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate implem
         Task task = getCurrentTaskFromExecutionVariables();
 
         IdType measureId = getMeasureId(task);
-        Bundle bundle = getMeasureAndLibrary(measureId,
-                ((EnhancedFhirWebserviceClientProvider) getFhirWebserviceClientProvider()).getWebserviceClient(measureId));
+        FhirWebserviceClient client = ((EnhancedFhirWebserviceClientProvider) getFhirWebserviceClientProvider())
+                .getWebserviceClient(measureId);
+        Bundle bundle = getMeasureAndLibrary(measureId, client);
 
         execution.setVariable(ConstantsFeasibility.VARIABLE_MEASURE, bundle.getEntry().get(0).getResource());
         execution.setVariable(ConstantsFeasibility.VARIABLE_LIBRARY, bundle.getEntry().get(1).getResource());
