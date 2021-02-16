@@ -50,6 +50,8 @@ public class DownloadFeasibilityResourcesTest {
     @Mock
     private Task task;
 
+    private static final String MEASURE_ID = "id-142416";
+
     @InjectMocks
     private DownloadFeasibilityResources service;
 
@@ -71,8 +73,7 @@ public class DownloadFeasibilityResourcesTest {
 
     @Test
     public void testDoExecute_BundleWithTooFewResultEntries() {
-        String measureId = "foo";
-        IdType measureRefId = new IdType("Measure/" + measureId);
+        IdType measureRefId = new IdType("Measure/" + MEASURE_ID);
         Reference measureRef = new Reference(measureRefId);
 
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
@@ -82,7 +83,7 @@ public class DownloadFeasibilityResourcesTest {
                 .thenReturn(Optional.of(measureRef));
         when(clientProvider.getWebserviceClient(measureRefId))
                 .thenReturn(webserviceClient);
-        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(measureId)))
+        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(new Bundle());
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
@@ -91,19 +92,14 @@ public class DownloadFeasibilityResourcesTest {
 
     @Test
     public void testDoExecute_FirstBundleEntryIsNoMeasure() {
-        String measureId = "foo";
-        IdType measureRefId = new IdType("Measure/" + measureId);
+        IdType measureRefId = new IdType("Measure/" + MEASURE_ID);
         Reference measureRef = new Reference(measureRefId);
-
-        Bundle.BundleEntryComponent patientEntryA = new Bundle.BundleEntryComponent()
-                .setResource(new Patient().setId("foo"));
-
-        Bundle.BundleEntryComponent patientEntryB = new Bundle.BundleEntryComponent()
-                .setResource(new Patient().setId("foo"));
-
-        Bundle measureOnlyBundle = new Bundle()
-                .addEntry(patientEntryA)
-                .addEntry(patientEntryB);
+        
+        Bundle bundle = new Bundle()
+                .addEntry(new Bundle.BundleEntryComponent()
+                        .setResource(new Patient().setId("foo")))
+                .addEntry(new Bundle.BundleEntryComponent()
+                        .setResource(new Patient().setId("foo")));
 
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
@@ -112,8 +108,8 @@ public class DownloadFeasibilityResourcesTest {
                 .thenReturn(Optional.of(measureRef));
         when(clientProvider.getWebserviceClient(measureRefId))
                 .thenReturn(webserviceClient);
-        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(measureId)))
-                .thenReturn(measureOnlyBundle);
+        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
+                .thenReturn(bundle);
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
         verify(task).setStatus(Task.TaskStatus.FAILED);
@@ -121,19 +117,14 @@ public class DownloadFeasibilityResourcesTest {
 
     @Test
     public void testDoExecute_SecondBundleEntryIsNoLibrary() {
-        String measureId = "foo";
-        IdType measureRefId = new IdType("Measure/" + measureId);
+        IdType measureRefId = new IdType("Measure/" + MEASURE_ID);
         Reference measureRef = new Reference(measureRefId);
 
-        Bundle.BundleEntryComponent measureEntryA = new Bundle.BundleEntryComponent()
-                .setResource(new Measure().setId("foo"));
-
-        Bundle.BundleEntryComponent measureEntryB = new Bundle.BundleEntryComponent()
-                .setResource(new Measure().setId("foo"));
-
-        Bundle measureOnlyBundle = new Bundle()
-                .addEntry(measureEntryA)
-                .addEntry(measureEntryB);
+        Bundle bundle = new Bundle()
+                .addEntry(new Bundle.BundleEntryComponent()
+                        .setResource(new Measure().setId("foo")))
+                .addEntry(new Bundle.BundleEntryComponent()
+                        .setResource(new Measure().setId("foo")));
 
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
@@ -142,8 +133,8 @@ public class DownloadFeasibilityResourcesTest {
                 .thenReturn(Optional.of(measureRef));
         when(clientProvider.getWebserviceClient(measureRefId))
                 .thenReturn(webserviceClient);
-        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(measureId)))
-                .thenReturn(measureOnlyBundle);
+        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
+                .thenReturn(bundle);
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
         verify(task).setStatus(Task.TaskStatus.FAILED);
@@ -151,23 +142,16 @@ public class DownloadFeasibilityResourcesTest {
 
     @Test
     public void testDoExecute() throws Exception {
-        String measureId = "foo";
-        IdType measureRefId = new IdType("Measure/" + measureId);
+        IdType measureRefId = new IdType("Measure/" + MEASURE_ID);
         Reference measureRef = new Reference(measureRefId);
 
-        Resource measure = new Measure()
-                .setId("foo");
-        Bundle.BundleEntryComponent measureEntry = new Bundle.BundleEntryComponent();
-        measureEntry.setResource(measure);
-
-        Resource library = new Library()
-                .setId("foo");
-        Bundle.BundleEntryComponent libraryEntry = new Bundle.BundleEntryComponent();
-        libraryEntry.setResource(library);
-
-        Bundle measureOnlyBundle = new Bundle()
-                .addEntry(measureEntry)
-                .addEntry(libraryEntry);
+        Resource measure = new Measure().setId("foo");
+        Resource library = new Library().setId("foo");
+        Bundle bundle = new Bundle()
+                .addEntry(new Bundle.BundleEntryComponent()
+                        .setResource(measure))
+                .addEntry(new Bundle.BundleEntryComponent()
+                        .setResource(library));
 
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
@@ -176,8 +160,8 @@ public class DownloadFeasibilityResourcesTest {
                 .thenReturn(Optional.of(measureRef));
         when(clientProvider.getWebserviceClient(measureRefId))
                 .thenReturn(webserviceClient);
-        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(measureId)))
-                .thenReturn(measureOnlyBundle);
+        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
+                .thenReturn(bundle);
 
         service.execute(execution);
 

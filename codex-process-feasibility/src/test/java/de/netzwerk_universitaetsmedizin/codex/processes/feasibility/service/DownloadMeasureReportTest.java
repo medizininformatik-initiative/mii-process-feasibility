@@ -49,6 +49,8 @@ public class DownloadMeasureReportTest {
     @InjectMocks
     private DownloadMeasureReport service;
 
+    private static final String MEASURE_REPORT_ID = "id-144911";
+
     @Test
     public void testDoExecute_MissingMeasureReportReference() {
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
@@ -67,8 +69,7 @@ public class DownloadMeasureReportTest {
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
 
-        String measureReportId = "foo";
-        Reference measureReportRef = new Reference().setReference("MeasureReport/" + measureReportId);
+        Reference measureReportRef = new Reference().setReference("MeasureReport/" + MEASURE_REPORT_ID);
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE))
                 .thenReturn(Optional.of(measureReportRef));
@@ -80,7 +81,7 @@ public class DownloadMeasureReportTest {
                 .setCode(coding);
         MeasureReport measureReport = new MeasureReport()
                 .setGroup(List.of(measureReportGroup));
-        when(webserviceClient.read(MeasureReport.class, measureReportId))
+        when(webserviceClient.read(MeasureReport.class, MEASURE_REPORT_ID))
                 .thenReturn(measureReport);
         Reference requesterRef = new Reference().setReference("http://localhost");
         when(task.getRequester())
@@ -101,8 +102,7 @@ public class DownloadMeasureReportTest {
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
 
-        String measureReportId = "foo";
-        Reference measureReportRef = new Reference().setReference("http://remote.host/MeasureReport/" + measureReportId);
+        Reference measureReportRef = new Reference().setReference("http://remote.host/MeasureReport/" + MEASURE_REPORT_ID);
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE))
                 .thenReturn(Optional.of(measureReportRef));
@@ -114,7 +114,7 @@ public class DownloadMeasureReportTest {
                 .setCode(coding);
         MeasureReport measureReport = new MeasureReport()
                 .setGroup(List.of(measureReportGroup));
-        when(webserviceClient.read(MeasureReport.class, measureReportId))
+        when(webserviceClient.read(MeasureReport.class, MEASURE_REPORT_ID))
                 .thenReturn(measureReport);
         Reference requesterRef = new Reference().setReference("http://remote.host");
         when(task.getRequester())

@@ -57,6 +57,7 @@ public class EvaluateMeasureTest {
     private final boolean expectedToFail;
     private static final String CODE_SYSTEM_MEASURE_POPULATION = "http://terminology.hl7.org/CodeSystem/measure-population";
     private static final String CODE_INITIAL_POPULATION = "initial-population";
+    private static final String MEASURE_ID = "id-145128";
 
     @SuppressWarnings("unused")
     public EvaluateMeasureTest(String name, boolean expectedToFail, MeasureReport measureReport) {
@@ -136,12 +137,11 @@ public class EvaluateMeasureTest {
 
     @Test
     public void testDoExecute() throws Exception {
-        final String measureId = "foo";
         when(execution.getVariable(VARIABLE_MEASURE_ID))
-                .thenReturn(measureId);
+                .thenReturn(MEASURE_ID);
         when(storeClient.operation())
                 .thenReturn(storeOperation);
-        when(storeOperation.onInstance("Measure/" + measureId)
+        when(storeOperation.onInstance("Measure/" + MEASURE_ID)
                 .named("evaluate-measure")
                 .withParameter(ArgumentMatchers.<Class<org.hl7.fhir.r4.model.Parameters>>any(), eq("periodStart"), any(DateType.class))
                 .andParameter(eq("periodEnd"), any(DateType.class))

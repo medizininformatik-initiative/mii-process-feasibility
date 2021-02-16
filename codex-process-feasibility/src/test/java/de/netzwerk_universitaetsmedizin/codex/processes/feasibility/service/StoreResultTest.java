@@ -37,10 +37,7 @@ public class StoreResultTest {
 
     @Test
     public void testDoExecute() throws Exception {
-        final String measureReportId = "foo";
         final MeasureReport measureReport = new MeasureReport();
-        measureReport.setId(measureReportId);
-
         final Task.TaskOutputComponent output = new Task.TaskOutputComponent();
 
         when(execution.getVariable(VARIABLE_AGGREGATED_MEASURE_REPORT))
