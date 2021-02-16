@@ -36,9 +36,6 @@ public class SelectResponseTargetTest {
     private TaskHelper taskHelper;
 
     @Mock
-    private Task task;
-
-    @Mock
     private DelegateExecution execution;
 
     @InjectMocks
@@ -46,19 +43,18 @@ public class SelectResponseTargetTest {
 
     @Test
     public void testDoExecute() throws Exception {
+        Task task = new Task();
+        Reference reference = new Reference()
+                .setIdentifier(new Identifier()
+                        .setSystem("http://localhost/systems/sample-system")
+                        .setValue("requester-id"));
+        task.setRequester(reference);
+
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterStringValue(task, CODESYSTEM_HIGHMED_BPMN,
                 CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY))
                 .thenReturn(Optional.of("correlation-key"));
-
-        final Reference reference = new Reference()
-                .setIdentifier(new Identifier()
-                        .setSystem("http://localhost/systems/sample-system")
-                        .setValue("requester-id"));
-
-        when(task.getRequester())
-                .thenReturn(reference);
 
         service.execute(execution);
         verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGET), targetsValuesCaptor.capture());

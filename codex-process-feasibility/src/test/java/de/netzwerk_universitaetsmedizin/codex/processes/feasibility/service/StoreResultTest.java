@@ -5,6 +5,7 @@ import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -17,7 +18,6 @@ import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.varia
 import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -27,9 +27,6 @@ public class StoreResultTest {
     private TaskHelper taskHelper;
 
     @Mock
-    private Task task;
-
-    @Mock
     private DelegateExecution execution;
 
     @InjectMocks
@@ -37,8 +34,9 @@ public class StoreResultTest {
 
     @Test
     public void testDoExecute() throws Exception {
-        final MeasureReport measureReport = new MeasureReport();
-        final Task.TaskOutputComponent output = new Task.TaskOutputComponent();
+        MeasureReport measureReport = new MeasureReport();
+        Task task = new Task();
+        Task.TaskOutputComponent output = new Task.TaskOutputComponent();
 
         when(execution.getVariable(VARIABLE_AGGREGATED_MEASURE_REPORT))
                 .thenReturn(measureReport);
@@ -49,6 +47,6 @@ public class StoreResultTest {
                 .thenReturn(output);
 
         service.execute(execution);
-        verify(task).addOutput(output);
+        Assert.assertEquals(output, task.getOutputFirstRep());
     }
 }
