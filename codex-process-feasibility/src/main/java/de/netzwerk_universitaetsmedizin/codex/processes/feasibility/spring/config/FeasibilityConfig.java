@@ -3,7 +3,6 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.spring.conf
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EnhancedFhirWebserviceClientProvider;
-import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EnhancedFhirWebserviceClientProviderImpl;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicRequest;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicResponse;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.AggregateResults;
@@ -33,7 +32,7 @@ public class FeasibilityConfig {
     private final FhirContext fhirContext;
 
     public FeasibilityConfig(FhirWebserviceClientProvider fhirClientProvider,
-                             EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider,
+                             @Qualifier("enhancedFhirWebserviceClientProvider") EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider,
                              @Qualifier("store") IGenericClient storeClient,
                              OrganizationProvider organizationProvider,
                              TaskHelper taskHelper,
@@ -44,11 +43,6 @@ public class FeasibilityConfig {
         this.organizationProvider = organizationProvider;
         this.taskHelper = taskHelper;
         this.fhirContext = fhirContext;
-    }
-
-    @Bean
-    public EnhancedFhirWebserviceClientProvider enhancedFhirWebserviceClientProvider() {
-        return new EnhancedFhirWebserviceClientProviderImpl(fhirClientProvider);
     }
 
     //
