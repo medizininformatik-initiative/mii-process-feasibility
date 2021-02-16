@@ -8,6 +8,7 @@ public interface EnhancedFhirWebserviceClientProvider extends FhirWebserviceClie
 
     /**
      * Gets a {@link FhirWebserviceClient} for local or remote use based on the given reference.
+     *
      * If the reference points to a local resource then a local webservice client gets returned.
      * A remote webservice client gets returned if the reference points to a remote resource.
      *
