@@ -31,7 +31,7 @@ public class FeasibilityConfig {
     private final TaskHelper taskHelper;
     private final FhirContext fhirContext;
 
-    public FeasibilityConfig(FhirWebserviceClientProvider fhirClientProvider,
+    public FeasibilityConfig(@Qualifier("clientProvider") FhirWebserviceClientProvider fhirClientProvider,
                              @Qualifier("store") IGenericClient storeClient,
                              OrganizationProvider organizationProvider,
                              TaskHelper taskHelper,
@@ -82,8 +82,9 @@ public class FeasibilityConfig {
     //
 
     @Bean
-    public DownloadFeasibilityResources downloadFeasibilityResources() {
-        return new DownloadFeasibilityResources(enhancedFhirClientProvider(), taskHelper, organizationProvider);
+    public DownloadFeasibilityResources downloadFeasibilityResources(
+            EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
+        return new DownloadFeasibilityResources(enhancedFhirClientProvider, taskHelper, organizationProvider);
     }
 
     @Bean
