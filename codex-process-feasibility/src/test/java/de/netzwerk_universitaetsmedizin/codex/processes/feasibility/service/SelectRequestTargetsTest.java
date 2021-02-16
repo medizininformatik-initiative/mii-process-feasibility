@@ -50,11 +50,10 @@ public class SelectRequestTargetsTest {
 
     @Test
     public void testDoExecute_SingleTarget() {
-        final Identifier id = new Identifier()
-                .setValue("http://localhost/foo");
-
+        Identifier id = new Identifier().setValue("http://localhost/foo");
         when(orgProvider.getRemoteIdentifiers())
                 .thenReturn(new ArrayList<>(List.of(id)));
+
         service.doExecute(execution);
 
         verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGETS), targetsValuesCaptor.capture());
@@ -65,13 +64,11 @@ public class SelectRequestTargetsTest {
 
     @Test
     public void testDoExecute_MultipleTargets() {
-        final Identifier idA = new Identifier()
-                .setValue("http://localhost/foo");
-        final Identifier idB = new Identifier()
-                .setValue("http://localhost/bar");
-
+        Identifier idA = new Identifier().setValue("http://localhost/foo");
+        Identifier idB = new Identifier().setValue("http://localhost/bar");
         when(orgProvider.getRemoteIdentifiers())
                 .thenReturn(new ArrayList<>(List.of(idA, idB)));
+
         service.doExecute(execution);
 
         verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGETS), targetsValuesCaptor.capture());

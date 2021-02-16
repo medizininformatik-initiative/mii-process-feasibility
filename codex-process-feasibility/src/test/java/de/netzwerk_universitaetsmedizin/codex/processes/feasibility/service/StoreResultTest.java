@@ -16,6 +16,7 @@ import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.varia
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_AGGREGATED_MEASURE_REPORT;
 import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -47,6 +48,7 @@ public class StoreResultTest {
                 .thenReturn(output);
 
         service.execute(execution);
-        Assert.assertEquals(output, task.getOutputFirstRep());
+
+        assertEquals(output, task.getOutputFirstRep());
     }
 }

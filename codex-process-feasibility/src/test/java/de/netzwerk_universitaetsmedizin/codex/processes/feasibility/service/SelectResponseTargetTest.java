@@ -49,7 +49,6 @@ public class SelectResponseTargetTest {
                         .setSystem("http://localhost/systems/sample-system")
                         .setValue("requester-id"));
         task.setRequester(reference);
-
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterStringValue(task, CODESYSTEM_HIGHMED_BPMN,
@@ -57,10 +56,9 @@ public class SelectResponseTargetTest {
                 .thenReturn(Optional.of("correlation-key"));
 
         service.execute(execution);
+
         verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGET), targetsValuesCaptor.capture());
         assertEquals("correlation-key", targetsValuesCaptor.getValue().getValue().getCorrelationKey());
-        assertEquals("requester-id", targetsValuesCaptor.getValue().getValue()
-                .getTargetOrganizationIdentifierValue());
+        assertEquals("requester-id", targetsValuesCaptor.getValue().getValue().getTargetOrganizationIdentifierValue());
     }
-
 }

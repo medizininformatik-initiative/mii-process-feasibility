@@ -60,11 +60,9 @@ public class DownloadMeasureReportTest {
         task = new Task();
     }
 
-
     @Test
     public void testDoExecute_MissingMeasureReportReference() {
         Task.TaskOutputComponent taskOutputComponent = new Task.TaskOutputComponent();
-
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
@@ -75,6 +73,7 @@ public class DownloadMeasureReportTest {
                 .thenReturn(taskOutputComponent);
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
+
         assertSame(FAILED, task.getStatus());
         assertEquals(taskOutputComponent, task.getOutputFirstRep());
     }
@@ -83,7 +82,6 @@ public class DownloadMeasureReportTest {
     public void testDoExecuteLocal() throws Exception {
         Reference requesterRef = new Reference().setReference("http://localhost");
         task.setRequester(requesterRef);
-
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
 
@@ -103,6 +101,7 @@ public class DownloadMeasureReportTest {
                 .thenReturn(measureReport);
 
         service.execute(execution);
+
         verify(execution).setVariable(VARIABLE_MEASURE_REPORT, measureReport);
         assertEquals(1, coding.getCoding().size());
         assertEquals(CODESYSTEM_FEASIBILITY, coding.getCoding().get(0).getSystem());
@@ -136,6 +135,7 @@ public class DownloadMeasureReportTest {
                 .thenReturn(measureReport);
 
         service.execute(execution);
+
         verify(execution).setVariable(VARIABLE_MEASURE_REPORT, measureReport);
         assertEquals(1, coding.getCoding().size());
         assertEquals(CODESYSTEM_FEASIBILITY, coding.getCoding().get(0).getSystem());

@@ -17,6 +17,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
+import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
+import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_ID;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -24,6 +26,8 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class StoreFeasibilityResourcesTest {
+
+    public static final String ID = "foo";
 
     @Captor
     ArgumentCaptor<Bundle> bundleCaptor;
@@ -39,27 +43,20 @@ public class StoreFeasibilityResourcesTest {
 
     @Test
     public void testDoExecute() {
-        final Measure measure = new Measure();
-        final Library library = new Library();
+        Measure measure = new Measure();
+        Library library = new Library();
+        when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(measure);
+        when(execution.getVariable(VARIABLE_LIBRARY)).thenReturn(library);
 
-        when(execution.getVariable(ConstantsFeasibility.VARIABLE_MEASURE))
-                .thenReturn(measure);
-        when(execution.getVariable(ConstantsFeasibility.VARIABLE_LIBRARY))
-                .thenReturn(library);
-
-        final String id = "foo";
-        final Bundle transactionResponse = new Bundle()
-                .setEntry(List.of(
-                        new Bundle.BundleEntryComponent()
-                                .setResponse(new Bundle.BundleEntryResponseComponent()
-                                        .setLocation("http://localhost/some-location/" + id))
-                ));
+        Bundle transactionResponse = new Bundle();
+        transactionResponse.addEntry().getResponse().setLocation("http://localhost/some-location/" + ID);
 
         when(storeClient.transaction().withBundle(bundleCaptor.capture()).execute())
                 .thenReturn(transactionResponse);
 
         service.doExecute(execution);
-        verify(execution).setVariable(VARIABLE_MEASURE_ID, id);
+
+        verify(execution).setVariable(VARIABLE_MEASURE_ID, ID);
         assertEquals(measure, bundleCaptor.getValue().getEntry().get(0).getResource());
         assertEquals(library, bundleCaptor.getValue().getEntry().get(1).getResource());
         assertEquals("Measure", bundleCaptor.getValue().getEntry().get(0).getRequest().getUrl());
