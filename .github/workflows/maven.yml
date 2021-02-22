@@ -23,6 +23,12 @@ jobs:
         server-id: highmed-dsf
         server-username: USERNAME
         server-password: GITHUB_TOKEN
+    - name: Cache Local Maven Repo
+      uses: actions/cache@v2.1.2
+      with:
+        path: |
+          ~/.m2/repository
+        key: maven-repo
     - name: Build with Maven
       run: mvn -B package --file pom.xml
       env:
