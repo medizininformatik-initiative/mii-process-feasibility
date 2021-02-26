@@ -29,8 +29,8 @@
                 <valueString value="Parameter"/>
             </extension>
             <path value="Task.input"/>
-            <min value="2"/>
-            <max value="2"/>
+            <min value="3"/>
+            <max value="3"/>
         </element>
         <element id="Task.input:message-name">
             <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
@@ -49,7 +49,7 @@
             </extension>
             <path value="Task.input"/>
             <sliceName value="business-key"/>
-            <max value="0"/>
+            <min value="1"/>
         </element>
         <element id="Task.input:correlation-key">
             <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
