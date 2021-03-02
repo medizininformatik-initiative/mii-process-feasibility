@@ -6,15 +6,14 @@ import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EnhancedFhir
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EnhancedFhirWebserviceClientProviderImpl;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicRequest;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicResponse;
-import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.AggregateResults;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.DownloadFeasibilityResources;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.DownloadMeasureReport;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.EvaluateMeasure;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SelectRequestTargets;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SelectResponseTarget;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreFeasibilityResources;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreLiveResult;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreMeasureReport;
-import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreResult;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.organization.OrganizationProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
@@ -66,15 +65,10 @@ public class FeasibilityConfig {
     public DownloadMeasureReport downloadMeasureReport() {
         return new DownloadMeasureReport(fhirClientProvider, taskHelper, organizationProvider);
     }
-
+    
     @Bean
-    public AggregateResults aggregateResults() {
-        return new AggregateResults(fhirClientProvider, taskHelper);
-    }
-
-    @Bean
-    public StoreResult storeResult() {
-        return new StoreResult(fhirClientProvider, taskHelper);
+    public StoreLiveResult storeLiveResult() {
+        return new StoreLiveResult(fhirClientProvider, taskHelper);
     }
 
     //

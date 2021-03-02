@@ -100,8 +100,11 @@ services:
     - type: bind
       source: ./zars/bpe/app/last_event
       target: /opt/bpe/last_event
+    ports:
+        - 5001:5001
     environment:
       TZ: Europe/Berlin
+      EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5001
     networks:
       zars-bpe-frontend:
       zars-bpe-backend:

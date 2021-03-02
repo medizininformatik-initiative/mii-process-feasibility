@@ -44,12 +44,6 @@ public class DownloadMeasureReport extends AbstractServiceDelegate implements In
         FhirWebserviceClient client = getWebserviceClient(measureReportId);
         MeasureReport measureReport = downloadMeasureReport(client, measureReportId);
 
-        MeasureReport.MeasureReportGroupComponent group = measureReport.getGroupFirstRep();
-        group.getCode().addCoding()
-                .setSystem(ConstantsFeasibility.CODESYSTEM_FEASIBILITY)
-                .setCode(ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_SINGLE_RESULT);
-        group.addExtension(ConstantsFeasibility.EXTENSION_DIC_URI, task.getRequester());
-
         execution.setVariable(ConstantsFeasibility.VARIABLE_MEASURE_REPORT, measureReport);
     }
 
