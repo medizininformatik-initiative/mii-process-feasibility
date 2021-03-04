@@ -49,6 +49,17 @@
             "type": {
               "coding": [
                 {
+                  "system": "http://highmed.org/fhir/CodeSystem/bpmn-message",
+                  "code": "business-key"
+                }
+              ]
+            },
+            "valueString": "600db7d6-ff7c-4545-b21e-2f6a371bddc1"
+          },
+          {
+            "type": {
+              "coding": [
+                {
                   "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/feasibility",
                   "code": "measure-reference"
                 }
