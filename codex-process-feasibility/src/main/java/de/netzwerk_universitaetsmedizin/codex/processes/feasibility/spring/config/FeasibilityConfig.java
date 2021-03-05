@@ -6,9 +6,11 @@ import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EnhancedFhir
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EnhancedFhirWebserviceClientProviderImpl;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicRequest;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicResponse;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.AggregateMeasureReports;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.DownloadFeasibilityResources;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.DownloadMeasureReport;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.EvaluateMeasure;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.PrepareForFurtherEvaluation;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SelectRequestTargets;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SelectResponseTarget;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreFeasibilityResources;
@@ -69,6 +71,16 @@ public class FeasibilityConfig {
     @Bean
     public StoreLiveResult storeLiveResult() {
         return new StoreLiveResult(fhirClientProvider, taskHelper);
+    }
+    
+    @Bean
+    public PrepareForFurtherEvaluation prepareForFurtherEvaluation() {
+        return new PrepareForFurtherEvaluation(fhirClientProvider, taskHelper);
+    }
+    
+    @Bean
+    public AggregateMeasureReports aggregateMeasureReports() {
+        return new AggregateMeasureReports(fhirClientProvider, taskHelper);
     }
 
     //

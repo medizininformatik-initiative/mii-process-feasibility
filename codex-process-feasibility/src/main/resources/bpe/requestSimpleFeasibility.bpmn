@@ -26,15 +26,12 @@
     <bpmn:sequenceFlow id="SequenceFlow_0b5s4ef" sourceRef="selectRequestTargets" targetRef="sendRequestToDics" />
     <bpmn:endEvent id="EndEvent" name="success">
       <bpmn:incoming>Flow_1479yc4</bpmn:incoming>
-      <bpmn:incoming>Flow_0wm2en5</bpmn:incoming>
+      <bpmn:incoming>Flow_1f790pw</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:subProcess id="Activity_1h2vwsh">
       <bpmn:incoming>Flow_0qqdr67</bpmn:incoming>
       <bpmn:outgoing>Flow_0wm2en5</bpmn:outgoing>
       <bpmn:multiInstanceLoopCharacteristics camunda:collection="${targets.entries}" camunda:elementVariable="target" />
-      <bpmn:endEvent id="Event_0i55mqk">
-        <bpmn:incoming>Flow_1kiy9bc</bpmn:incoming>
-      </bpmn:endEvent>
       <bpmn:receiveTask id="Activity_15y7a7a" name="receive query result from DIC" messageRef="Message_18ld88c">
         <bpmn:extensionElements>
           <camunda:inputOutput>
@@ -58,7 +55,15 @@
         <bpmn:incoming>Flow_1oq6cy1</bpmn:incoming>
         <bpmn:outgoing>Flow_1kiy9bc</bpmn:outgoing>
       </bpmn:serviceTask>
-      <bpmn:sequenceFlow id="Flow_1kiy9bc" sourceRef="Activity_103gahn" targetRef="Event_0i55mqk" />
+      <bpmn:sequenceFlow id="Flow_1kiy9bc" sourceRef="Activity_103gahn" targetRef="Activity_16mfy9t" />
+      <bpmn:endEvent id="Event_0i55mqk">
+        <bpmn:incoming>Flow_13dcknp</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_13dcknp" sourceRef="Activity_16mfy9t" targetRef="Event_0i55mqk" />
+      <bpmn:serviceTask id="Activity_16mfy9t" name="aggregate query results" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.AggregateMeasureReports">
+        <bpmn:incoming>Flow_1kiy9bc</bpmn:incoming>
+        <bpmn:outgoing>Flow_13dcknp</bpmn:outgoing>
+      </bpmn:serviceTask>
     </bpmn:subProcess>
     <bpmn:boundaryEvent id="Event_13wq5pb" attachedToRef="Activity_1h2vwsh">
       <bpmn:outgoing>Flow_1479yc4</bpmn:outgoing>
@@ -68,7 +73,13 @@
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="Flow_0qqdr67" sourceRef="sendRequestToDics" targetRef="Activity_1h2vwsh" />
     <bpmn:sequenceFlow id="Flow_1479yc4" sourceRef="Event_13wq5pb" targetRef="EndEvent" />
-    <bpmn:sequenceFlow id="Flow_0wm2en5" sourceRef="Activity_1h2vwsh" targetRef="EndEvent" />
+    <bpmn:sequenceFlow id="Flow_0wm2en5" sourceRef="Activity_1h2vwsh" targetRef="Activity_1aufhzp" />
+    <bpmn:sequenceFlow id="Flow_1f790pw" sourceRef="Activity_1aufhzp" targetRef="EndEvent" />
+    <bpmn:serviceTask id="Activity_1aufhzp" name="prepare query for further evaluation" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.PrepareForFurtherEvaluation">
+      <bpmn:documentation>Assign queries to organizations</bpmn:documentation>
+      <bpmn:incoming>Flow_0wm2en5</bpmn:incoming>
+      <bpmn:outgoing>Flow_1f790pw</bpmn:outgoing>
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmn:message id="Message_1pq9qxp" name="requestSimpleFeasibilityMessage" />
   <bpmn:message id="Message_07ayhv1" name="resultSimpleFeasibilityMessage" />
@@ -85,14 +96,18 @@
   <bpmn:message id="Message_18ld88c" name="resultSingleDicSimpleFeasibilityMessage" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="requestSimpleFeasibility">
+      <bpmndi:BPMNEdge id="Flow_1f790pw_di" bpmnElement="Flow_1f790pw">
+        <di:waypoint x="1560" y="155" />
+        <di:waypoint x="1612" y="155" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0wm2en5_di" bpmnElement="Flow_0wm2en5">
-        <di:waypoint x="1210" y="155" />
-        <di:waypoint x="1332" y="155" />
+        <di:waypoint x="1380" y="155" />
+        <di:waypoint x="1460" y="155" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1479yc4_di" bpmnElement="Flow_1479yc4">
-        <di:waypoint x="1228" y="217" />
-        <di:waypoint x="1350" y="217" />
-        <di:waypoint x="1350" y="173" />
+        <di:waypoint x="1398" y="222" />
+        <di:waypoint x="1630" y="222" />
+        <di:waypoint x="1630" y="173" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0qqdr67_di" bpmnElement="Flow_0qqdr67">
         <di:waypoint x="530" y="155" />
@@ -119,47 +134,57 @@
         <dc:Bounds x="430" y="115" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_18syky8_di" bpmnElement="EndEvent">
-        <dc:Bounds x="1332" y="137" width="36" height="36" />
+        <dc:Bounds x="1612" y="137" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1330" y="113" width="41" height="14" />
+          <dc:Bounds x="1610" y="113" width="41" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1h2vwsh_di" bpmnElement="Activity_1h2vwsh" isExpanded="true">
-        <dc:Bounds x="580" y="83" width="630" height="134" />
+        <dc:Bounds x="580" y="88" width="800" height="134" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_13dcknp_di" bpmnElement="Flow_13dcknp">
+        <di:waypoint x="1240" y="157" />
+        <di:waypoint x="1312" y="157" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1kiy9bc_di" bpmnElement="Flow_1kiy9bc">
-        <di:waypoint x="1080" y="152" />
-        <di:waypoint x="1152" y="152" />
+        <di:waypoint x="1080" y="157" />
+        <di:waypoint x="1140" y="157" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1oq6cy1_di" bpmnElement="Flow_1oq6cy1">
-        <di:waypoint x="930" y="152" />
-        <di:waypoint x="980" y="152" />
+        <di:waypoint x="930" y="157" />
+        <di:waypoint x="980" y="157" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1mxiy48_di" bpmnElement="Flow_1mxiy48">
-        <di:waypoint x="777" y="152" />
-        <di:waypoint x="830" y="152" />
+        <di:waypoint x="777" y="157" />
+        <di:waypoint x="830" y="157" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1iuvnle_di" bpmnElement="Flow_1iuvnle">
-        <di:waypoint x="638" y="152" />
-        <di:waypoint x="677" y="152" />
+        <di:waypoint x="638" y="157" />
+        <di:waypoint x="677" y="157" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_0i55mqk_di" bpmnElement="Event_0i55mqk">
-        <dc:Bounds x="1152" y="134" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_15y7a7a_di" bpmnElement="Activity_15y7a7a">
-        <dc:Bounds x="677" y="112" width="100" height="80" />
+        <dc:Bounds x="677" y="117" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1tvmfdb_di" bpmnElement="Event_1tvmfdb">
-        <dc:Bounds x="602" y="134" width="36" height="36" />
+        <dc:Bounds x="602" y="139" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1l7gm0z_di" bpmnElement="Activity_09o61p4">
-        <dc:Bounds x="830" y="112" width="100" height="80" />
+        <dc:Bounds x="830" y="117" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_103gahn_di" bpmnElement="Activity_103gahn">
-        <dc:Bounds x="980" y="112" width="100" height="80" />
+        <dc:Bounds x="980" y="117" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0i55mqk_di" bpmnElement="Event_0i55mqk">
+        <dc:Bounds x="1312" y="139" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ecnlg3_di" bpmnElement="Activity_16mfy9t">
+        <dc:Bounds x="1140" y="117" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1y41cdj_di" bpmnElement="Activity_1aufhzp">
+        <dc:Bounds x="1460" y="115" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_13wq5pb_di" bpmnElement="Event_13wq5pb">
-        <dc:Bounds x="1192" y="199" width="36" height="36" />
+        <dc:Bounds x="1362" y="204" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

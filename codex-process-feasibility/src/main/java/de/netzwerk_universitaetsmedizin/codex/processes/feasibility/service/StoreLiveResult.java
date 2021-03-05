@@ -13,10 +13,20 @@ import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
+import org.hl7.fhir.r4.model.Task.TaskOutputComponent;
 import org.springframework.beans.factory.InitializingBean;
 
+/**
+ * The type Store live result.
+ */
 public class StoreLiveResult extends AbstractServiceDelegate implements InitializingBean {
   
+  /**
+   * Instantiates a new Store live result.
+   *
+   * @param clientProvider the client provider
+   * @param taskHelper     the task helper
+   */
   public StoreLiveResult(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper) {
     super(clientProvider, taskHelper);
   }
@@ -24,7 +34,8 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
   @Override
   protected void doExecute(DelegateExecution execution) throws BpmnError, Exception {
     MeasureReport measureReport = getMeasureReport(execution);
-    addMeasureReportReferenceToTask(measureReport);
+    Task task = getCurrentTaskFromExecutionVariables();
+    addMeasureReportReferenceToTask(measureReport, task);
     storeMeasureReport(measureReport);
   }
   
@@ -32,16 +43,17 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
     return (MeasureReport) execution.getVariable(ConstantsFeasibility.VARIABLE_MEASURE_REPORT);
   }
   
-  private void addMeasureReportReferenceToTask(MeasureReport measureReport) {
-    Task task = getCurrentTaskFromExecutionVariables();
+  private void addMeasureReportReferenceToTask(MeasureReport measureReport, Task task) {
     task.addOutput(createMeasureReportReferenceOutput(measureReport));
   }
   
-  protected Task.TaskOutputComponent createMeasureReportReferenceOutput(MeasureReport measureReport) {
+  private TaskOutputComponent createMeasureReportReferenceOutput(MeasureReport measureReport) {
     return getTaskHelper().createOutput(ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
         ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE,
         new Reference().setReference("MeasureReport/" + measureReport.getIdElement().getIdPart()));
   }
+  
+  
   
   private IdType storeMeasureReport(MeasureReport measureReport) {
     measureReport.setMeta(

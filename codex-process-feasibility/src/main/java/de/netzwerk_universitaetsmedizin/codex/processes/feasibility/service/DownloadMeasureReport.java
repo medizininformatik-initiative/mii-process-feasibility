@@ -1,5 +1,6 @@
 package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 
+import com.google.common.collect.Iterables;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
@@ -39,14 +40,12 @@ public class DownloadMeasureReport extends AbstractServiceDelegate implements In
     @Override
     protected void doExecute(DelegateExecution execution) {
         Task task = getCurrentTaskFromExecutionVariables();
-
         IdType measureReportId = getMeasureReportId(task);
         FhirWebserviceClient client = getWebserviceClient(measureReportId);
         MeasureReport measureReport = downloadMeasureReport(client, measureReportId);
-
         execution.setVariable(ConstantsFeasibility.VARIABLE_MEASURE_REPORT, measureReport);
     }
-
+    
     private MeasureReport downloadMeasureReport(FhirWebserviceClient client, IdType measureReportId) {
         logger.debug("Download MeasureReport with ID {} from {}", measureReportId.getIdPart(), client.getBaseUrl());
         return client.read(MeasureReport.class, measureReportId.getIdPart());
