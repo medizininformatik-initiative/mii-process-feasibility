@@ -100,5 +100,60 @@
                 <targetProfile value="http://hl7.org/fhir/StructureDefinition/Measure"/>
             </type>
         </element>
+        <element id="Task.output">
+            <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
+                <valueString value="Parameter"/>
+            </extension>
+            <path value="Task.output"/>
+        </element>
+        <element id="Task.output:measure-report">
+            <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
+                <valueString value="Parameter"/>
+            </extension>
+            <path value="Task.output"/>
+            <sliceName value="measure-report"/>
+            <min value="0"/>
+            <max value="*"/>
+        </element>
+        <element id="Task.output:measure-report.type">
+            <path value="Task.output.type"/>
+            <binding>
+                <extension url="http://hl7.org/fhir/StructureDefinition/elementdefinition-bindingName">
+                    <valueString value="TaskInputParameterType"/>
+                </extension>
+                <strength value="required"/>
+                <valueSet value="https://www.netzwerk-universitaetsmedizin.de/fhir/ValueSet/feasibility"/>
+            </binding>
+        </element>
+        <element id="Task.output:measure-report.type.coding">
+            <path value="Task.output.type.coding"/>
+            <min value="1"/>
+            <max value="1"/>
+        </element>
+        <element id="Task.output:measure-report.type.coding.system">
+            <path value="Task.output.type.coding.system"/>
+            <min value="1"/>
+            <fixedUri value="https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/feasibility"/>
+        </element>
+        <element id="Task.output:measure-report.type.coding.code">
+            <path value="Task.output.type.coding.code"/>
+            <min value="1"/>
+            <fixedCode value="measure-report-reference"/>
+        </element>
+        <element id="Task.output:measure-report.value[x]">
+            <path value="Task.output.value[x]"/>
+            <type>
+                <code value="Reference"/>
+                <targetProfile value="http://hl7.org/fhir/StructureDefinition/MeasureReport"/>
+            </type>
+        </element>
+        <element id="Task.output:measure-report.value[x].reference">
+            <path value="Task.output.value[x].reference"/>
+            <min value="1"/>
+        </element>
+        <element id="Task.output:measure-report.value[x].identifier">
+            <path value="Task.output.value[x].identifier"/>
+            <max value="0"/>
+        </element>
     </differential>
 </StructureDefinition>

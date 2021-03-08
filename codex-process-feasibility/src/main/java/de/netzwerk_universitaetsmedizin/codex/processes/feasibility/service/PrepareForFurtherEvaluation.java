@@ -32,9 +32,9 @@ public class PrepareForFurtherEvaluation extends AbstractServiceDelegate impleme
  
   @Override
   protected void doExecute(DelegateExecution execution) throws BpmnError, Exception {
-    for (Map.Entry entry : getMeasureReportMap(execution).entrySet()){
+    for (Map.Entry<Reference, MeasureReport> entry : getMeasureReportMap(execution).entrySet()){
       getLeadingTaskFromExecutionVariables().addOutput(
-          addOrganizationReference(createMeasureReportReferenceOutput((MeasureReport) entry.getValue()), (Reference) entry.getKey()));
+          addOrganizationReference(createMeasureReportReferenceOutput(entry.getValue()), entry.getKey()));
     }
   }
   
