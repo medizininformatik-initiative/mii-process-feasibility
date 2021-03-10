@@ -1,6 +1,7 @@
 package de.netzwerk_universitaetsmedizin.codex.processes.feasibility;
 
 import ca.uhn.fhir.context.FhirContext;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.spring.config.EnhancedFhirWebserviceClientProviderConfig;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.spring.config.FeasibilityConfig;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.spring.config.StoreConfig;
 import org.highmed.dsf.bpe.ProcessPluginDefinition;
@@ -37,7 +38,7 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
 
     @Override
     public Stream<Class<?>> getSpringConfigClasses() {
-        return Stream.of(StoreConfig.class, FeasibilityConfig.class);
+        return Stream.of(StoreConfig.class, FeasibilityConfig.class, EnhancedFhirWebserviceClientProviderConfig.class);
     }
 
     @Override

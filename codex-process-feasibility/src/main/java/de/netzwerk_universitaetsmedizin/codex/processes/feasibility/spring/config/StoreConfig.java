@@ -11,11 +11,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class StoreConfig {
 
-    @Autowired
-    private FhirContext fhirContext;
+    private final FhirContext fhirContext;
 
     @Value("${de.netzwerk_universitaetsmedizin.codex.processes.feasibility.store.url:foo}")
     private String storeUrl;
+
+    public StoreConfig(FhirContext fhirContext) {
+        this.fhirContext = fhirContext;
+    }
 
     @Bean
     @Qualifier("store")

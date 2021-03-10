@@ -1,9 +1,9 @@
 package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EnhancedFhirWebserviceClientProvider;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.organization.OrganizationProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.highmed.fhir.client.FhirWebserviceClient;
@@ -28,7 +28,8 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate implem
 
     private final OrganizationProvider organizationProvider;
 
-    public DownloadFeasibilityResources(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper, OrganizationProvider organizationProvider) {
+    public DownloadFeasibilityResources(EnhancedFhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
+                                        OrganizationProvider organizationProvider) {
         super(clientProvider, taskHelper);
         this.organizationProvider = organizationProvider;
     }
@@ -44,7 +45,8 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate implem
         Task task = getCurrentTaskFromExecutionVariables();
 
         IdType measureId = getMeasureId(task);
-        FhirWebserviceClient client = getWebserviceClient(measureId);
+        FhirWebserviceClient client = ((EnhancedFhirWebserviceClientProvider) getFhirWebserviceClientProvider())
+                .getWebserviceClient(measureId);
         Bundle bundle = getMeasureAndLibrary(measureId, client);
 
         execution.setVariable(ConstantsFeasibility.VARIABLE_MEASURE, bundle.getEntry().get(0).getResource());
@@ -60,15 +62,6 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate implem
         } else {
             logger.error("Task {} is missing the measure reference.", task.getId());
             throw new RuntimeException("Missing measure reference.");
-        }
-    }
-
-    private FhirWebserviceClient getWebserviceClient(IdType measureId) {
-        if (measureId.getBaseUrl() == null ||
-                measureId.getBaseUrl().equals(getFhirWebserviceClientProvider().getLocalBaseUrl())) {
-            return getFhirWebserviceClientProvider().getLocalWebserviceClient();
-        } else {
-            return getFhirWebserviceClientProvider().getRemoteWebserviceClient(measureId.getBaseUrl());
         }
     }
 
