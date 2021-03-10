@@ -20,8 +20,6 @@ import java.util.Optional;
 
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
-import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_SINGLE_RESULT;
-import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.EXTENSION_DIC_URI;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
@@ -103,12 +101,6 @@ public class DownloadMeasureReportTest {
         service.execute(execution);
 
         verify(execution).setVariable(VARIABLE_MEASURE_REPORT, measureReport);
-        assertEquals(1, coding.getCoding().size());
-        assertEquals(CODESYSTEM_FEASIBILITY, coding.getCoding().get(0).getSystem());
-        assertEquals(CODESYSTEM_FEASIBILITY_VALUE_SINGLE_RESULT, coding.getCoding().get(0).getCode());
-        assertEquals(1, measureReportGroup.getExtension().size());
-        assertEquals(EXTENSION_DIC_URI, measureReportGroup.getExtension().get(0).getUrl());
-        assertEquals(requesterRef, measureReportGroup.getExtension().get(0).getValue());
     }
 
     @Test
@@ -137,11 +129,5 @@ public class DownloadMeasureReportTest {
         service.execute(execution);
 
         verify(execution).setVariable(VARIABLE_MEASURE_REPORT, measureReport);
-        assertEquals(1, coding.getCoding().size());
-        assertEquals(CODESYSTEM_FEASIBILITY, coding.getCoding().get(0).getSystem());
-        assertEquals(CODESYSTEM_FEASIBILITY_VALUE_SINGLE_RESULT, coding.getCoding().get(0).getCode());
-        assertEquals(1, measureReportGroup.getExtension().size());
-        assertEquals(EXTENSION_DIC_URI, measureReportGroup.getExtension().get(0).getUrl());
-        assertEquals(requesterRef, measureReportGroup.getExtension().get(0).getValue());
     }
 }
