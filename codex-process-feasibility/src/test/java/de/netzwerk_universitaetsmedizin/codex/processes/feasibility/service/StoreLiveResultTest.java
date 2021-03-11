@@ -77,12 +77,14 @@ public class StoreLiveResultTest {
                 .thenReturn(taskOutputComponent);
 
         when(clientProvider.getLocalWebserviceClient().withMinimalReturn()).thenReturn(returnMinimal);
-        when(returnMinimal.create(any(MeasureReport.class))).thenReturn(new IdType());
+
+        IdType measureReportId = new IdType("e26daf2d-2d55-4f23-a7c8-4b994e3a319e");
+        when(returnMinimal.create(any(MeasureReport.class))).thenReturn(measureReportId);
 
         service.execute(execution);
 
         assertEquals(taskOutputComponent, task.getOutputFirstRep());
-        assertEquals("MeasureReport/" + MEASURE_REPORT_ID, refCaptor.getValue().getReference());
+        assertEquals("MeasureReport/" + measureReportId, refCaptor.getValue().getReference());
     }
 
     @Test

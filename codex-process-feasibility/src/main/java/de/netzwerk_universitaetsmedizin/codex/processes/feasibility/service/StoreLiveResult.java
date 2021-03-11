@@ -5,6 +5,7 @@ import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Reference;
@@ -37,24 +38,15 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
     protected void doExecute(DelegateExecution execution) {
         MeasureReport measureReport = getMeasureReport(execution);
         Task task = getCurrentTaskFromExecutionVariables();
-        addMeasureReportReferenceToTask(measureReport, task);
-        storeMeasureReport(measureReport);
+        IdType measureReportId = storeMeasureReport(measureReport);
+        addMeasureReportReferenceToTaskOutput(task, measureReportId);
     }
 
     private MeasureReport getMeasureReport(DelegateExecution execution) {
         return (MeasureReport) execution.getVariable(VARIABLE_MEASURE_REPORT);
     }
 
-    private void addMeasureReportReferenceToTask(MeasureReport measureReport, Task task) {
-        task.addOutput(createMeasureReportReferenceOutput(measureReport));
-    }
-
-    private TaskOutputComponent createMeasureReportReferenceOutput(MeasureReport measureReport) {
-        return getTaskHelper().createOutput(CODESYSTEM_FEASIBILITY, CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE,
-                new Reference().setReference("MeasureReport/" + measureReport.getIdElement().getIdPart()));
-    }
-
-    private void storeMeasureReport(MeasureReport measureReport) {
+    private IdType storeMeasureReport(MeasureReport measureReport) {
         measureReport.setMeta(
                 new Meta().setTag(
                         List.of(new Coding()
@@ -62,8 +54,17 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
                                 .setCode("LOCAL"))
                 )
         );
-        getFhirWebserviceClientProvider().getLocalWebserviceClient()
+        return getFhirWebserviceClientProvider().getLocalWebserviceClient()
                 .withMinimalReturn()
                 .create(measureReport);
+    }
+
+    private void addMeasureReportReferenceToTaskOutput(Task task, IdType measureReportId) {
+        task.addOutput(createMeasureReportReferenceOutput(measureReportId));
+    }
+
+    private TaskOutputComponent createMeasureReportReferenceOutput(IdType measureReportId) {
+        return getTaskHelper().createOutput(CODESYSTEM_FEASIBILITY, CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE,
+                new Reference().setReference("MeasureReport/" + measureReportId.getIdPart()));
     }
 }
