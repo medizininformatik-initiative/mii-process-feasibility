@@ -75,7 +75,7 @@
     <bpmn:sequenceFlow id="Flow_1479yc4" sourceRef="Event_13wq5pb" targetRef="EndEvent" />
     <bpmn:sequenceFlow id="Flow_0wm2en5" sourceRef="Activity_1h2vwsh" targetRef="Activity_1aufhzp" />
     <bpmn:sequenceFlow id="Flow_1f790pw" sourceRef="Activity_1aufhzp" targetRef="EndEvent" />
-    <bpmn:serviceTask id="Activity_1aufhzp" name="prepare query for further evaluation" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.PrepareForFurtherEvaluation">
+    <bpmn:serviceTask id="Activity_1aufhzp" name="prepare task resource for further evaluation" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.PrepareForFurtherEvaluation">
       <bpmn:documentation>Assign queries to organizations</bpmn:documentation>
       <bpmn:incoming>Flow_0wm2en5</bpmn:incoming>
       <bpmn:outgoing>Flow_1f790pw</bpmn:outgoing>
