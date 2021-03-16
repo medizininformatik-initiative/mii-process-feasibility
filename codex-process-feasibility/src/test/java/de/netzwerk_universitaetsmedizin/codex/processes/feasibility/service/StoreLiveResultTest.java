@@ -3,7 +3,7 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
-import org.highmed.fhir.client.PreferReturnMinimalWithRetry;
+import org.highmed.fhir.client.FhirWebserviceClient;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
@@ -43,7 +43,7 @@ public class StoreLiveResultTest {
     private FhirWebserviceClientProvider clientProvider;
 
     @Mock
-    private PreferReturnMinimalWithRetry returnMinimal;
+    private FhirWebserviceClient client;
 
     @Mock
     private DelegateExecution execution;
@@ -76,10 +76,12 @@ public class StoreLiveResultTest {
                 refCaptor.capture()))
                 .thenReturn(taskOutputComponent);
 
-        when(clientProvider.getLocalWebserviceClient().withMinimalReturn()).thenReturn(returnMinimal);
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
 
+        MeasureReport report = new MeasureReport();
         IdType measureReportId = new IdType("e26daf2d-2d55-4f23-a7c8-4b994e3a319e");
-        when(returnMinimal.create(any(MeasureReport.class))).thenReturn(measureReportId);
+        report.setIdElement(measureReportId);
+        when(client.create(any(MeasureReport.class))).thenReturn(report);
 
         service.execute(execution);
 
@@ -98,8 +100,8 @@ public class StoreLiveResultTest {
                 refCaptor.capture()))
                 .thenReturn(new TaskOutputComponent());
 
-        when(clientProvider.getLocalWebserviceClient().withMinimalReturn()).thenReturn(returnMinimal);
-        when(returnMinimal.create(measureReportCaptor.capture())).thenReturn(new IdType());
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
+        when(client.create(measureReportCaptor.capture())).thenReturn(measureReport);
 
         service.execute(execution);
 

@@ -38,15 +38,17 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
     protected void doExecute(DelegateExecution execution) {
         MeasureReport measureReport = getMeasureReport(execution);
         Task task = getCurrentTaskFromExecutionVariables();
-        IdType measureReportId = storeMeasureReport(measureReport);
-        addMeasureReportReferenceToTaskOutput(task, measureReportId);
+        MeasureReport storedMeasureReport = storeMeasureReport(measureReport);
+        addMeasureReportReferenceToTaskOutput(task, storedMeasureReport.getIdElement());
+
+        execution.setVariable(VARIABLE_MEASURE_REPORT, storedMeasureReport);
     }
 
     private MeasureReport getMeasureReport(DelegateExecution execution) {
         return (MeasureReport) execution.getVariable(VARIABLE_MEASURE_REPORT);
     }
 
-    private IdType storeMeasureReport(MeasureReport measureReport) {
+    private MeasureReport storeMeasureReport(MeasureReport measureReport) {
         measureReport.setMeta(
                 new Meta().setTag(
                         List.of(new Coding()
@@ -55,7 +57,6 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
                 )
         );
         return getFhirWebserviceClientProvider().getLocalWebserviceClient()
-                .withMinimalReturn()
                 .create(measureReport);
     }
 
