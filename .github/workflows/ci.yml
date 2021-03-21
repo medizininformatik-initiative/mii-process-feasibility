@@ -15,6 +15,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up JDK 11
       uses: actions/setup-java@v1
       with:
@@ -23,14 +24,24 @@ jobs:
         server-id: highmed-dsf
         server-username: USERNAME
         server-password: GITHUB_TOKEN
+
     - name: Cache Local Maven Repo
       uses: actions/cache@v2.1.2
       with:
         path: |
           ~/.m2/repository
         key: maven-repo
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: java
+
     - name: Build with Maven
       run: mvn -B package --file pom.xml
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           USENAME: ${{ github.actor }}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
