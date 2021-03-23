@@ -33,6 +33,11 @@ mvn clean package
 You can test the processes by following the [README](codex-processes-ap2-docker-test-setup/README.md) in
 the `codex-processes-ap2-docker-test-setup` directory.
 
+## Edit
+You should edit the *.bpmn files only with the standalone Camunda Modeller, because of different 
+formatting of the bpmn tools and plugins.
+https://camunda.com/download/modeler/
+
 ## License
 
 Copyright 2021 Netzwerk Universitätsmedizin

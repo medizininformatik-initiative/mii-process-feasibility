@@ -45,16 +45,14 @@ Messages, queries and results are represented by FHIR resources. The following t
 10. After arrival, the ZARS FHIR communication server will send the `result` Task resource to the ZARS BPE via websocket subscription. The incoming `result` message will use its correlation ID to match the original `request` process to continue. 
     
 10. As part of this process, the MeasureReport resource is fetched from the DIZ.
-    
-10. The fetched MeasureReport resource is stored on the ZARS FHIR communication server together with the updated Task resource which references the MeasureReport resource in its output parameter, in order to make it available to the initial requester.
+
+10. The fetched MeasureReport resource is stored immediately on the ZARS FHIR communication server together with the updated Task resource. The Task resource references the MeasureReport resource in its output parameter, in order to make it available to the initial requester.
 
 ## Request Process as BPMN Model
 
 ![fig-1](./docs/requestSimpleFeasibility.png)
 
-In the [Business Process Model and Notation][7] (BPMN) model of the `request` process, the start message is the `request` message. After selecting the request targets (the DIZ'es), the `execute` messages are send in the next step. After that a subprocess is started for each target, which will wait for the `result` messages to arrive.
-
-__TODO:__ [Support Live Result Updates](https://github.com/num-codex/codex-processes-ap2/issues/6)
+In the [Business Process Model and Notation][7] (BPMN) model of the `request` process, the start message is the `request` message. After selecting the request targets (the DIZ'es), the `execute` messages are send in the next step. After that a subprocess is started for each target, which will wait for the `result` message to arrive. After the result message of each DIZ is stored immediately, the results are aggregated. After Subprocess the task resource is prepared for further evaluation.
 
 ## Execute Process as BPMN Model
 
