@@ -9,16 +9,16 @@ on:
     - main
 
 jobs:
-  build:
 
+  test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
 
     - name: Set up JDK 11
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
+        distribution: 'zulu'
         java-version: 11
         # Set up maven repository credentials for highmed-dsf dependencies
         server-id: highmed-dsf
@@ -34,14 +34,69 @@ jobs:
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
-      with:
-        languages: java
 
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B verify --file pom.xml
       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USENAME: ${{ github.actor }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        USENAME: ${{ github.actor }}
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
+
+
+  build:
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Prepare Version
+      id: prep
+      run: |
+        echo ::set-output name=version::${GITHUB_REF#refs/tags/v}
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'zulu'
+        java-version: 11
+        # Set up maven repository credentials for highmed-dsf dependencies
+        server-id: highmed-dsf
+        server-username: USERNAME
+        server-password: GITHUB_TOKEN
+
+    - name: Cache Local Maven Repo
+      uses: actions/cache@v2.1.2
+      with:
+        path: |
+          ~/.m2/repository
+        key: maven-repo
+
+    - name: Build with Maven
+      run: mvn -B package -DskipTests --file pom.xml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        USENAME: ${{ github.actor }}
+
+    - name: Login to GitHub Docker Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push BPE image
+      uses: docker/build-push-action@v2
+      with:
+        context: docker/bpe
+        tags: ghcr.io/num-codex/codex-processes-ap2/bpe:${{ steps.prep.version }}
+        push: true
+
+    - name: Build and push FHIR image
+      uses: docker/build-push-action@v2
+      with:
+        context: docker/fhir
+        tags: ghcr.io/num-codex/codex-processes-ap2/fhir:${{ steps.prep.version }}
+        push: true

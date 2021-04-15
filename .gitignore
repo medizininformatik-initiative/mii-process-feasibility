@@ -50,3 +50,6 @@
 /codex-processes-ap2-tools/codex-processes-ap2-test-data-generator/cert/*.txt
 /codex-processes-ap2-tools/codex-processes-ap2-test-data-generator/config/*.properties
 /codex-processes-ap2-tools/codex-processes-ap2-test-data-generator/target/
+
+/docker/bpe/plugin/*.jar
+/docker/bpe/process/*.jar

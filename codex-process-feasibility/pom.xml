@@ -55,6 +55,42 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
+
+                    <execution>
+                        <id>copy-process-plugin-to-docker-bpe</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>../docker/bpe/process
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-hapi-fhir-client-to-docker-bpe</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>ca.uhn.hapi.fhir</groupId>
+                                    <artifactId>hapi-fhir-client</artifactId>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>../docker/bpe/plugin</outputDirectory>
+                        </configuration>
+                    </execution>
+
                     <execution>
                         <id>copy-process-plugin-to-dic-1</id>
                         <phase>package</phase>
@@ -163,6 +199,20 @@
                 <artifactId>maven-clean-plugin</artifactId>
                 <configuration>
                     <filesets>
+                        <fileset>
+                            <directory>../docker/bpe/plugin</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>../docker/bpe/process</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
                         <fileset>
                             <directory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/app/plugin</directory>
                             <includes>
