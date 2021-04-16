@@ -93,12 +93,12 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: docker/bpe
-        tags: ghcr.io/num-codex/codex-processes-ap2/bpe:${{ steps.prep.version }}
+        tags: ghcr.io/num-codex/codex-processes-ap2/bpe:${{ steps.prep.outputs.version }}
         push: true
 
     - name: Build and push FHIR image
       uses: docker/build-push-action@v2
       with:
         context: docker/fhir
-        tags: ghcr.io/num-codex/codex-processes-ap2/fhir:${{ steps.prep.version }}
+        tags: ghcr.io/num-codex/codex-processes-ap2/fhir:${{ steps.prep.outputs.version }}
         push: true
