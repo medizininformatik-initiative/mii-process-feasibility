@@ -9,17 +9,6 @@ DIC's.
 
 ### Custom FHIR Server Image
 
-Currently, we need a custom highmed/bpe and highmed/fhir image. In order to build it, do the following:
-
-```sh
-git clone https://github.com/num-codex/highmed-dsf.git
-cd highmed-dsf
-git checkout 175-quality-resporting-resources
-mvn clean install
-docker build --pull -t highmed/bpe dsf-bpe/dsf-bpe-server-jetty/docker
-docker build --pull -t highmed/fhir dsf-fhir/dsf-fhir-server-jetty/docker
-```
-
 Before you can start any site, you have to run maven in order to build plugins, certificates and test data:
 
 ```sh
