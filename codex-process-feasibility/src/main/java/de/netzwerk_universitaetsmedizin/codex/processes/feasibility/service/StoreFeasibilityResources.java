@@ -14,11 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
+import java.util.List;
 import java.util.Objects;
 
 public class StoreFeasibilityResources extends AbstractServiceDelegate implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(StoreFeasibilityResources.class);
+    private static final String CQL_QUERY_CONTENT_TYPE = "text/cql";
 
     private final IGenericClient storeClient;
 
@@ -41,9 +43,19 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
         Measure measure = (Measure) execution.getVariable(ConstantsFeasibility.VARIABLE_MEASURE);
         Library library = (Library) execution.getVariable(ConstantsFeasibility.VARIABLE_LIBRARY);
 
-        Bundle transactionResponse = storeResources(measure, library);
+        Bundle transactionResponse = storeResources(measure, stripNonCqlAttachments(library));
 
         execution.setVariable(ConstantsFeasibility.VARIABLE_MEASURE_ID, extractMeasureId(transactionResponse));
+    }
+
+    private Library stripNonCqlAttachments(Library library) {
+        var cqlAttachment = library.getContent()
+                .stream()
+                .filter(a -> a.getContentType().equalsIgnoreCase(CQL_QUERY_CONTENT_TYPE))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("query is missing content of type " + CQL_QUERY_CONTENT_TYPE));
+
+        return library.setContent(List.of(cqlAttachment));
     }
 
     private Bundle storeResources(Measure measure, Library library) {
