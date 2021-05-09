@@ -97,7 +97,8 @@
             <path value="Task.input.value[x]"/>
             <type>
                 <code value="Reference"/>
-                <targetProfile value="http://hl7.org/fhir/StructureDefinition/MeasureReport"/>
+                <targetProfile
+                        value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-measure-report"/>
             </type>
         </element>
         <element id="Task.input:measure-report.value[x].reference">

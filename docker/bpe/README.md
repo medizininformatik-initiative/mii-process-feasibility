@@ -26,4 +26,7 @@ Docker files for the BPE part of this project.
 |WEBSOCKET_URL| Websocket compliant URL for reaching the FHIR part that belongs to this BPE. ||
 |WEBSOCKET_P12_CERTIFICATE| Certificate bundle in the PKCS12 format used for websocket requests. ||
 |WEBSOCKET_P12_CERTIFICATE_PASSWORD| Password for the certificate bundle. ||
-|PROCESS_STORE_URL| URL for reaching a FHIR store where all process related information are stored. ||
+|PROCESS_EVALUATION_STRATEGY| Specifies whether CQL or Structured Queries shall be evaluated. Possible values are `cql` or `structured-query`. ||
+|PROCESS_STORE_URL| URL for reaching a FHIR store where all process related information are stored. Needs to be set if the evaluation strategy is set to `cql`. ||
+|FLARE_BASE_URL| Base URL for reaching a Flare instance. Needs to be set if the evaluation strategy is set to `structured-query`. ||
+|FLARE_CONNECT_TIMEOUT| Connection timeout in `ms` when connecting to a Flare instance. |`2000`|

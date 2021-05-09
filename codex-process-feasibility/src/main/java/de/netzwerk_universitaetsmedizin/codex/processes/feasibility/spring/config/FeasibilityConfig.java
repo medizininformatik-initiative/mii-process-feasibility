@@ -4,12 +4,16 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EnhancedFhirWebserviceClientProvider;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EnhancedFhirWebserviceClientProviderImpl;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EvaluationStrategyProvider;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.FlareWebserviceClient;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicRequest;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicResponse;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.AggregateMeasureReports;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.DownloadFeasibilityResources;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.DownloadMeasureReport;
-import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.EvaluateMeasure;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.EvaluateCqlMeasure;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.EvaluateStructuredQueryMeasure;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.PrepareEvaluationStrategy;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.PrepareForFurtherEvaluation;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SelectRequestTargets;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SelectResponseTarget;
@@ -31,17 +35,23 @@ public class FeasibilityConfig {
     private final OrganizationProvider organizationProvider;
     private final TaskHelper taskHelper;
     private final FhirContext fhirContext;
+    private final EvaluationStrategyProvider evaluationStrategyProvider;
+    private final FlareWebserviceClient flareWebserviceClient;
 
     public FeasibilityConfig(@Qualifier("clientProvider") FhirWebserviceClientProvider fhirClientProvider,
                              @Qualifier("store") IGenericClient storeClient,
                              OrganizationProvider organizationProvider,
                              TaskHelper taskHelper,
-                             FhirContext fhirContext) {
+                             FhirContext fhirContext,
+                             EvaluationStrategyProvider evaluationStrategyProvider,
+                             FlareWebserviceClient flareWebserviceClient) {
         this.fhirClientProvider = fhirClientProvider;
         this.storeClient = storeClient;
         this.organizationProvider = organizationProvider;
         this.taskHelper = taskHelper;
         this.fhirContext = fhirContext;
+        this.evaluationStrategyProvider = evaluationStrategyProvider;
+        this.flareWebserviceClient = flareWebserviceClient;
     }
 
     @Bean
@@ -67,17 +77,17 @@ public class FeasibilityConfig {
     public DownloadMeasureReport downloadMeasureReport() {
         return new DownloadMeasureReport(fhirClientProvider, taskHelper, organizationProvider);
     }
-    
+
     @Bean
     public StoreLiveResult storeLiveResult() {
         return new StoreLiveResult(fhirClientProvider, taskHelper);
     }
-    
+
     @Bean
     public PrepareForFurtherEvaluation prepareForFurtherEvaluation() {
         return new PrepareForFurtherEvaluation(fhirClientProvider, taskHelper);
     }
-    
+
     @Bean
     public AggregateMeasureReports aggregateMeasureReports() {
         return new AggregateMeasureReports(fhirClientProvider, taskHelper);
@@ -94,13 +104,23 @@ public class FeasibilityConfig {
     }
 
     @Bean
+    public PrepareEvaluationStrategy prepareEvaluationStrategy() {
+        return new PrepareEvaluationStrategy(fhirClientProvider, taskHelper, evaluationStrategyProvider);
+    }
+
+    @Bean
     public StoreFeasibilityResources storeFeasibilityResources() {
         return new StoreFeasibilityResources(fhirClientProvider, taskHelper, storeClient);
     }
 
     @Bean
-    public EvaluateMeasure evaluateMeasure() {
-        return new EvaluateMeasure(fhirClientProvider, taskHelper, storeClient);
+    public EvaluateCqlMeasure evaluateMeasure() {
+        return new EvaluateCqlMeasure(fhirClientProvider, taskHelper, storeClient);
+    }
+
+    @Bean
+    public EvaluateStructuredQueryMeasure evaluateStructureQueryMeasure() {
+        return new EvaluateStructuredQueryMeasure(fhirClientProvider, taskHelper, flareWebserviceClient);
     }
 
     @Bean

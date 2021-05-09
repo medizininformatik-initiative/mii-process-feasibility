@@ -1,0 +1,103 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+    <meta>
+        <tag>
+            <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
+            <code value="REMOTE"/>
+        </tag>
+    </meta>
+    <url value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-measure-report"/>
+    <!-- version managed by bpe -->
+    <version value="${version}"/>
+    <name value="MeasureReport"/>
+    <!-- status managed by bpe -->
+    <status value="unknown"/>
+    <experimental value="false"/>
+    <date value="2021-05-04"/>
+    <fhirVersion value="4.0.1"/>
+    <kind value="resource"/>
+    <abstract value="false"/>
+    <type value="MeasureReport"/>
+    <baseDefinition value="http://hl7.org/fhir/StructureDefinition/MeasureReport"/>
+    <derivation value="constraint"/>
+    <differential>
+        <element id="MeasureReport.status">
+            <path value="MeasureReport.status"/>
+            <fixedCode value="complete"/>
+            <mustSupport value="true"/>
+        </element>
+        <element id="MeasureReport.type">
+            <path value="MeasureReport.type"/>
+            <fixedCode value="summary"/>
+            <mustSupport value="true"/>
+        </element>
+
+        <element id="MeasureReport.date">
+            <path value="MeasureReport.date"/>
+            <min value="1"/>
+            <mustSupport value="true"/>
+        </element>
+
+        <element id="MeasureReport.period">
+            <path value="MeasureReport.period"/>
+            <mustSupport value="true"/>
+        </element>
+        <element id="MeasureReport.period.start">
+            <path value="MeasureReport.period.start"/>
+            <min value="1"/>
+        </element>
+        <element id="MeasureReport.period.end">
+            <path value="MeasureReport.period.end"/>
+            <min value="1"/>
+        </element>
+
+        <element id="MeasureReport.group">
+            <path value="MeasureReport.group"/>
+            <min value="1"/>
+            <max value="1"/>
+            <mustSupport value="true"/>
+        </element>
+        <element id="MeasureReport.group.population">
+            <path value="MeasureReport.group.population"/>
+            <min value="1"/>
+            <max value="1"/>
+            <mustSupport value="true"/>
+        </element>
+
+        <!-- Population Code Slice -->
+        <element id="MeasureReport.group.population.code">
+            <path value="MeasureReport.group.population.code"/>
+            <min value="1"/>
+            <mustSupport value="true"/>
+        </element>
+        <element id="MeasureReport.group.population.code.coding">
+            <path value="MeasureReport.group.population.code.coding"/>
+            <slicing>
+                <discriminator>
+                    <type value="value"/>
+                    <path value="code"/>
+                </discriminator>
+                <ordered value="false"/>
+                <rules value="closed"/>
+            </slicing>
+            <min value="1"/>
+        </element>
+        <!-- INITIAL POPULATION -->
+        <element id="MeasureReport.group.population.code.coding:initial-population">
+            <path value="MeasureReport.group.population.code.coding"/>
+            <sliceName value="initial-population"/>
+            <min value="1"/>
+            <max value="1"/>
+        </element>
+        <element id="MeasureReport.group.population.code.coding:initial-population.code">
+            <path value="MeasureReport.group.population.code.coding.code"/>
+            <min value="1"/>
+            <fixedCode value="initial-population"/>
+        </element>
+
+        <element id="MeasureReport.group.population.count">
+            <path value="MeasureReport.group.population.count"/>
+            <min value="1"/>
+            <mustSupport value="true"/>
+        </element>
+    </differential>
+</StructureDefinition>

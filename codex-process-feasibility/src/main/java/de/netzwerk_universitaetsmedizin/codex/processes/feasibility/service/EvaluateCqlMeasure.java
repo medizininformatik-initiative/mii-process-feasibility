@@ -17,17 +17,17 @@ import java.util.Objects;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_ID;
 import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 
-public class EvaluateMeasure extends AbstractServiceDelegate implements InitializingBean {
+public class EvaluateCqlMeasure extends AbstractServiceDelegate implements InitializingBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(EvaluateMeasure.class);
+    private static final Logger logger = LoggerFactory.getLogger(EvaluateCqlMeasure.class);
 
     private static final String CODE_SYSTEM_MEASURE_POPULATION = "http://terminology.hl7.org/CodeSystem/measure-population";
     private static final String CODE_INITIAL_POPULATION = "initial-population";
 
     private final IGenericClient storeClient;
 
-    public EvaluateMeasure(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                           IGenericClient storeClient) {
+    public EvaluateCqlMeasure(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
+                              IGenericClient storeClient) {
         super(clientProvider, taskHelper);
 
         this.storeClient = storeClient;

@@ -2,7 +2,9 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility;
 
 import ca.uhn.fhir.context.FhirContext;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.spring.config.EnhancedFhirWebserviceClientProviderConfig;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.spring.config.EvaluationConfig;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.spring.config.FeasibilityConfig;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.spring.config.FlareWebserviceClientConfig;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.spring.config.StoreConfig;
 import org.highmed.dsf.bpe.ProcessPluginDefinition;
 import org.highmed.dsf.fhir.resources.AbstractResource;
@@ -38,7 +40,8 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
 
     @Override
     public Stream<Class<?>> getSpringConfigClasses() {
-        return Stream.of(StoreConfig.class, FeasibilityConfig.class, EnhancedFhirWebserviceClientProviderConfig.class);
+        return Stream.of(StoreConfig.class, FeasibilityConfig.class, EnhancedFhirWebserviceClientProviderConfig.class,
+                EvaluationConfig.class, FlareWebserviceClientConfig.class);
     }
 
     @Override
@@ -51,6 +54,13 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
         var sExtDic = StructureDefinitionResource
                 .file("fhir/StructureDefinition/codex-extension-dic.xml");
 
+        var sMeasure = StructureDefinitionResource
+                .file("fhir/StructureDefinition/codex-measure.xml");
+        var sMeasureReport = StructureDefinitionResource
+                .file("fhir/StructureDefinition/codex-measure-report.xml");
+        var sLibrary = StructureDefinitionResource
+                .file("fhir/StructureDefinition/codex-library.xml");
+
         var sTExe = StructureDefinitionResource
                 .file("fhir/StructureDefinition/codex-task-execute-simple-feasibility.xml");
         var sTReq = StructureDefinitionResource
@@ -62,9 +72,9 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
 
         Map<String, List<AbstractResource>> resourcesByProcessKeyAndVersion = Map.of(
                 "executeSimpleFeasibility/" + VERSION,
-                Arrays.asList(aExe, sTExe, sTResS, vF, cF),
+                Arrays.asList(aExe, sTExe, sTResS, vF, cF, sMeasure, sMeasureReport, sLibrary),
                 "requestSimpleFeasibility/" + VERSION,
-                Arrays.asList(aReq, sTReq, sExtDic, vF, cF));
+                Arrays.asList(aReq, sTReq, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary));
 
         return ResourceProvider.read(VERSION,
                 () -> fhirContext.newXmlParser().setStripVersionsFromReferences(false),

@@ -37,7 +37,7 @@ services:
     - zars-fhir-app
 
   zars-fhir-app:
-    image: highmed/fhir
+    image: ghcr.io/highmed/fhir:0.5.0-m1
     restart: on-failure
     volumes:
     - type: bind
@@ -79,7 +79,7 @@ services:
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: highmed/bpe
+    image: ghcr.io/highmed/bpe:0.5.0-m1
     restart: on-failure
     volumes:
     - type: bind
@@ -153,7 +153,7 @@ services:
     - dic-1-fhir-app
 
   dic-1-fhir-app:
-    image: highmed/fhir
+    image: ghcr.io/highmed/fhir:0.5.0-m1
     restart: on-failure
     volumes:
     - type: bind
@@ -193,7 +193,7 @@ services:
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: highmed/bpe
+    image: ghcr.io/highmed/bpe:0.5.0-m1
     restart: on-failure
     volumes:
     - type: bind
@@ -249,19 +249,50 @@ services:
 
   # ---- DIC-1 - FHIR Data Store ----------------------------------------------
   dic-1-store:
-    image: samply/blaze:0.10.3
-    restart: on-failure
+    image: ghcr.io/num-codex/codex-flare:0.0.1
+    restart: always
     ports:
-    - 8071:8080
+    - 5000:5000
     environment:
-      BASE_URL: http://localhost:8071
-      LOG_LEVEL: debug
+      FHIR_BASE_URL: http://dic-1-store-fhir-server:8080/fhir
     networks:
-    - dic-1-bpe-backend
+      dic-1-bpe-backend:
+    volumes:
+    - ./dic-1/flare/codex-code-tree.json:/opt/flare/src/query_parser/codex/codex-code-tree.json
+    - ./dic-1/flare/codex-mapping.json:/opt/flare/src/query_parser/codex/codex-mapping.json
+    depends_on:
+    - dic-1-store-fhir-server
+
+  dic-1-store-fhir-server:
+    image: ghcr.io/chgl/hapi/hapi-fhir-jpaserver-starter:5.2.0-distroless
+    networks:
+      dic-1-bpe-backend:
+    restart: always
+    ports:
+    - 8081:8080
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://dic-1-store-db:5432/fhir?currentSchema=public"
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_DRIVERCLASSNAME: org.postgresql.Driver
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQL10Dialect
+      VALIDATION_REQUESTS_ENABLED: "false"
+      HAPI_FHIR_USE_APACHE_ADDRESS_STRATEGY: "true"
+    depends_on:
+    - dic-1-store-db
+
+  dic-1-store-db:
+    image: postgres:12.6-alpine
+    networks:
+      dic-1-bpe-backend:
+    restart: always
     volumes:
     - type: volume
       source: dic-1-store-data
-      target: /app/data
+      target: /var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fhir
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-proxy:
@@ -284,7 +315,7 @@ services:
     - dic-2-fhir-app
 
   dic-2-fhir-app:
-    image: highmed/fhir
+    image: ghcr.io/highmed/fhir:0.5.0-m1
     restart: on-failure
     volumes:
     - type: bind
@@ -324,7 +355,7 @@ services:
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: highmed/bpe
+    image: ghcr.io/highmed/bpe:0.5.0-m1
     restart: on-failure
     volumes:
     - type: bind

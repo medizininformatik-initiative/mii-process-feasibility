@@ -46,7 +46,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
-public class EvaluateMeasureTest {
+public class EvaluateCqlMeasureTest {
 
     private static final String CODE_SYSTEM_MEASURE_POPULATION = "http://terminology.hl7.org/CodeSystem/measure-population";
     private static final String CODE_INITIAL_POPULATION = "initial-population";
@@ -68,7 +68,7 @@ public class EvaluateMeasureTest {
     private DelegateExecution execution;
 
     @InjectMocks
-    private EvaluateMeasure service;
+    private EvaluateCqlMeasure service;
 
     private final MeasureReport measureReport;
     private final Optional<String> expectedErrMsg;
@@ -76,7 +76,7 @@ public class EvaluateMeasureTest {
     private Task.TaskOutputComponent taskOutputComponent;
 
     @SuppressWarnings("unused")
-    public EvaluateMeasureTest(String name, Optional<String> expectedErrMsg, MeasureReport measureReport) {
+    public EvaluateCqlMeasureTest(String name, Optional<String> expectedErrMsg, MeasureReport measureReport) {
         this.expectedErrMsg = expectedErrMsg;
         this.measureReport = measureReport;
     }
