@@ -4,7 +4,8 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EnhancedFhirWebserviceClientProvider;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EnhancedFhirWebserviceClientProviderImpl;
-import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EvaluationStrategyProvider;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EvaluationSettingsProvider;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.FeasibilityCountObfuscator;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.FlareWebserviceClient;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicRequest;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicResponse;
@@ -13,10 +14,11 @@ import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.Down
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.DownloadMeasureReport;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.EvaluateCqlMeasure;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.EvaluateStructuredQueryMeasure;
-import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.PrepareEvaluationStrategy;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.ObfuscateEvaluationResult;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.PrepareForFurtherEvaluation;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SelectRequestTargets;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SelectResponseTarget;
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SetupEvaluationSettings;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreFeasibilityResources;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreLiveResult;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreMeasureReport;
@@ -35,7 +37,7 @@ public class FeasibilityConfig {
     private final OrganizationProvider organizationProvider;
     private final TaskHelper taskHelper;
     private final FhirContext fhirContext;
-    private final EvaluationStrategyProvider evaluationStrategyProvider;
+    private final EvaluationSettingsProvider evaluationSettingsProvider;
     private final FlareWebserviceClient flareWebserviceClient;
 
     public FeasibilityConfig(@Qualifier("clientProvider") FhirWebserviceClientProvider fhirClientProvider,
@@ -43,20 +45,25 @@ public class FeasibilityConfig {
                              OrganizationProvider organizationProvider,
                              TaskHelper taskHelper,
                              FhirContext fhirContext,
-                             EvaluationStrategyProvider evaluationStrategyProvider,
+                             EvaluationSettingsProvider evaluationSettingsProvider,
                              FlareWebserviceClient flareWebserviceClient) {
         this.fhirClientProvider = fhirClientProvider;
         this.storeClient = storeClient;
         this.organizationProvider = organizationProvider;
         this.taskHelper = taskHelper;
         this.fhirContext = fhirContext;
-        this.evaluationStrategyProvider = evaluationStrategyProvider;
+        this.evaluationSettingsProvider = evaluationSettingsProvider;
         this.flareWebserviceClient = flareWebserviceClient;
     }
 
     @Bean
     public EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider() {
         return new EnhancedFhirWebserviceClientProviderImpl(fhirClientProvider);
+    }
+
+    @Bean
+    public FeasibilityCountObfuscator feasibilityCountObfuscator() {
+        return new FeasibilityCountObfuscator();
     }
 
     //
@@ -98,14 +105,14 @@ public class FeasibilityConfig {
     //
 
     @Bean
-    public DownloadFeasibilityResources downloadFeasibilityResources(
-            EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
-        return new DownloadFeasibilityResources(enhancedFhirClientProvider, taskHelper, organizationProvider);
+    public SetupEvaluationSettings setupEvaluationSettings() {
+        return new SetupEvaluationSettings(fhirClientProvider, taskHelper, evaluationSettingsProvider);
     }
 
     @Bean
-    public PrepareEvaluationStrategy prepareEvaluationStrategy() {
-        return new PrepareEvaluationStrategy(fhirClientProvider, taskHelper, evaluationStrategyProvider);
+    public DownloadFeasibilityResources downloadFeasibilityResources(
+            EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
+        return new DownloadFeasibilityResources(enhancedFhirClientProvider, taskHelper, organizationProvider);
     }
 
     @Bean
@@ -114,13 +121,18 @@ public class FeasibilityConfig {
     }
 
     @Bean
-    public EvaluateCqlMeasure evaluateMeasure() {
+    public EvaluateCqlMeasure evaluateCqlMeasure() {
         return new EvaluateCqlMeasure(fhirClientProvider, taskHelper, storeClient);
     }
 
     @Bean
     public EvaluateStructuredQueryMeasure evaluateStructureQueryMeasure() {
         return new EvaluateStructuredQueryMeasure(fhirClientProvider, taskHelper, flareWebserviceClient);
+    }
+
+    @Bean
+    public ObfuscateEvaluationResult obfuscateEvaluationResult(FeasibilityCountObfuscator feasibilityCountObfuscator) {
+        return new ObfuscateEvaluationResult(fhirClientProvider, taskHelper, feasibilityCountObfuscator);
     }
 
     @Bean
