@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * Determines which evaluation strategy to be used within the process.
  */
-public enum EvaluationStrategy implements EvaluationStrategyProvider {
+public enum EvaluationStrategy {
 
     /**
      * Measures will be evaluated using CQL.
@@ -46,10 +46,5 @@ public enum EvaluationStrategy implements EvaluationStrategyProvider {
                 .filter(es -> es.strategyRepresentation.equalsIgnoreCase(strategyRepresentation))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No known evaluation strategy with the representation: " + strategyRepresentation));
-    }
-
-    @Override
-    public EvaluationStrategy provideEvaluationStrategy() {
-        return this;
     }
 }

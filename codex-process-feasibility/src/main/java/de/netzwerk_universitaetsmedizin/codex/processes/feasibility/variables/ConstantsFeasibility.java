@@ -8,6 +8,7 @@ public interface ConstantsFeasibility {
     String VARIABLE_MEASURE_REPORT_ID = "measure-report-id";
     String VARIABLE_MEASURE_REPORT_MAP = "measure-report-map";
     String VARIABLE_EVALUATION_STRATEGY = "evaluation-strategy";
+    String VARIABLE_EVALUATION_OBFUSCATION = "evaluation-obfuscation";
 
     String CODESYSTEM_FEASIBILITY = "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/feasibility";
     String CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE = "measure-reference";
