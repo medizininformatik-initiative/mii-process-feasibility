@@ -11,14 +11,14 @@
             "https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-request-simple-feasibility"
           ]
         },
-        "instantiatesUri": "http://highmed.org/bpe/Process/requestSimpleFeasibility/0.1.0",
+        "instantiatesUri": "http://www.netzwerk-universitaetsmedizin.de/bpe/Process/requestSimpleFeasibility/0.1.0",
         "status": "requested",
         "intent": "order",
         "authoredOn": "2021",
         "requester": {
           "type": "Organization",
           "identifier": {
-            "system": "http://highmed.org/fhir/NamingSystem/organization-identifier",
+            "system": "http://highmed.org/sid/organization-identifier",
             "value": "Test_ZARS"
           }
         },
@@ -27,7 +27,7 @@
             {
               "type": "Organization",
               "identifier": {
-                "system": "http://highmed.org/fhir/NamingSystem/organization-identifier",
+                "system": "http://highmed.org/sid/organization-identifier",
                 "value": "Test_ZARS"
               }
             }
@@ -83,18 +83,18 @@
         "meta": {
           "tag": [
             {
-              "system": "http://highmed.org/fhir/CodeSystem/authorization-role",
-              "code": "LOCAL"
-            },
-            {
-              "system": "http://highmed.org/fhir/CodeSystem/authorization-role",
-              "code": "REMOTE"
+              "system": "http://highmed.org/fhir/CodeSystem/read-access-tag",
+              "code": "ALL"
             }
+          ],
+          "profile": [
+            "https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-measure"
           ]
         },
+        "url": "https://zars/Measure/7a142223-616f-41a1-97da-2ae726031b71",
         "status": "active",
         "library": [
-          "https://zars/fhir/Library/30561ba6-106f-4d52-bb8d-e49e20a40d40"
+          "urn:uuid:30561ba6-106f-4d52-bb8d-e49e20a40d40"
         ],
         "scoring": {
           "coding": [
@@ -137,16 +137,15 @@
         "meta": {
           "tag": [
             {
-              "system": "http://highmed.org/fhir/CodeSystem/authorization-role",
-              "code": "LOCAL"
-            },
-            {
-              "system": "http://highmed.org/fhir/CodeSystem/authorization-role",
-              "code": "REMOTE"
+              "system": "http://highmed.org/fhir/CodeSystem/read-access-tag",
+              "code": "ALL"
             }
+          ],
+          "profile": [
+            "https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-library"
           ]
         },
-        "url": "https://zars/fhir/Library/30561ba6-106f-4d52-bb8d-e49e20a40d40",
+        "url": "urn:uuid:30561ba6-106f-4d52-bb8d-e49e20a40d40",
         "status": "active",
         "type": {
           "coding": [
@@ -159,7 +158,11 @@
         "content": [
           {
             "contentType": "text/cql",
-            "data": "bGlicmFyeSBSZXRyaWV2ZQp1c2luZyBGSElSIHZlcnNpb24gJzQuMC4wJwppbmNsdWRlIEZISVJIZWxwZXJzIHZlcnNpb24gJzQuMC4wJwoKY29udGV4dCBQYXRpZW50CgpkZWZpbmUgSW5Jbml0aWFsUG9wdWxhdGlvbjoKICBQYXRpZW50LmdlbmRlciA9ICdtYWxlJwoK"
+            "data": "bGlicmFyeSBSZXRyaWV2ZQp1c2luZyBGSElSIHZlcnNpb24gJzQuMC4wJwppbmNsdWRlIEZISVJIZWxwZXJzIHZlcnNpb24gJzQuMC4wJwoKY29udGV4dCBQYXRpZW50CgpkZWZpbmUgSW5Jbml0aWFsUG9wdWxhdGlvbjoKUGF0aWVudC5nZW5kZXIgPSAnbWFsZScK"
+          },
+          {
+            "contentType": "application/json",
+            "data": "ewogICAgInZlcnNpb24iOiAiaHR0cDovL3RvX2JlX2RlY2lkZWQuY29tL2RyYWZ0LTEvc2NoZW1hIyIsCiAgICAiZGlzcGxheSI6ICIiLAogICAgImluY2x1c2lvbkNyaXRlcmlhIjogWwogICAgICBbCiAgICAgICAgewogICAgICAgICAgInRlcm1Db2RlIjogewogICAgICAgICAgICAiY29kZSI6ICIyOTQ2My03IiwKICAgICAgICAgICAgInN5c3RlbSI6ICJodHRwOi8vbG9pbmMub3JnIiwKICAgICAgICAgICAgInZlcnNpb24iOiAidjEiLAogICAgICAgICAgICAiZGlzcGxheSI6ICJCb2R5IFdlaWdodCIKICAgICAgICB9LAogICAgICAgICJ2YWx1ZUZpbHRlciI6IHsKICAgICAgICAgICAgInR5cGUiOiAicXVhbnRpdHktY29tcGFyYXRvciIsCiAgICAgICAgICAgICJ1bml0IjogewogICAgICAgICAgICAgICJjb2RlIjogImtnIiwKICAgICAgICAgICAgICAiZGlzcGxheSI6ICJraWxvZ3JhbSIKICAgICAgICAgICAgfSwKICAgICAgICAgICAgImNvbXBhcmF0b3IiOiAiZ3QiLAogICAgICAgICAgICAidmFsdWUiOiA5MAogICAgICAgICAgfQogICAgICAgIH0KICAgICAgXQogICAgXQogIH0K"
           }
         ]
       },
