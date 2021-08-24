@@ -2,6 +2,7 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.MeasureReport;
@@ -30,8 +31,9 @@ public class PrepareForFurtherEvaluation extends AbstractServiceDelegate impleme
      * @param clientProvider the client provider
      * @param taskHelper     the task helper
      */
-    public PrepareForFurtherEvaluation(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper) {
-        super(clientProvider, taskHelper);
+    public PrepareForFurtherEvaluation(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
+                                       ReadAccessHelper readAccessHelper) {
+        super(clientProvider, taskHelper, readAccessHelper);
     }
 
     @Override

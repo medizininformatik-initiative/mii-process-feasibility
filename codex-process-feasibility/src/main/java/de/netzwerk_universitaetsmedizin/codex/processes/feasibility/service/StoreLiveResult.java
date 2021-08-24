@@ -2,6 +2,7 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.Coding;
@@ -30,8 +31,9 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
      * @param clientProvider the client provider
      * @param taskHelper     the task helper
      */
-    public StoreLiveResult(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper) {
-        super(clientProvider, taskHelper);
+    public StoreLiveResult(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
+                           ReadAccessHelper readAccessHelper) {
+        super(clientProvider, taskHelper, readAccessHelper);
     }
 
     @Override
@@ -52,8 +54,8 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
         measureReport.setMeta(
                 new Meta().setTag(
                         List.of(new Coding()
-                                .setSystem("http://highmed.org/fhir/CodeSystem/authorization-role")
-                                .setCode("LOCAL"))
+                                .setSystem("http://highmed.org/fhir/CodeSystem/read-access-tag")
+                                .setCode("ALL"))
                 )
         );
         return getFhirWebserviceClientProvider().getLocalWebserviceClient()

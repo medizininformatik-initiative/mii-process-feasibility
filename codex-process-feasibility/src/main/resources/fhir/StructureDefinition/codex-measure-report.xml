@@ -1,8 +1,8 @@
 <StructureDefinition xmlns="http://hl7.org/fhir">
     <meta>
         <tag>
-            <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
-            <code value="REMOTE"/>
+            <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+            <code value="ALL"/>
         </tag>
     </meta>
     <url value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-measure-report"/>
@@ -12,7 +12,7 @@
     <!-- status managed by bpe -->
     <status value="unknown"/>
     <experimental value="false"/>
-    <date value="2021-05-04"/>
+    <date value="2021-08-22"/>
     <fhirVersion value="4.0.1"/>
     <kind value="resource"/>
     <abstract value="false"/>

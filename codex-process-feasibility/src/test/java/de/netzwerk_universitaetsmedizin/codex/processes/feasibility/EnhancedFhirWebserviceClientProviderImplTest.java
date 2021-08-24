@@ -30,18 +30,18 @@ public class EnhancedFhirWebserviceClientProviderImplTest {
     private static final String FULL_URL = BASE_URL + "/" + PATH;
 
     @Test
-    public void testGetWebserviceClient_Local() {
+    public void testGetWebserviceClientByReference_Local() {
         IdType idType = new IdType("Something/id-123456");
         when(clientProvider.getLocalWebserviceClient())
                 .thenReturn(client);
 
-        FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getWebserviceClient(idType);
+        FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getWebserviceClientByReference(idType);
 
         assertSame(client, webserviceClient);
     }
 
     @Test
-    public void testGetWebserviceClient_ReferenceUrlEqualsLocalBaseUrl() {
+    public void testGetWebserviceClientByReference_ReferenceUrlEqualsLocalBaseUrl() {
         IdType localIdType = new IdType(FULL_URL);
 
         when(clientProvider.getLocalBaseUrl())
@@ -49,18 +49,18 @@ public class EnhancedFhirWebserviceClientProviderImplTest {
         when(clientProvider.getLocalWebserviceClient())
                 .thenReturn(client);
 
-        final FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getWebserviceClient(localIdType);
+        final FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getWebserviceClientByReference(localIdType);
 
         assertSame(client, webserviceClient);
     }
 
     @Test
-    public void testGetWebserviceClient_Remote() {
+    public void testGetWebserviceClientByReference_Remote() {
         IdType idType = new IdType("http://remote.host/Something/id-123456");
-        when(clientProvider.getRemoteWebserviceClient("http://remote.host"))
+        when(clientProvider.getWebserviceClient("http://remote.host"))
                 .thenReturn(client);
 
-        FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getWebserviceClient(idType);
+        FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getWebserviceClientByReference(idType);
 
         assertSame(client, webserviceClient);
     }
@@ -87,33 +87,10 @@ public class EnhancedFhirWebserviceClientProviderImplTest {
     }
 
     @Test
-    public void testGetRemoteWebserviceClient_Reference() {
-        IdType idType = new IdType(FULL_URL);
-
-        when(clientProvider.getRemoteWebserviceClient(idType))
+    public void testGetWebserviceClient() {
+        when(clientProvider.getWebserviceClient(FULL_URL))
                 .thenReturn(client);
-        FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getRemoteWebserviceClient(idType);
-
-        assertSame(client, webserviceClient);
-    }
-
-    @Test
-    public void testGetRemoteWebserviceClient_Url() {
-        when(clientProvider.getRemoteWebserviceClient(FULL_URL))
-                .thenReturn(client);
-
-        FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getRemoteWebserviceClient(FULL_URL);
-
-        assertSame(client, webserviceClient);
-    }
-
-    @Test
-    public void testGetRemoteWebserviceClient_BaseUrlAndPath() {
-        when(clientProvider.getRemoteWebserviceClient(BASE_URL, PATH))
-                .thenReturn(client);
-
-        FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getRemoteWebserviceClient(BASE_URL,
-                PATH);
+        FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getWebserviceClient(FULL_URL);
 
         assertSame(client, webserviceClient);
     }

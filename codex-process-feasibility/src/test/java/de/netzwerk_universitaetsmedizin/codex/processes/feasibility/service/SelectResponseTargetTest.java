@@ -2,6 +2,7 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.variable.value.PrimitiveValue;
+import org.highmed.dsf.fhir.organization.EndpointProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.highmed.dsf.fhir.variables.Target;
 import org.hl7.fhir.r4.model.Identifier;
@@ -36,6 +37,9 @@ public class SelectResponseTargetTest {
     private TaskHelper taskHelper;
 
     @Mock
+    private EndpointProvider endpointProvider;
+
+    @Mock
     private DelegateExecution execution;
 
     @InjectMocks
@@ -44,11 +48,13 @@ public class SelectResponseTargetTest {
     @Test
     public void testDoExecute() throws Exception {
         Task task = new Task();
-        Reference reference = new Reference()
+        Reference requesterReference = new Reference()
                 .setIdentifier(new Identifier()
                         .setSystem("http://localhost/systems/sample-system")
                         .setValue("requester-id"));
-        task.setRequester(reference);
+        task.setRequester(requesterReference);
+        when(endpointProvider.getFirstDefaultEndpointAddress(requesterReference.getIdentifier().getValue()))
+                .thenReturn(Optional.of("endpoint-url"));
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterStringValue(task, CODESYSTEM_HIGHMED_BPMN,
@@ -58,7 +64,10 @@ public class SelectResponseTargetTest {
         service.execute(execution);
 
         verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGET), targetsValuesCaptor.capture());
-        assertEquals("correlation-key", targetsValuesCaptor.getValue().getValue().getCorrelationKey());
-        assertEquals("requester-id", targetsValuesCaptor.getValue().getValue().getTargetOrganizationIdentifierValue());
+
+        var target = targetsValuesCaptor.getValue().getValue();
+        assertEquals("correlation-key", target.getCorrelationKey());
+        assertEquals("requester-id", target.getTargetOrganizationIdentifierValue());
+        assertEquals("endpoint-url", target.getTargetEndpointUrl());
     }
 }

@@ -15,5 +15,5 @@ public interface EnhancedFhirWebserviceClientProvider extends FhirWebserviceClie
      * @param reference A FHIR ID Type that points either to a local or a remote resource.
      * @return A FHIR webservice client.
      */
-    FhirWebserviceClient getWebserviceClient(IdType reference);
+    FhirWebserviceClient getWebserviceClientByReference(IdType reference);
 }

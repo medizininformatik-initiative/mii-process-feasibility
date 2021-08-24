@@ -2,6 +2,7 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message;
 
 import ca.uhn.fhir.context.FhirContext;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.organization.OrganizationProvider;
 import org.highmed.dsf.fhir.task.AbstractTaskMessageSend;
@@ -18,8 +19,9 @@ import static de.netzwerk_universitaetsmedizin.codex.processes.feasibility.varia
 public class SendDicResponse extends AbstractTaskMessageSend {
 
     public SendDicResponse(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                           OrganizationProvider organizationProvider, FhirContext fhirContext) {
-        super(clientProvider, taskHelper, organizationProvider, fhirContext);
+                           ReadAccessHelper readAccessHelper, OrganizationProvider organizationProvider,
+                           FhirContext fhirContext) {
+        super(clientProvider, taskHelper, readAccessHelper, organizationProvider, fhirContext);
     }
 
     @Override

@@ -2,6 +2,7 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.Coding;
@@ -21,8 +22,9 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
 
     private static final Logger logger = LoggerFactory.getLogger(StoreMeasureReport.class);
 
-    public StoreMeasureReport(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper) {
-        super(clientProvider, taskHelper);
+    public StoreMeasureReport(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
+                              ReadAccessHelper readAccessHelper) {
+        super(clientProvider, taskHelper, readAccessHelper);
     }
 
     @Override
@@ -39,11 +41,8 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
         measureReport.setMeta(
                 new Meta().setTag(
                         List.of(new Coding()
-                                        .setSystem("http://highmed.org/fhir/CodeSystem/authorization-role")
-                                        .setCode("LOCAL"),
-                                new Coding()
-                                        .setSystem("http://highmed.org/fhir/CodeSystem/authorization-role")
-                                        .setCode("REMOTE")))
+                                .setSystem("http://highmed.org/fhir/CodeSystem/read-access-tag")
+                                .setCode("ALL")))
         );
         return getFhirWebserviceClientProvider().getLocalWebserviceClient()
                 .withMinimalReturn()

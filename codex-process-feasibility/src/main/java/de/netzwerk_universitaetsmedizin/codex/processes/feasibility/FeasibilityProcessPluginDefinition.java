@@ -13,6 +13,7 @@ import org.highmed.dsf.fhir.resources.CodeSystemResource;
 import org.highmed.dsf.fhir.resources.ResourceProvider;
 import org.highmed.dsf.fhir.resources.StructureDefinitionResource;
 import org.highmed.dsf.fhir.resources.ValueSetResource;
+import org.springframework.core.env.PropertyResolver;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +46,8 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
     }
 
     @Override
-    public ResourceProvider getResourceProvider(FhirContext fhirContext, ClassLoader classLoader) {
+    public ResourceProvider getResourceProvider(FhirContext fhirContext, ClassLoader classLoader,
+                                                PropertyResolver propertyResolver) {
         var aExe = ActivityDefinitionResource.file("fhir/ActivityDefinition/executeSimpleFeasibility.xml");
         var aReq = ActivityDefinitionResource.file("fhir/ActivityDefinition/requestSimpleFeasibility.xml");
 
@@ -71,13 +73,13 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
         var vF = ValueSetResource.file("fhir/ValueSet/feasibility.xml");
 
         Map<String, List<AbstractResource>> resourcesByProcessKeyAndVersion = Map.of(
-                "executeSimpleFeasibility/" + VERSION,
+                "wwwnetzwerk-universitaetsmedizinde_executeSimpleFeasibility/" + VERSION,
                 Arrays.asList(aExe, sTExe, sTResS, vF, cF, sMeasure, sMeasureReport, sLibrary),
-                "requestSimpleFeasibility/" + VERSION,
+                "wwwnetzwerk-universitaetsmedizinde_requestSimpleFeasibility/" + VERSION,
                 Arrays.asList(aReq, sTReq, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary));
 
         return ResourceProvider.read(VERSION,
                 () -> fhirContext.newXmlParser().setStripVersionsFromReferences(false),
-                classLoader, resourcesByProcessKeyAndVersion);
+                classLoader, propertyResolver, resourcesByProcessKeyAndVersion);
     }
 }

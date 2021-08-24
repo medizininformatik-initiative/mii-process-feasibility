@@ -3,6 +3,7 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EvaluationSettingsProvider;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,8 +18,9 @@ public class SetupEvaluationSettings extends AbstractServiceDelegate implements 
     private final EvaluationSettingsProvider evaluationSettingsProvider;
 
     public SetupEvaluationSettings(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
+                                   ReadAccessHelper readAccessHelper,
                                    EvaluationSettingsProvider evaluationSettingsProvider) {
-        super(clientProvider, taskHelper);
+        super(clientProvider, taskHelper, readAccessHelper);
         this.evaluationSettingsProvider = evaluationSettingsProvider;
     }
 

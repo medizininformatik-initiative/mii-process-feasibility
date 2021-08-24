@@ -1,86 +1,62 @@
 <ActivityDefinition xmlns="http://hl7.org/fhir">
     <meta>
         <tag>
-            <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
-            <code value="REMOTE"/>
+            <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+            <code value="ALL"/>
         </tag>
     </meta>
     <extension url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization">
         <extension url="message-name">
             <valueString value="requestSimpleFeasibilityMessage"/>
         </extension>
-        <extension url="authorization-roles">
-            <extension url="authorization-role">
-                <valueCoding>
-                    <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
-                    <code value="LOCAL"/>
-                </valueCoding>
-            </extension>
-        </extension>
-        <extension url="requester-organization-types">
-            <extension url="requester-organization-type">
-                <valueCoding>
-                    <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
-                    <code value="MeDIC"/>
-                </valueCoding>
-            </extension>
-        </extension>
-        <extension url="recipient-organization-types">
-            <extension url="recipient-organization-type">
-                <valueCoding>
-                    <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
-                    <code value="MeDIC"/>
-                </valueCoding>
-            </extension>
-        </extension>
         <extension url="task-profile">
             <valueCanonical
                     value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-request-simple-feasibility"/>
+        </extension>
+        <extension url="requester">
+            <valueCoding>
+                <system value="http://highmed.org/fhir/CodeSystem/process-authorization"/>
+                <code value="LOCAL_ALL"/>
+            </valueCoding>
+        </extension>
+        <extension url="recipient">
+            <valueCoding>
+                <system value="http://highmed.org/fhir/CodeSystem/process-authorization"/>
+                <code value="LOCAL_ALL"/>
+            </valueCoding>
         </extension>
     </extension>
     <extension url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization">
         <extension url="message-name">
             <valueString value="resultSingleDicSimpleFeasibilityMessage"/>
         </extension>
-        <extension url="authorization-roles">
-            <extension url="authorization-role">
-                <valueCoding>
-                    <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
-                    <code value="REMOTE"/>
-                </valueCoding>
-            </extension>
-        </extension>
-        <extension url="requester-organization-types">
-            <extension url="requester-organization-type">
-                <valueCoding>
-                    <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
-                    <code value="MeDIC"/>
-                </valueCoding>
-            </extension>
-        </extension>
-        <extension url="recipient-organization-types">
-            <extension url="recipient-organization-type">
-                <valueCoding>
-                    <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
-                    <code value="MeDIC"/>
-                </valueCoding>
-            </extension>
-        </extension>
         <extension url="task-profile">
             <valueCanonical
                     value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility"/>
         </extension>
+        <extension url="requester">
+            <valueCoding>
+                <system value="http://highmed.org/fhir/CodeSystem/process-authorization"/>
+                <code value="REMOTE_ALL"/>
+            </valueCoding>
+        </extension>
+        <extension url="recipient">
+            <valueCoding>
+                <system value="http://highmed.org/fhir/CodeSystem/process-authorization"/>
+                <code value="LOCAL_ALL"/>
+            </valueCoding>
+        </extension>
     </extension>
-    <url value="http://highmed.org/bpe/Process/requestSimpleFeasibility"/>
+    <url value="http://www.netzwerk-universitaetsmedizin.de/bpe/Process/requestSimpleFeasibility"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
-    <name value="requestSimpleFeasibility"/>
+    <name value="RequestSimpleFeasibility"/>
     <title value="Request simple feasibility"/>
     <subtitle value="Feasibility Request Process"/>
     <!-- status managed by bpe -->
     <status value="unknown"/>
     <experimental value="false"/>
-    <date value="2021-01-09"/>
+    <date value="2021-08-22"/>
     <publisher value="Codex"/>
     <contact>
         <name value="Codex"/>

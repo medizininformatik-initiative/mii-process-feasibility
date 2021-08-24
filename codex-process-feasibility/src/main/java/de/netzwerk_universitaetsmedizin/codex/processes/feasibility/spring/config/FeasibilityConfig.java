@@ -22,7 +22,9 @@ import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.Setu
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreFeasibilityResources;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreLiveResult;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreMeasureReport;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
+import org.highmed.dsf.fhir.organization.EndpointProvider;
 import org.highmed.dsf.fhir.organization.OrganizationProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,7 +37,9 @@ public class FeasibilityConfig {
     private final FhirWebserviceClientProvider fhirClientProvider;
     private final IGenericClient storeClient;
     private final OrganizationProvider organizationProvider;
+    private final EndpointProvider endpointProvider;
     private final TaskHelper taskHelper;
+    private final ReadAccessHelper readAccessHelper;
     private final FhirContext fhirContext;
     private final EvaluationSettingsProvider evaluationSettingsProvider;
     private final FlareWebserviceClient flareWebserviceClient;
@@ -43,14 +47,18 @@ public class FeasibilityConfig {
     public FeasibilityConfig(@Qualifier("clientProvider") FhirWebserviceClientProvider fhirClientProvider,
                              @Qualifier("store") IGenericClient storeClient,
                              OrganizationProvider organizationProvider,
+                             EndpointProvider endpointProvider,
                              TaskHelper taskHelper,
+                             ReadAccessHelper readAccessHelper,
                              FhirContext fhirContext,
                              EvaluationSettingsProvider evaluationSettingsProvider,
                              FlareWebserviceClient flareWebserviceClient) {
         this.fhirClientProvider = fhirClientProvider;
         this.storeClient = storeClient;
         this.organizationProvider = organizationProvider;
+        this.endpointProvider = endpointProvider;
         this.taskHelper = taskHelper;
+        this.readAccessHelper = readAccessHelper;
         this.fhirContext = fhirContext;
         this.evaluationSettingsProvider = evaluationSettingsProvider;
         this.flareWebserviceClient = flareWebserviceClient;
@@ -72,32 +80,32 @@ public class FeasibilityConfig {
 
     @Bean
     public SelectRequestTargets selectRequestTargets() {
-        return new SelectRequestTargets(fhirClientProvider, taskHelper, organizationProvider);
+        return new SelectRequestTargets(fhirClientProvider, taskHelper, readAccessHelper, organizationProvider, endpointProvider);
     }
 
     @Bean
     public SendDicRequest sendDicRequest() {
-        return new SendDicRequest(fhirClientProvider, taskHelper, organizationProvider, fhirContext);
+        return new SendDicRequest(fhirClientProvider, taskHelper, readAccessHelper, organizationProvider, fhirContext);
     }
 
     @Bean
-    public DownloadMeasureReport downloadMeasureReport() {
-        return new DownloadMeasureReport(fhirClientProvider, taskHelper, organizationProvider);
+    public DownloadMeasureReport downloadMeasureReport(EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
+        return new DownloadMeasureReport(enhancedFhirClientProvider, taskHelper, readAccessHelper, organizationProvider);
     }
 
     @Bean
     public StoreLiveResult storeLiveResult() {
-        return new StoreLiveResult(fhirClientProvider, taskHelper);
+        return new StoreLiveResult(fhirClientProvider, taskHelper, readAccessHelper);
     }
 
     @Bean
     public PrepareForFurtherEvaluation prepareForFurtherEvaluation() {
-        return new PrepareForFurtherEvaluation(fhirClientProvider, taskHelper);
+        return new PrepareForFurtherEvaluation(fhirClientProvider, taskHelper, readAccessHelper);
     }
 
     @Bean
     public AggregateMeasureReports aggregateMeasureReports() {
-        return new AggregateMeasureReports(fhirClientProvider, taskHelper);
+        return new AggregateMeasureReports(fhirClientProvider, taskHelper, readAccessHelper);
     }
 
     //
@@ -106,47 +114,50 @@ public class FeasibilityConfig {
 
     @Bean
     public SetupEvaluationSettings setupEvaluationSettings() {
-        return new SetupEvaluationSettings(fhirClientProvider, taskHelper, evaluationSettingsProvider);
+        return new SetupEvaluationSettings(fhirClientProvider, taskHelper, readAccessHelper, evaluationSettingsProvider);
     }
 
     @Bean
     public DownloadFeasibilityResources downloadFeasibilityResources(
             EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
-        return new DownloadFeasibilityResources(enhancedFhirClientProvider, taskHelper, organizationProvider);
+        return new DownloadFeasibilityResources(enhancedFhirClientProvider, taskHelper, readAccessHelper,
+                organizationProvider);
     }
 
     @Bean
     public StoreFeasibilityResources storeFeasibilityResources() {
-        return new StoreFeasibilityResources(fhirClientProvider, taskHelper, storeClient);
+        return new StoreFeasibilityResources(fhirClientProvider, taskHelper, readAccessHelper, storeClient);
     }
 
     @Bean
     public EvaluateCqlMeasure evaluateCqlMeasure() {
-        return new EvaluateCqlMeasure(fhirClientProvider, taskHelper, storeClient);
+        return new EvaluateCqlMeasure(fhirClientProvider, taskHelper, readAccessHelper, storeClient);
     }
 
     @Bean
     public EvaluateStructuredQueryMeasure evaluateStructureQueryMeasure() {
-        return new EvaluateStructuredQueryMeasure(fhirClientProvider, taskHelper, flareWebserviceClient);
+        return new EvaluateStructuredQueryMeasure(fhirClientProvider, taskHelper, readAccessHelper, flareWebserviceClient);
     }
 
     @Bean
     public ObfuscateEvaluationResult obfuscateEvaluationResult(FeasibilityCountObfuscator feasibilityCountObfuscator) {
-        return new ObfuscateEvaluationResult(fhirClientProvider, taskHelper, feasibilityCountObfuscator);
+        return new ObfuscateEvaluationResult(fhirClientProvider, taskHelper, readAccessHelper,
+                feasibilityCountObfuscator);
     }
 
     @Bean
     public StoreMeasureReport storeMeasureReport() {
-        return new StoreMeasureReport(fhirClientProvider, taskHelper);
+        return new StoreMeasureReport(fhirClientProvider, taskHelper, readAccessHelper);
     }
 
     @Bean
     public SelectResponseTarget selectResponseTarget() {
-        return new SelectResponseTarget(fhirClientProvider, taskHelper, organizationProvider);
+        return new SelectResponseTarget(fhirClientProvider, taskHelper, readAccessHelper, organizationProvider,
+                endpointProvider);
     }
 
     @Bean
     public SendDicResponse sendDicResponse() {
-        return new SendDicResponse(fhirClientProvider, taskHelper, organizationProvider, fhirContext);
+        return new SendDicResponse(fhirClientProvider, taskHelper, readAccessHelper, organizationProvider, fhirContext);
     }
 }
