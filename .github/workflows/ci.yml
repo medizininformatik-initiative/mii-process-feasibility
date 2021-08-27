@@ -81,24 +81,3 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         USENAME: ${{ github.actor }}
-
-    - name: Login to GitHub Docker Registry
-      uses: docker/login-action@v1
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Build and push BPE image
-      uses: docker/build-push-action@v2
-      with:
-        context: docker/bpe
-        tags: ghcr.io/num-codex/codex-processes-ap2/bpe:${{ steps.prep.outputs.version }}
-        push: true
-
-    - name: Build and push FHIR image
-      uses: docker/build-push-action@v2
-      with:
-        context: docker/fhir
-        tags: ghcr.io/num-codex/codex-processes-ap2/fhir:${{ steps.prep.outputs.version }}
-        push: true
