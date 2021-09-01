@@ -22,7 +22,7 @@
                 <type>
                     <coding>
                         <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
-                        <code value="MeDIC"/>
+                        <code value="HRP"/>
                     </coding>
                 </type>
                 <name value="Test ZARS"/>
@@ -292,7 +292,7 @@
                 <code>
                     <coding>
                         <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
-                        <code value="MeDIC"/>
+                        <code value="HRP"/>
                     </coding>
                 </code>
                 <endpoint>

@@ -22,7 +22,7 @@
                 <type>
                     <coding>
                         <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
-                        <code value="MeDIC"/>
+                        <code value="HRP"/>
                     </coding>
                 </type>
                 <name value="Test ZARS"/>
@@ -158,6 +158,113 @@
             <url value="Endpoint"/>
             <ifNoneExist
                     value="identifier=http://highmed.org/sid/endpoint-identifier|Test_DIC_1_Endpoint"/>
+        </request>
+    </entry>
+
+    <entry>
+        <fullUrl value="urn:uuid:c4a7b553-01b1-4b50-bcb3-1467f5ae6791"/>
+        <resource>
+            <Organization xmlns="http://hl7.org/fhir">
+                <meta>
+                    <profile value="http://highmed.org/fhir/StructureDefinition/organization-parent"/>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+                        <code value="ALL"/>
+                    </tag>
+                </meta>
+                <identifier>
+                    <system value="http://highmed.org/sid/organization-identifier"/>
+                    <value value="netzwerk-universitaetsmedizin.de"/>
+                </identifier>
+                <active value="true"/>
+                <name value="Netzwerk Universitätsmedizin"/>
+            </Organization>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="Organization"/>
+            <ifNoneExist
+                    value="identifier=http://highmed.org/sid/organization-identifier|netzwerk-universitaetsmedizin.de"/>
+        </request>
+    </entry>
+
+    <entry>
+        <fullUrl value="urn:uuid:6da23450-e2e2-49e1-8591-02c553d53e3b"/>
+        <resource>
+            <OrganizationAffiliation xmlns="http://hl7.org/fhir">
+                <meta>
+                    <profile value="http://highmed.org/fhir/StructureDefinition/organization-affiliation"/>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+                        <code value="ALL"/>
+                    </tag>
+                </meta>
+                <active value="true"/>
+                <organization>
+                    <reference value="urn:uuid:c4a7b553-01b1-4b50-bcb3-1467f5ae6791"/>
+                    <type value="Organization"/>
+                </organization>
+                <participatingOrganization>
+                    <reference value="urn:uuid:bb73165c-c7b9-4342-8e28-531f07fa7735"/>
+                    <type value="Organization"/>
+                </participatingOrganization>
+                <code>
+                    <coding>
+                        <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                        <code value="HRP"/>
+                    </coding>
+                </code>
+                <endpoint>
+                    <reference value="urn:uuid:169e782c-2673-40e9-8b30-f1dc46dba984"/>
+                    <type value="Endpoint"/>
+                </endpoint>
+            </OrganizationAffiliation>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="OrganizationAffiliation"/>
+            <ifNoneExist
+                    value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|netzwerk-universitaetsmedizin.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_ZARS"/>
+        </request>
+    </entry>
+
+    <entry>
+        <fullUrl value="urn:uuid:b84cddc8-83da-4bcc-9fdc-5e78cf709944"/>
+        <resource>
+            <OrganizationAffiliation xmlns="http://hl7.org/fhir">
+                <meta>
+                    <profile value="http://highmed.org/fhir/StructureDefinition/organization-affiliation"/>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+                        <code value="ALL"/>
+                    </tag>
+                </meta>
+                <active value="true"/>
+                <organization>
+                    <reference value="urn:uuid:c4a7b553-01b1-4b50-bcb3-1467f5ae6791"/>
+                    <type value="Organization"/>
+                </organization>
+                <participatingOrganization>
+                    <reference value="urn:uuid:cf62edc2-cc5d-43ed-ac0e-caf09f7326c3"/>
+                    <type value="Organization"/>
+                </participatingOrganization>
+                <code>
+                    <coding>
+                        <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                        <code value="MeDIC"/>
+                    </coding>
+                </code>
+                <endpoint>
+                    <reference value="urn:uuid:296cc73f-3a25-4aff-90f1-c5657a3ccbf1"/>
+                    <type value="Endpoint"/>
+                </endpoint>
+            </OrganizationAffiliation>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="OrganizationAffiliation"/>
+            <ifNoneExist
+                    value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|netzwerk-universitaetsmedizin.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_DIC_1"/>
         </request>
     </entry>
 </Bundle>

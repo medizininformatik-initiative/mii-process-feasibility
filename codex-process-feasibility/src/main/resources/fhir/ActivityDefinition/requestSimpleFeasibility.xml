@@ -15,14 +15,44 @@
         </extension>
         <extension url="requester">
             <valueCoding>
+                <extension
+                        url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization-consortium-role">
+                    <extension url="consortium">
+                        <valueIdentifier>
+                            <system value="http://highmed.org/sid/organization-identifier"/>
+                            <value value="netzwerk-universitaetsmedizin.de"/>
+                        </valueIdentifier>
+                    </extension>
+                    <extension url="role">
+                        <valueCoding>
+                            <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                            <code value="HRP"/>
+                        </valueCoding>
+                    </extension>
+                </extension>
                 <system value="http://highmed.org/fhir/CodeSystem/process-authorization"/>
-                <code value="LOCAL_ALL"/>
+                <code value="LOCAL_ROLE"/>
             </valueCoding>
         </extension>
         <extension url="recipient">
             <valueCoding>
+                <extension
+                        url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization-consortium-role">
+                    <extension url="consortium">
+                        <valueIdentifier>
+                            <system value="http://highmed.org/sid/organization-identifier"/>
+                            <value value="netzwerk-universitaetsmedizin.de"/>
+                        </valueIdentifier>
+                    </extension>
+                    <extension url="role">
+                        <valueCoding>
+                            <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                            <code value="HRP"/>
+                        </valueCoding>
+                    </extension>
+                </extension>
                 <system value="http://highmed.org/fhir/CodeSystem/process-authorization"/>
-                <code value="LOCAL_ALL"/>
+                <code value="LOCAL_ROLE"/>
             </valueCoding>
         </extension>
     </extension>
@@ -36,14 +66,44 @@
         </extension>
         <extension url="requester">
             <valueCoding>
+                <extension
+                        url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization-consortium-role">
+                    <extension url="consortium">
+                        <valueIdentifier>
+                            <system value="http://highmed.org/sid/organization-identifier"/>
+                            <value value="netzwerk-universitaetsmedizin.de"/>
+                        </valueIdentifier>
+                    </extension>
+                    <extension url="role">
+                        <valueCoding>
+                            <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                            <code value="MeDIC"/>
+                        </valueCoding>
+                    </extension>
+                </extension>
                 <system value="http://highmed.org/fhir/CodeSystem/process-authorization"/>
-                <code value="REMOTE_ALL"/>
+                <code value="REMOTE_ROLE"/>
             </valueCoding>
         </extension>
         <extension url="recipient">
             <valueCoding>
+                <extension
+                        url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization-consortium-role">
+                    <extension url="consortium">
+                        <valueIdentifier>
+                            <system value="http://highmed.org/sid/organization-identifier"/>
+                            <value value="netzwerk-universitaetsmedizin.de"/>
+                        </valueIdentifier>
+                    </extension>
+                    <extension url="role">
+                        <valueCoding>
+                            <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                            <code value="HRP"/>
+                        </valueCoding>
+                    </extension>
+                </extension>
                 <system value="http://highmed.org/fhir/CodeSystem/process-authorization"/>
-                <code value="LOCAL_ALL"/>
+                <code value="LOCAL_ROLE"/>
             </valueCoding>
         </extension>
     </extension>
