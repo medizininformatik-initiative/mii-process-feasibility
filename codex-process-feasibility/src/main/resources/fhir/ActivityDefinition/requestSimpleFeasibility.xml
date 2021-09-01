@@ -11,7 +11,7 @@
         </extension>
         <extension url="task-profile">
             <valueCanonical
-                    value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-request-simple-feasibility"/>
+                    value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-request-simple-feasibility|${version}"/>
         </extension>
         <extension url="requester">
             <valueCoding>
@@ -32,7 +32,7 @@
         </extension>
         <extension url="task-profile">
             <valueCanonical
-                    value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility"/>
+                    value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility|${version}"/>
         </extension>
         <extension url="requester">
             <valueCoding>

@@ -15,7 +15,7 @@
         <camunda:inputOutput>
           <camunda:inputParameter name="messageName">resultSingleDicSimpleFeasibilityMessage</camunda:inputParameter>
           <camunda:inputParameter name="instantiatesUri">http://www.netzwerk-universitaetsmedizin.de/bpe/Process/requestSimpleFeasibility/0.1.0</camunda:inputParameter>
-          <camunda:inputParameter name="profile">https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility</camunda:inputParameter>
+          <camunda:inputParameter name="profile">https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility|0.1.0</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0ascyjc</bpmn:incoming>

@@ -14,7 +14,7 @@
         <camunda:inputOutput>
           <camunda:inputParameter name="instantiatesUri">http://www.netzwerk-universitaetsmedizin.de/bpe/Process/executeSimpleFeasibility/0.1.0</camunda:inputParameter>
           <camunda:inputParameter name="messageName">executeSimpleFeasibilityMessage</camunda:inputParameter>
-          <camunda:inputParameter name="profile">https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-execute-simple-feasibility</camunda:inputParameter>
+          <camunda:inputParameter name="profile">https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-execute-simple-feasibility|0.1.0</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0b5s4ef</bpmn:incoming>
