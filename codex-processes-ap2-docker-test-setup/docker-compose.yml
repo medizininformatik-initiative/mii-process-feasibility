@@ -35,12 +35,43 @@ services:
     environment:
       TZ: Europe/Berlin
 
+  db:
+    image: postgres:13
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      TZ: Europe/Berlin
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      POSTGRES_USER: liquibase_user
+      POSTGRES_DB: postgres
+    networks:
+    - zars-fhir-backend
+    - dic-1-fhir-backend
+    - dic-2-fhir-backend
+    - zars-bpe-backend
+    - dic-1-bpe-backend
+    - dic-2-bpe-backend
+    secrets:
+    - db_liquibase.password
+    volumes:
+    - type: volume
+      source: db-data
+      target: /var/lib/postgresql/data
+    - type: bind
+      source: ./db/init-db.sh
+      target: /docker-entrypoint-initdb.d/init-db.sh
+      read_only: true
+
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
     image: ghcr.io/highmed/fhir:0.5.0
     restart: on-failure
     secrets:
-    - db_zars_liquibase.password
+    - db_liquibase.password
     - db_fhir_zars_user.password
     - db_fhir_zars_user_permanent_delete.password
     - app_client_trust_certificates.pem
@@ -56,14 +87,14 @@ services:
       target: /opt/fhir/log
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_zars_liquibase.password
+      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       ORG_HIGHMED_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_zars_user.password
       ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_zars_user_permanent_delete.password
       ORG_HIGHMED_DSF_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
       ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_zars_client_certificate.pem
       ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_zars_client_certificate_private_key.pem
       ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://zars-fhir-db/fhir
+      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://db/zars_fhir
       ORG_HIGHMED_DSF_FHIR_DB_USER_GROUP: zars_fhir_users
       ORG_HIGHMED_DSF_FHIR_DB_USER_USERNAME: zars_fhir_server_user
       ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: zars_fhir_permanent_delete_users
@@ -78,39 +109,15 @@ services:
       zars-fhir-backend:
       internet:
     depends_on:
-    - zars-fhir-db
+    - db
     - proxy
-
-  zars-fhir-db:
-    image: postgres:13
-    restart: on-failure
-    ports:
-    - "5432:5432"
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d fhir" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    environment:
-      TZ: Europe/Berlin
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_zars_liquibase.password
-      POSTGRES_USER: liquibase_user
-      POSTGRES_DB: fhir
-    networks:
-    - zars-fhir-backend
-    volumes:
-    - type: volume
-      source: zars-fhir-db-data
-      target: /var/lib/postgresql/data
-    secrets:
-    - db_zars_liquibase.password
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
     image: ghcr.io/highmed/bpe:0.5.0
     restart: on-failure
     secrets:
-    - db_zars_liquibase.password
+    - db_liquibase.password
     - db_zars_bpe_user.password
     - db_zars_bpe_user_camunda.password
     - app_client_trust_certificates.pem
@@ -134,14 +141,14 @@ services:
       target: /opt/bpe/last_event
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_zars_liquibase.password
+      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       ORG_HIGHMED_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_zars_bpe_user.password
       ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_zars_bpe_user_camunda.password
       ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
       ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_zars_client_certificate.pem
       ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_zars_client_certificate_private_key.pem
       ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://zars-bpe-db/bpe
+      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://db/zars_bpe
       ORG_HIGHMED_DSF_BPE_DB_USER_GROUP: zars_bpe_users
       ORG_HIGHMED_DSF_BPE_DB_USER_USERNAME: zars_bpe_server_user
       ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_GROUP: zars_camunda_users
@@ -153,37 +160,15 @@ services:
       zars-bpe-backend:
       internet:
     depends_on:
-    - zars-bpe-db
+    - db
     - proxy
-
-  zars-bpe-db:
-    image: postgres:13
-    restart: on-failure
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d bpe" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    environment:
-      TZ: Europe/Berlin
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_zars_liquibase.password
-      POSTGRES_USER: liquibase_user
-      POSTGRES_DB: bpe
-    networks:
-    - zars-bpe-backend
-    volumes:
-    - type: volume
-      source: zars-bpe-db-data
-      target: /var/lib/postgresql/data
-    secrets:
-    - db_zars_liquibase.password
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
     image: ghcr.io/highmed/fhir:0.5.0
     restart: on-failure
     secrets:
-    - db_dic_1_liquibase.password
+    - db_liquibase.password
     - db_fhir_dic_1_user.password
     - db_fhir_dic_1_user_permanent_delete.password
     - app_client_trust_certificates.pem
@@ -199,14 +184,14 @@ services:
       target: /opt/fhir/log
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_dic_1_liquibase.password
+      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       ORG_HIGHMED_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_1_user.password
       ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_1_user_permanent_delete.password
       ORG_HIGHMED_DSF_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
       ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_1_client_certificate.pem
       ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_1_client_certificate_private_key.pem
       ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://dic-1-fhir-db/fhir
+      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://db/dic_1_fhir
       ORG_HIGHMED_DSF_FHIR_DB_USER_GROUP: dic_1_fhir_users
       ORG_HIGHMED_DSF_FHIR_DB_USER_USERNAME: dic_1_fhir_server_user
       ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: dic_1_fhir_permanent_delete_users
@@ -221,37 +206,15 @@ services:
       dic-1-fhir-backend:
       internet:
     depends_on:
-    - dic-1-fhir-db
+    - db
     - proxy
-
-  dic-1-fhir-db:
-    image: postgres:13
-    restart: on-failure
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d fhir" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    environment:
-      TZ: Europe/Berlin
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_dic_1_liquibase.password
-      POSTGRES_USER: liquibase_user
-      POSTGRES_DB: fhir
-    networks:
-    - dic-1-fhir-backend
-    volumes:
-    - type: volume
-      source: dic-1-fhir-db-data
-      target: /var/lib/postgresql/data
-    secrets:
-    - db_dic_1_liquibase.password
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
     image: ghcr.io/highmed/bpe:0.5.0
     restart: on-failure
     secrets:
-    - db_dic_1_liquibase.password
+    - db_liquibase.password
     - db_dic_1_bpe_user.password
     - db_dic_1_bpe_user_camunda.password
     - app_client_trust_certificates.pem
@@ -275,14 +238,14 @@ services:
       target: /opt/bpe/last_event
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_dic_1_liquibase.password
+      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       ORG_HIGHMED_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_1_bpe_user.password
       ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_dic_1_bpe_user_camunda.password
       ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
       ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_1_client_certificate.pem
       ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_1_client_certificate_private_key.pem
       ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://dic-1-bpe-db/bpe
+      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://db/dic_1_bpe
       ORG_HIGHMED_DSF_BPE_DB_USER_GROUP: dic_1_bpe_users
       ORG_HIGHMED_DSF_BPE_DB_USER_USERNAME: dic_1_bpe_server_user
       ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_1_camunda_users
@@ -298,31 +261,9 @@ services:
       dic-1-bpe-backend:
       internet:
     depends_on:
-    - dic-1-bpe-db
+    - db
     - dic-1-store
     - proxy
-
-  dic-1-bpe-db:
-    image: postgres:13
-    restart: on-failure
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d bpe" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    environment:
-      TZ: Europe/Berlin
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_dic_1_liquibase.password
-      POSTGRES_USER: liquibase_user
-      POSTGRES_DB: bpe
-    networks:
-    - dic-1-bpe-backend
-    volumes:
-    - type: volume
-      source: dic-1-bpe-db-data
-      target: /var/lib/postgresql/data
-    secrets:
-    - db_dic_1_liquibase.password
 
   # ---- DIC-1 - FHIR Data Store ----------------------------------------------
   dic-1-store:
@@ -376,7 +317,7 @@ services:
     image: ghcr.io/highmed/fhir:0.5.0
     restart: on-failure
     secrets:
-    - db_dic_2_liquibase.password
+    - db_liquibase.password
     - db_fhir_dic_2_user.password
     - db_fhir_dic_2_user_permanent_delete.password
     - app_client_trust_certificates.pem
@@ -392,14 +333,14 @@ services:
       target: /opt/fhir/log
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_dic_2_liquibase.password
+      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       ORG_HIGHMED_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_2_user.password
       ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_2_user_permanent_delete.password
       ORG_HIGHMED_DSF_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
       ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_2_client_certificate.pem
       ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_2_client_certificate_private_key.pem
       ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://dic-2-fhir-db/fhir
+      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://db/dic_2_fhir
       ORG_HIGHMED_DSF_FHIR_DB_USER_GROUP: dic_2_fhir_users
       ORG_HIGHMED_DSF_FHIR_DB_USER_USERNAME: dic_2_fhir_server_user
       ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: dic_2_fhir_permanent_delete_users
@@ -414,37 +355,15 @@ services:
       dic-2-fhir-backend:
       internet:
     depends_on:
-    - dic-2-fhir-db
+    - db
     - proxy
-
-  dic-2-fhir-db:
-    image: postgres:13
-    restart: on-failure
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d fhir" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    environment:
-      TZ: Europe/Berlin
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_dic_2_liquibase.password
-      POSTGRES_USER: liquibase_user
-      POSTGRES_DB: fhir
-    networks:
-    - dic-2-fhir-backend
-    volumes:
-    - type: volume
-      source: dic-2-fhir-db-data
-      target: /var/lib/postgresql/data
-    secrets:
-    - db_dic_2_liquibase.password
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
     image: ghcr.io/highmed/bpe:0.5.0
     restart: on-failure
     secrets:
-    - db_dic_2_liquibase.password
+    - db_liquibase.password
     - db_dic_2_bpe_user.password
     - db_dic_2_bpe_user_camunda.password
     - app_client_trust_certificates.pem
@@ -468,14 +387,14 @@ services:
       target: /opt/bpe/last_event
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_dic_2_liquibase.password
+      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       ORG_HIGHMED_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_2_bpe_user.password
       ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_dic_2_bpe_user_camunda.password
       ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
       ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_2_client_certificate.pem
       ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_2_client_certificate_private_key.pem
       ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://dic-2-bpe-db/bpe
+      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://db/dic_2_bpe
       ORG_HIGHMED_DSF_BPE_DB_USER_GROUP: dic_2_bpe_users
       ORG_HIGHMED_DSF_BPE_DB_USER_USERNAME: dic_2_bpe_server_user
       ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_2_camunda_users
@@ -490,31 +409,9 @@ services:
       dic-2-bpe-backend:
       internet:
     depends_on:
-    - dic-2-bpe-db
+    - db
     - dic-2-store
     - proxy
-
-  dic-2-bpe-db:
-    image: postgres:13
-    restart: on-failure
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d bpe" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    environment:
-      TZ: Europe/Berlin
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_dic_2_liquibase.password
-      POSTGRES_USER: liquibase_user
-      POSTGRES_DB: bpe
-    networks:
-    - dic-2-bpe-backend
-    volumes:
-    - type: volume
-      source: dic-2-bpe-db-data
-      target: /var/lib/postgresql/data
-    secrets:
-    - db_dic_2_liquibase.password
 
   # ---- DIC-2 - FHIR Data Store ----------------------------------------------
   dic-2-store:
@@ -545,12 +442,13 @@ secrets:
   app_client_certificate_private_key.pem.password:
     file: ./secrets/app_client_certificate_private_key.pem.password
 
+  db_liquibase.password:
+    file: ./secrets/db_liquibase.password
+
   db_zars_bpe_user.password:
     file: secrets/db_zars_bpe_user.password
   db_zars_bpe_user_camunda.password:
     file: secrets/db_zars_bpe_user_camunda.password
-  db_zars_liquibase.password:
-    file: ./secrets/db_zars_liquibase.password
   app_zars_client_certificate.pem:
     file: ./secrets/app_zars_client_certificate.pem
   app_zars_client_certificate_private_key.pem:
@@ -572,8 +470,6 @@ secrets:
     file: ./secrets/db_fhir_dic_1_user.password
   db_fhir_dic_1_user_permanent_delete.password:
     file: ./secrets/db_fhir_dic_1_user_permanent_delete.password
-  db_dic_1_liquibase.password:
-    file: ./secrets/db_dic_1_liquibase.password
 
   db_dic_2_bpe_user.password:
     file: secrets/db_dic_2_bpe_user.password
@@ -587,8 +483,6 @@ secrets:
     file: ./secrets/db_fhir_dic_2_user.password
   db_fhir_dic_2_user_permanent_delete.password:
     file: ./secrets/db_fhir_dic_2_user_permanent_delete.password
-  db_dic_2_liquibase.password:
-    file: ./secrets/db_dic_2_liquibase.password
 
 networks:
   internet:
@@ -621,21 +515,11 @@ networks:
   dic-2-bpe-backend:
 
 volumes:
-  zars-fhir-db-data:
-    name: "zars-fhir-db-data"
-  zars-bpe-db-data:
-    name: "zars-bpe-db-data"
-
-  dic-1-fhir-db-data:
-    name: "dic-1-fhir-db-data"
-  dic-1-bpe-db-data:
-    name: "dic-1-bpe-db-data"
   dic-1-store-data:
     name: "dic-1-store-data"
 
-  dic-2-fhir-db-data:
-    name: "dic-2-fhir-db-data"
-  dic-2-bpe-db-data:
-    name: "dic-2-bpe-db-data"
   dic-2-store-data:
     name: "dic-2-store-data"
+
+  db-data:
+    name: "db-data"
