@@ -13,11 +13,11 @@ public class EnhancedFhirWebserviceClientProviderImpl implements EnhancedFhirWeb
     }
 
     @Override
-    public FhirWebserviceClient getWebserviceClient(IdType reference) {
+    public FhirWebserviceClient getWebserviceClientByReference(IdType reference) {
         if (reference.getBaseUrl() == null || reference.getBaseUrl().equals(getLocalBaseUrl())) {
             return getLocalWebserviceClient();
         } else {
-            return getRemoteWebserviceClient(reference.getBaseUrl());
+            return getWebserviceClient(reference.getBaseUrl());
         }
     }
 
@@ -32,19 +32,7 @@ public class EnhancedFhirWebserviceClientProviderImpl implements EnhancedFhirWeb
     }
 
     @Override
-    public FhirWebserviceClient getRemoteWebserviceClient(IdType organizationReference) {
-        return this.fhirClientProvider.getRemoteWebserviceClient(organizationReference);
-    }
-
-    @Override
-    public FhirWebserviceClient getRemoteWebserviceClient(String organizationIdentifierSystem,
-                                                          String organizationIdentifierValue) {
-        return this.fhirClientProvider.getRemoteWebserviceClient(organizationIdentifierSystem,
-                organizationIdentifierValue);
-    }
-
-    @Override
-    public FhirWebserviceClient getRemoteWebserviceClient(String webserviceUrl) {
-        return this.fhirClientProvider.getRemoteWebserviceClient(webserviceUrl);
+    public FhirWebserviceClient getWebserviceClient(String webserviceUrl) {
+        return this.fhirClientProvider.getWebserviceClient(webserviceUrl);
     }
 }

@@ -3,6 +3,7 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.DateType;
@@ -27,8 +28,8 @@ public class EvaluateCqlMeasure extends AbstractServiceDelegate implements Initi
     private final IGenericClient storeClient;
 
     public EvaluateCqlMeasure(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                              IGenericClient storeClient) {
-        super(clientProvider, taskHelper);
+                              ReadAccessHelper readAccessHelper, IGenericClient storeClient) {
+        super(clientProvider, taskHelper, readAccessHelper);
 
         this.storeClient = storeClient;
     }

@@ -2,9 +2,13 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.variable.value.PrimitiveValue;
+import org.highmed.dsf.fhir.organization.EndpointProvider;
 import org.highmed.dsf.fhir.organization.OrganizationProvider;
 import org.highmed.dsf.fhir.variables.Targets;
+import org.hl7.fhir.r4.model.Endpoint;
 import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Reference;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -15,6 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TARGETS;
 import static org.junit.Assert.assertEquals;
@@ -33,6 +38,9 @@ public class SelectRequestTargetsTest {
     private OrganizationProvider orgProvider;
 
     @Mock
+    private EndpointProvider endpointProvider;
+
+    @Mock
     private DelegateExecution execution;
 
     @InjectMocks
@@ -40,7 +48,7 @@ public class SelectRequestTargetsTest {
 
     @Test
     public void testDoExecute_NoTargets() {
-        when(orgProvider.getRemoteIdentifiers())
+        when(orgProvider.getRemoteOrganizations())
                 .thenReturn(new ArrayList<>());
         service.doExecute(execution);
 
@@ -50,34 +58,75 @@ public class SelectRequestTargetsTest {
 
     @Test
     public void testDoExecute_SingleTarget() {
-        Identifier id = new Identifier().setValue("http://localhost/foo");
-        when(orgProvider.getRemoteIdentifiers())
-                .thenReturn(new ArrayList<>(List.of(id)));
+        var organizationId = new Identifier().setValue("http://localhost/foo");
+        var dic_endpoint = new Endpoint()
+                .setIdentifier(List.of(new Identifier()
+                        .setSystem("http://highmed.org/sid/endpoint-identifier")
+                        .setValue("DIC Endpoint")))
+                .setAddress("https://dic/fhir");
+        var organization = new Organization()
+                .setIdentifier(List.of(organizationId))
+                .setEndpoint(List.of(new Reference(dic_endpoint)));
+
+        when(orgProvider.getRemoteOrganizations())
+                .thenReturn(List.of(organization));
+        when(endpointProvider.getFirstDefaultEndpointAddress(organizationId.getValue()))
+                .thenReturn(Optional.of("https://dic/fhir"));
 
         service.doExecute(execution);
 
         verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGETS), targetsValuesCaptor.capture());
-        assertEquals(1, targetsValuesCaptor.getValue().getValue().getEntries().size());
-        assertEquals("http://localhost/foo", targetsValuesCaptor.getValue().getValue().getEntries().get(0)
-                .getTargetOrganizationIdentifierValue());
+
+        var targets = targetsValuesCaptor.getValue().getValue();
+        assertEquals(1, targets.getEntries().size());
+        assertEquals("http://localhost/foo", targets.getEntries().get(0).getTargetOrganizationIdentifierValue());
+        assertEquals("https://dic/fhir", targets.getEntries().get(0).getTargetEndpointUrl());
     }
 
     @Test
     public void testDoExecute_MultipleTargets() {
-        Identifier idA = new Identifier().setValue("http://localhost/foo");
-        Identifier idB = new Identifier().setValue("http://localhost/bar");
-        when(orgProvider.getRemoteIdentifiers())
-                .thenReturn(new ArrayList<>(List.of(idA, idB)));
+        var organizationAId = new Identifier().setValue("http://localhost/foo");
+        var organizationBId = new Identifier().setValue("http://localhost/bar");
+        var dic_1_endpoint = new Endpoint()
+                .setIdentifier(List.of(new Identifier()
+                        .setSystem("http://highmed.org/sid/endpoint-identifier")
+                        .setValue("DIC 1 Endpoint")))
+                .setAddress("https://dic-1/fhir");
+        var dic_2_endpoint = new Endpoint()
+                .setIdentifier(List.of(new Identifier()
+                        .setSystem("http://highmed.org/sid/endpoint-identifier")
+                        .setValue("DIC 2 Endpoint")))
+                .setAddress("https://dic-2/fhir");
+        var organizationA = new Organization()
+                .setIdentifier(List.of(organizationAId))
+                .setEndpoint(List.of(new Reference(dic_1_endpoint)));
+        var organizationB = new Organization()
+                .setIdentifier(List.of(organizationBId))
+                .setEndpoint(List.of(new Reference(dic_2_endpoint)));
+
+        when(orgProvider.getRemoteOrganizations())
+                .thenReturn(List.of(organizationA, organizationB));
+
+        when(endpointProvider.getFirstDefaultEndpointAddress(organizationAId.getValue()))
+                .thenReturn(Optional.of("https://dic-1/fhir"));
+        when(endpointProvider.getFirstDefaultEndpointAddress(organizationBId.getValue()))
+                .thenReturn(Optional.of("https://dic-2/fhir"));
 
         service.doExecute(execution);
 
         verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGETS), targetsValuesCaptor.capture());
-        assertEquals(2, targetsValuesCaptor.getValue().getValue().getEntries().size());
-        assertEquals("http://localhost/foo", targetsValuesCaptor.getValue().getValue().getEntries().get(0)
+
+        var targets = targetsValuesCaptor.getValue().getValue();
+        assertEquals(2, targets.getEntries().size());
+        assertEquals("http://localhost/foo", targets.getEntries().get(0)
                 .getTargetOrganizationIdentifierValue());
-        assertEquals("http://localhost/bar", targetsValuesCaptor.getValue().getValue().getEntries().get(1)
+        assertEquals("http://localhost/bar", targets.getEntries().get(1)
                 .getTargetOrganizationIdentifierValue());
         assertNotEquals(targetsValuesCaptor.getValue().getValue().getEntries().get(0).getCorrelationKey(),
                 targetsValuesCaptor.getValue().getValue().getEntries().get(1).getCorrelationKey());
+        assertEquals("https://dic-1/fhir", targets.getEntries().get(0)
+                .getTargetEndpointUrl());
+        assertEquals("https://dic-2/fhir", targets.getEntries().get(1)
+                .getTargetEndpointUrl());
     }
 }

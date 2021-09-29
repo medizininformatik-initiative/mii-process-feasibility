@@ -1,8 +1,8 @@
 <StructureDefinition xmlns="http://hl7.org/fhir">
     <meta>
         <tag>
-            <system value="http://highmed.org/fhir/CodeSystem/authorization-role"/>
-            <code value="REMOTE"/>
+            <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+            <code value="ALL"/>
         </tag>
     </meta>
     <url value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/dic"/>
@@ -12,7 +12,7 @@
     <!-- status managed by bpe -->
     <status value="unknown"/>
     <experimental value="false"/>
-    <date value="2021-01-13"/>
+    <date value="2021-08-22"/>
     <fhirVersion value="4.0.1"/>
     <kind value="complex-type"/>
     <abstract value="false"/>
@@ -60,7 +60,7 @@
         <element id="Extension.value[x].identifier.system">
             <path value="Extension.value[x].identifier.system"/>
             <min value="1"/>
-            <fixedUri value="http://highmed.org/fhir/NamingSystem/organization-identifier"/>
+            <fixedUri value="http://highmed.org/sid/organization-identifier"/>
         </element>
         <element id="Extension.value[x].identifier.value">
             <path value="Extension.value[x].identifier.value"/>

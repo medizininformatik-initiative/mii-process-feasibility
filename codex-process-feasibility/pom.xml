@@ -18,7 +18,7 @@
         <dependency>
             <groupId>org.highmed.dsf</groupId>
             <artifactId>dsf-bpe-process-base</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
+            <version>0.5.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.highmed.dsf</groupId>
             <artifactId>dsf-fhir-validation</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
+            <version>0.5.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -106,7 +106,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/app/process
+                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/process
                             </outputDirectory>
                         </configuration>
                     </execution>
@@ -123,7 +123,7 @@
                                     <artifactId>hapi-fhir-client</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/app/plugin</outputDirectory>
+                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/plugin</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -140,7 +140,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/app/process
+                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/process
                             </outputDirectory>
                         </configuration>
                     </execution>
@@ -157,7 +157,7 @@
                                     <artifactId>hapi-fhir-client</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/app/plugin</outputDirectory>
+                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/plugin</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -174,7 +174,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-ap2-docker-test-setup/zars/bpe/app/process</outputDirectory>
+                            <outputDirectory>../codex-processes-ap2-docker-test-setup/zars/bpe/process</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -190,7 +190,7 @@
                                     <artifactId>hapi-fhir-client</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-ap2-docker-test-setup/zars/bpe/app/plugin</outputDirectory>
+                            <outputDirectory>../codex-processes-ap2-docker-test-setup/zars/bpe/plugin</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -215,42 +215,42 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/app/plugin</directory>
+                            <directory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/plugin</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/app/process</directory>
+                            <directory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/app/plugin</directory>
+                            <directory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/plugin</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/app/process</directory>
+                            <directory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-ap2-docker-test-setup/zars/bpe/app/plugin</directory>
+                            <directory>../codex-processes-ap2-docker-test-setup/zars/bpe/plugin</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-ap2-docker-test-setup/zars/bpe/app/process</directory>
+                            <directory>../codex-processes-ap2-docker-test-setup/zars/bpe/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>

@@ -3,6 +3,7 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.FlareWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -36,8 +37,8 @@ public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate impl
     private final FlareWebserviceClient flareClient;
 
     public EvaluateStructuredQueryMeasure(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                                          FlareWebserviceClient flareClient) {
-        super(clientProvider, taskHelper);
+                                          ReadAccessHelper readAccessHelper, FlareWebserviceClient flareClient) {
+        super(clientProvider, taskHelper, readAccessHelper);
         this.flareClient = flareClient;
     }
 

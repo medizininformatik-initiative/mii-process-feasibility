@@ -97,7 +97,7 @@ public class DownloadFeasibilityResourcesTest {
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
                 .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClient(measureRefId))
+        when(clientProvider.getWebserviceClientByReference(measureRefId))
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(new Bundle());
@@ -124,7 +124,7 @@ public class DownloadFeasibilityResourcesTest {
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
                 .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClient(measureRefId))
+        when(clientProvider.getWebserviceClientByReference(measureRefId))
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);
@@ -151,7 +151,7 @@ public class DownloadFeasibilityResourcesTest {
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
                 .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClient(measureRefId))
+        when(clientProvider.getWebserviceClientByReference(measureRefId))
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);
@@ -180,7 +180,7 @@ public class DownloadFeasibilityResourcesTest {
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
                 .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClient(measureRefId))
+        when(clientProvider.getWebserviceClientByReference(measureRefId))
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);

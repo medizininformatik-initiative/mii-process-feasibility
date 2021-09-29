@@ -3,6 +3,7 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.FeasibilityCountObfuscator;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.MeasureReport;
@@ -17,8 +18,8 @@ public class ObfuscateEvaluationResult extends AbstractServiceDelegate implement
     private final FeasibilityCountObfuscator obfuscator;
 
     public ObfuscateEvaluationResult(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                                     FeasibilityCountObfuscator obfuscator) {
-        super(clientProvider, taskHelper);
+                                     ReadAccessHelper readAccessHelper, FeasibilityCountObfuscator obfuscator) {
+        super(clientProvider, taskHelper, readAccessHelper);
         this.obfuscator = obfuscator;
     }
 

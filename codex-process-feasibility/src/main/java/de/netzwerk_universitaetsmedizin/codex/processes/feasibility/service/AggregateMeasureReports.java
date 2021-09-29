@@ -2,6 +2,7 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.MeasureReport;
@@ -26,8 +27,9 @@ public class AggregateMeasureReports extends AbstractServiceDelegate implements 
      * @param clientProvider the client provider
      * @param taskHelper     the task helper
      */
-    public AggregateMeasureReports(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper) {
-        super(clientProvider, taskHelper);
+    public AggregateMeasureReports(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
+                                   ReadAccessHelper readAccessHelper) {
+        super(clientProvider, taskHelper, readAccessHelper);
     }
 
     @Override

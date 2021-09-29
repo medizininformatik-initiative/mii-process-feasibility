@@ -2,7 +2,9 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
+import org.highmed.dsf.fhir.organization.EndpointProvider;
 import org.highmed.dsf.fhir.organization.OrganizationProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.highmed.dsf.fhir.variables.Target;
@@ -20,17 +22,21 @@ import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_CO
 public class SelectResponseTarget extends AbstractServiceDelegate implements InitializingBean {
 
     private final OrganizationProvider organizationProvider;
+    private final EndpointProvider endpointProvider;
 
     public SelectResponseTarget(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                                OrganizationProvider organizationProvider) {
-        super(clientProvider, taskHelper);
+                                ReadAccessHelper readAccessHelper, OrganizationProvider organizationProvider,
+                                EndpointProvider endpointProvider) {
+        super(clientProvider, taskHelper, readAccessHelper);
         this.organizationProvider = organizationProvider;
+        this.endpointProvider = endpointProvider;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         Objects.requireNonNull(organizationProvider, "organizationProvider");
+        Objects.requireNonNull(endpointProvider, "endpointProvider");
     }
 
     @Override
@@ -43,6 +49,8 @@ public class SelectResponseTarget extends AbstractServiceDelegate implements Ini
         Identifier targetOrganizationIdentifier = task.getRequester().getIdentifier();
 
         execution.setVariable(BPMN_EXECUTION_VARIABLE_TARGET, TargetValues
-                .create(Target.createBiDirectionalTarget(targetOrganizationIdentifier.getValue(), correlationKey)));
+                .create(Target.createBiDirectionalTarget(targetOrganizationIdentifier.getValue(),
+                        endpointProvider.getFirstDefaultEndpointAddress(targetOrganizationIdentifier.getValue()).get(),
+                        correlationKey)));
     }
 }

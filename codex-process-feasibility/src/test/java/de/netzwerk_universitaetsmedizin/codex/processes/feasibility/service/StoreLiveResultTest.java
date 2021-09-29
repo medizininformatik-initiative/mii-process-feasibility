@@ -106,7 +106,7 @@ public class StoreLiveResultTest {
         service.execute(execution);
 
         assertEquals(MEASURE_REPORT_ID, measureReportCaptor.getValue().getIdElement().getIdPart());
-        assertEquals("http://highmed.org/fhir/CodeSystem/authorization-role", measureReportCaptor.getValue().getMeta().getTagFirstRep().getSystem());
-        assertEquals("LOCAL", measureReportCaptor.getValue().getMeta().getTagFirstRep().getCode());
+        assertEquals("http://highmed.org/fhir/CodeSystem/read-access-tag", measureReportCaptor.getValue().getMeta().getTagFirstRep().getSystem());
+        assertEquals("ALL", measureReportCaptor.getValue().getMeta().getTagFirstRep().getCode());
     }
 }

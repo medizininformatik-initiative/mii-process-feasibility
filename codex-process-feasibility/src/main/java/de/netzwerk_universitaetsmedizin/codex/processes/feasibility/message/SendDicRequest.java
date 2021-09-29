@@ -3,6 +3,7 @@ package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message;
 import ca.uhn.fhir.context.FhirContext;
 import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.variables.ConstantsFeasibility;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.organization.OrganizationProvider;
 import org.highmed.dsf.fhir.task.AbstractTaskMessageSend;
@@ -20,8 +21,9 @@ public class SendDicRequest extends AbstractTaskMessageSend {
     private static final Logger logger = LoggerFactory.getLogger(SendDicRequest.class);
 
     public SendDicRequest(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                          OrganizationProvider organizationProvider, FhirContext fhirContext) {
-        super(clientProvider, taskHelper, organizationProvider, fhirContext);
+                          ReadAccessHelper readAccessHelper, OrganizationProvider organizationProvider,
+                          FhirContext fhirContext) {
+        super(clientProvider, taskHelper, readAccessHelper, organizationProvider, fhirContext);
     }
 
     protected Stream<Task.ParameterComponent> getAdditionalInputParameters(DelegateExecution execution) {

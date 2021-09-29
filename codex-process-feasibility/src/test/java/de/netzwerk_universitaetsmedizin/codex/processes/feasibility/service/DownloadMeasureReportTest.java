@@ -1,10 +1,11 @@
 package de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service;
 
+import de.netzwerk_universitaetsmedizin.codex.processes.feasibility.EnhancedFhirWebserviceClientProvider;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.highmed.fhir.client.FhirWebserviceClient;
 import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
@@ -37,7 +38,7 @@ public class DownloadMeasureReportTest {
     private static final String MEASURE_REPORT_ID = "id-144911";
 
     @Mock
-    private FhirWebserviceClientProvider clientProvider;
+    private EnhancedFhirWebserviceClientProvider clientProvider;
 
     @Mock
     private FhirWebserviceClient webserviceClient;
@@ -77,7 +78,7 @@ public class DownloadMeasureReportTest {
     }
 
     @Test
-    public void testDoExecuteLocal() throws Exception {
+    public void testDoExecute() throws Exception {
         Reference requesterRef = new Reference().setReference("http://localhost");
         task.setRequester(requesterRef);
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
@@ -87,35 +88,7 @@ public class DownloadMeasureReportTest {
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE))
                 .thenReturn(Optional.of(measureReportRef));
-        when(clientProvider.getLocalWebserviceClient())
-                .thenReturn(webserviceClient);
-
-        CodeableConcept coding = new CodeableConcept();
-        MeasureReport.MeasureReportGroupComponent measureReportGroup = new MeasureReport.MeasureReportGroupComponent()
-                .setCode(coding);
-        MeasureReport measureReport = new MeasureReport()
-                .setGroup(List.of(measureReportGroup));
-        when(webserviceClient.read(MeasureReport.class, MEASURE_REPORT_ID))
-                .thenReturn(measureReport);
-
-        service.execute(execution);
-
-        verify(execution).setVariable(VARIABLE_MEASURE_REPORT, measureReport);
-    }
-
-    @Test
-    public void testDoExecuteRemote() throws Exception {
-        Reference requesterRef = new Reference().setReference("http://remote.host");
-        task.setRequester(requesterRef);
-
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
-                .thenReturn(task);
-
-        Reference measureReportRef = new Reference().setReference("http://remote.host/MeasureReport/" + MEASURE_REPORT_ID);
-        when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
-                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE))
-                .thenReturn(Optional.of(measureReportRef));
-        when(clientProvider.getRemoteWebserviceClient("http://remote.host"))
+        when(clientProvider.getWebserviceClientByReference(new IdType(measureReportRef.getReference())))
                 .thenReturn(webserviceClient);
 
         CodeableConcept coding = new CodeableConcept();
