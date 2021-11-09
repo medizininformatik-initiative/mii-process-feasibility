@@ -41,7 +41,7 @@ jobs:
       run: mvn -B verify --file pom.xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        USENAME: ${{ github.actor }}
+        USERNAME: ${{ github.actor }}
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
@@ -80,4 +80,4 @@ jobs:
       run: mvn -B deploy -DskipTests --file pom.xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        USENAME: ${{ github.actor }}
+        USERNAME: ${{ github.actor }}
