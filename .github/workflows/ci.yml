@@ -82,7 +82,7 @@ jobs:
         servers: '[{"id": "highmed-dsf", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"}]'
 
     - name: Build with Maven
-      run: mvn -B deploy -DskipTests --file pom.xml
+      run: mvn -B deploy -DskipTests --file codex-process-feasibility/pom.xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         USERNAME: ${{ github.actor }}
