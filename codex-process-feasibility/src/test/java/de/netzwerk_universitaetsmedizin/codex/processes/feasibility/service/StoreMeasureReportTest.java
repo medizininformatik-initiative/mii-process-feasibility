@@ -45,6 +45,7 @@ public class StoreMeasureReportTest {
 
         service.doExecute(execution);
 
+        System.out.println("buhu");
         verify(execution).setVariable(VARIABLE_MEASURE_REPORT_ID, "id-094601");
     }
 }
