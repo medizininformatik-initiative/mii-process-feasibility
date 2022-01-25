@@ -25,9 +25,9 @@ public class FlareWebserviceClientImpl implements FlareWebserviceClient {
     public int requestFeasibility(byte[] structuredQuery) throws IOException, InterruptedException {
         var req = HttpRequest.newBuilder()
                 .POST(ofByteArray(structuredQuery))
-                .setHeader("Content-Type", "codex/json")
-                .setHeader("Accept", "internal/json")
-                .uri(flareBaseUrl.resolve("query-sync"))
+                .setHeader("Content-Type", "application/json")
+                .setHeader("Accept-Encoding", "CSQ")
+                .uri(flareBaseUrl.resolve("/query/execute"))
                 .build();
 
         var res = httpClient.send(req, ofString());
