@@ -68,7 +68,7 @@ services:
 
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
-    image: ghcr.io/highmed/fhir:0.5.2
+    image: ghcr.io/highmed/fhir:0.5.4
     restart: on-failure
     secrets:
     - db_liquibase.password
@@ -114,7 +114,7 @@ services:
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: ghcr.io/highmed/bpe:0.5.2
+    image: ghcr.io/highmed/bpe:0.5.4
     restart: on-failure
     secrets:
     - db_liquibase.password
@@ -165,7 +165,7 @@ services:
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
-    image: ghcr.io/highmed/fhir:0.5.2
+    image: ghcr.io/highmed/fhir:0.5.4
     restart: on-failure
     secrets:
     - db_liquibase.password
@@ -211,7 +211,7 @@ services:
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: ghcr.io/highmed/bpe:0.5.2
+    image: ghcr.io/highmed/bpe:0.5.4
     restart: on-failure
     secrets:
     - db_liquibase.password
@@ -314,7 +314,7 @@ services:
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-app:
-    image: ghcr.io/highmed/fhir:0.5.2
+    image: ghcr.io/highmed/fhir:0.5.4
     restart: on-failure
     secrets:
     - db_liquibase.password
@@ -360,7 +360,7 @@ services:
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: ghcr.io/highmed/bpe:0.5.2
+    image: ghcr.io/highmed/bpe:0.5.4
     restart: on-failure
     secrets:
     - db_liquibase.password
