@@ -74,10 +74,10 @@ This describes the execute process in case `Structured Query` is specified as an
 
 This process supports the following query types within the transferred Library resource:
 
-|Type | Description | Mime Type |
-|-----|-------------|-----------|
-| CQL | Standardized query format. See https://cql.hl7.org/ for more information. | `text/cql` |
-| Structured Query | Internal query representation within the CODEX project based on the JSON format. | `application/sq+json` |
+| Type              | Description                                                                                    | Mime Type                  |
+|-------------------|------------------------------------------------------------------------------------------------|----------------------------|
+| CQL               | Standardized query format. See https://cql.hl7.org/ for more information.                      | `text/cql`                 |
+| Structured Query  | Internal query representation within the CODEX project based on the JSON format.               | `application/sq+json`      |
 | FHIR Search Query | Standardized FHIR search query. See https://www.hl7.org/fhir/search.html for more information. | `application/x-fhir-query` |
 
 **Note**: _Although a FHIR search query can be transferred to the process no result will be calculated!_
@@ -98,6 +98,32 @@ In the [Business Process Model and Notation][7] (BPMN) model of the `request` pr
 
 The BPMN model of the `execute` process is straightforward and already explained in detail above.
 
+## Configuration
+
+Besides the [common DSF settings controlled by different environment variables][8], there are some additional ones specific to this process:
+
+| EnvVar                                                                                       | Description                                                                                                                                   | Default |
+|----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_FLARE_WEBSERVICE_BASEURL        | Base URL to a Flare instance. Only required when evaluation strategy is set to `structured-query`.                                            |         |
+| DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_FLARE_WEBSERVICE_CONNECTTIMEOUT | Timeout in ms when trying to connect to a Flare instance.                                                                                     | `2000`  |
+| DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_EVALUATION_STRATEGY             | How the feasibility shall be evaluated. Possible values are `cql` and `structured-query`. When using the latter a Flare instance is required. | `cql`   |
+| DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_EVALUATION_OBFUSCATE            | Whether the feasibility results shall be obfuscated.                                                                                          | `true`  |
+| DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_STORE_URL                       | Base URL to a FHIR store used for feasibility evaluation. Only required when evaluation strategy is set to `cql`.                             | `foo`   |
+
+## Compatibility
+
+This version of the process is compatible with the following components:
+
+| Component | Compatible Version(s) |
+|-----------|-----------------------|
+| DSF FHIR  | `0.5.x`               |
+| DSF BPE   | `0.5.x`               |
+| Blaze     | `>= 0.12`             |
+| Flare     | `1.0`                 |
+
+**Note:** Flare got rewritten. Only the [new project][9] is supported.
+
+
 [1]: <https://www.hl7.org/FHIR/task.html>
 [2]: <https://www.hl7.org/fhir/measure.html>
 [3]: <https://www.hl7.org/fhir/library.html>
@@ -105,3 +131,5 @@ The BPMN model of the `execute` process is straightforward and already explained
 [5]: <https://www.hl7.org/fhir/operation-measure-evaluate-measure.html>
 [6]: <https://www.hl7.org/fhir/measurereport.html>
 [7]: <https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation>
+[8]: <https://github.com/highmed/highmed-dsf/wiki/DSF-0.5.4-Configuration-Parameters#dsf-bpe>
+[9]: <https://github.com/rwth-imi/flare-query>
