@@ -6,7 +6,7 @@
       <bpmn:messageEventDefinition id="MessageEventDefinition_0sjtzj6" messageRef="Message_1yz2a31" />
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="SequenceFlow_14cn0vs" sourceRef="StartEvent" targetRef="Activity_0zvan0q" />
-    <bpmn:serviceTask id="downloadFeasibilityResources" name="download feasibility resources" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.DownloadFeasibilityResources">
+    <bpmn:serviceTask id="downloadFeasibilityResources" name="download feasibility resources" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadFeasibilityResources">
       <bpmn:incoming>Flow_1f2ymuq</bpmn:incoming>
       <bpmn:outgoing>Flow_11cnoe1</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -19,24 +19,24 @@
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0ascyjc</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_13swtie" messageRef="Message_1dr71re" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicResponse" />
+      <bpmn:messageEventDefinition id="MessageEventDefinition_13swtie" messageRef="Message_1dr71re" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicResponse" />
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_0ascyjc" sourceRef="selectResponseTarget" targetRef="EndEvent" />
-    <bpmn:serviceTask id="selectResponseTarget" name="select response target" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SelectResponseTarget">
+    <bpmn:serviceTask id="selectResponseTarget" name="select response target" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.SelectResponseTarget">
       <bpmn:incoming>Flow_11lpcfm</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0ascyjc</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="evaluateMeasure" name="evaluate CQL measure" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.EvaluateCqlMeasure">
+    <bpmn:serviceTask id="evaluateMeasure" name="evaluate CQL measure" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateCqlMeasure">
       <bpmn:incoming>Flow_1cad9ed</bpmn:incoming>
       <bpmn:outgoing>Flow_1qdam0i</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_11cnoe1" sourceRef="downloadFeasibilityResources" targetRef="Gateway_1kfqiko" />
-    <bpmn:serviceTask id="storeFeasibilityResources" name="store feasibility resources" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreFeasibilityResources">
+    <bpmn:serviceTask id="storeFeasibilityResources" name="store feasibility resources" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.StoreFeasibilityResources">
       <bpmn:incoming>Flow_09g5hz4</bpmn:incoming>
       <bpmn:outgoing>Flow_1cad9ed</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_1cad9ed" sourceRef="storeFeasibilityResources" targetRef="evaluateMeasure" />
-    <bpmn:serviceTask id="storeMeasureReport" name="store measure report" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreMeasureReport">
+    <bpmn:serviceTask id="storeMeasureReport" name="store measure report" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.StoreMeasureReport">
       <bpmn:incoming>Flow_1lvwaa9</bpmn:incoming>
       <bpmn:incoming>Flow_10dmu4o</bpmn:incoming>
       <bpmn:outgoing>Flow_11lpcfm</bpmn:outgoing>
@@ -53,15 +53,15 @@
     <bpmn:sequenceFlow id="Flow_0gowl5w" name="Structured Query" sourceRef="Gateway_1kfqiko" targetRef="Activity_11pqdmi">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('evaluation-strategy')=='structured-query'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:serviceTask id="Activity_11pqdmi" name="evaluate Structured Query measure" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.EvaluateStructuredQueryMeasure">
+    <bpmn:serviceTask id="Activity_11pqdmi" name="evaluate Structured Query measure" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateStructuredQueryMeasure">
       <bpmn:incoming>Flow_0gowl5w</bpmn:incoming>
       <bpmn:outgoing>Flow_1cs9290</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_1h6wvlq" name="obfuscate evaluation result" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.ObfuscateEvaluationResult">
+    <bpmn:serviceTask id="Activity_1h6wvlq" name="obfuscate evaluation result" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.ObfuscateEvaluationResult">
       <bpmn:incoming>Flow_0r37nze</bpmn:incoming>
       <bpmn:outgoing>Flow_10dmu4o</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_0zvan0q" name="setup evaluation settings" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SetupEvaluationSettings">
+    <bpmn:serviceTask id="Activity_0zvan0q" name="setup evaluation settings" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.SetupEvaluationSettings">
       <bpmn:incoming>SequenceFlow_14cn0vs</bpmn:incoming>
       <bpmn:outgoing>Flow_1f2ymuq</bpmn:outgoing>
     </bpmn:serviceTask>

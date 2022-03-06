@@ -252,10 +252,10 @@ services:
       ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_1_camunda_server_user
       ORG_HIGHMED_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_1
       ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-1/fhir
-      DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_FLARE_WEBSERVICE_BASEURL: http://dic-1-store:5000/
-      DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_FLARE_WEBSERVICE_CONNECTTIMEOUT: 2000
-      DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_EVALUATION_STRATEGY: structured-query
-      DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_EVALUATION_OBFUSCATE: "false"
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_FLARE_WEBSERVICE_BASEURL: http://dic-1-store:5000/
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_FLARE_WEBSERVICE_CONNECTTIMEOUT: 2000
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: structured-query
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
     networks:
       dic-1-bpe-frontend:
       dic-1-bpe-backend:
@@ -267,7 +267,7 @@ services:
 
   # ---- DIC-1 - FHIR Data Store ----------------------------------------------
   dic-1-store:
-    image: ghcr.io/num-codex/codex-flare:0.0.1
+    image: ghcr.io/medizininformatik-initiative/feasibility-flare:0.0.1
     restart: always
     ports:
     - "5000:5000"
@@ -276,8 +276,8 @@ services:
     networks:
       dic-1-bpe-backend:
     volumes:
-    - ./dic-1/flare/codex-code-tree.json:/opt/flare/src/query_parser/codex/codex-code-tree.json
-    - ./dic-1/flare/codex-mapping.json:/opt/flare/src/query_parser/codex/codex-mapping.json
+    - ./dic-1/flare/feasibility-code-tree.json:/opt/flare/src/query_parser/feasibility/feasibility-code-tree.json
+    - ./dic-1/flare/feasibility-mapping.json:/opt/flare/src/query_parser/feasibility/feasibility-mapping.json
     depends_on:
     - dic-1-store-fhir-server
 
@@ -401,9 +401,9 @@ services:
       ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_2_camunda_server_user
       ORG_HIGHMED_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_2
       ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-2/fhir
-      DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_STORE_URL: http://dic-2-store:8080/fhir
-      DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_EVALUATION_STRATEGY: cql
-      DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_EVALUATION_OBFUSCATE: "false"
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_STORE_URL: http://dic-2-store:8080/fhir
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
     networks:
       dic-2-bpe-frontend:
       dic-2-bpe-backend:

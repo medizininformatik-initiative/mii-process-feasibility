@@ -1,4 +1,4 @@
-/feasibility-dsf-process-bpe-plugin/target/
+/feasibility-dsf-process/target/
 
 /feasibility-dsf-process-docker-test-setup/certs/*.pem
 /feasibility-dsf-process-docker-test-setup/certs/*.p12

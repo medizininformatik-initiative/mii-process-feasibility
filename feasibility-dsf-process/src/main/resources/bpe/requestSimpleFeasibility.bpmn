@@ -5,11 +5,11 @@
       <bpmn:outgoing>SequenceFlow_11k77gx</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_10c2suu" messageRef="Message_1pq9qxp" />
     </bpmn:startEvent>
-    <bpmn:serviceTask id="selectRequestTargets" name="select request targets" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.SelectRequestTargets">
+    <bpmn:serviceTask id="selectRequestTargets" name="select request targets" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.SelectRequestTargets">
       <bpmn:incoming>SequenceFlow_11k77gx</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0b5s4ef</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sendTask id="sendRequestToDics" name="send request to dics" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.message.SendDicRequest">
+    <bpmn:sendTask id="sendRequestToDics" name="send request to dics" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicRequest">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="instantiatesUri">http://www.netzwerk-universitaetsmedizin.de/bpe/Process/executeSimpleFeasibility/0.1.0</camunda:inputParameter>
@@ -45,12 +45,12 @@
       </bpmn:startEvent>
       <bpmn:sequenceFlow id="Flow_1iuvnle" sourceRef="Event_1tvmfdb" targetRef="Activity_15y7a7a" />
       <bpmn:sequenceFlow id="Flow_1mxiy48" sourceRef="Activity_15y7a7a" targetRef="Activity_09o61p4" />
-      <bpmn:serviceTask id="Activity_09o61p4" name="download MeasureReport" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.DownloadMeasureReport">
+      <bpmn:serviceTask id="Activity_09o61p4" name="download MeasureReport" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadMeasureReport">
         <bpmn:incoming>Flow_1mxiy48</bpmn:incoming>
         <bpmn:outgoing>Flow_1oq6cy1</bpmn:outgoing>
       </bpmn:serviceTask>
       <bpmn:sequenceFlow id="Flow_1oq6cy1" sourceRef="Activity_09o61p4" targetRef="Activity_103gahn" />
-      <bpmn:serviceTask id="Activity_103gahn" name="store live result" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.StoreLiveResult">
+      <bpmn:serviceTask id="Activity_103gahn" name="store live result" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.StoreLiveResult">
         <bpmn:incoming>Flow_1oq6cy1</bpmn:incoming>
         <bpmn:outgoing>Flow_1kiy9bc</bpmn:outgoing>
       </bpmn:serviceTask>
@@ -59,7 +59,7 @@
         <bpmn:incoming>Flow_13dcknp</bpmn:incoming>
       </bpmn:endEvent>
       <bpmn:sequenceFlow id="Flow_13dcknp" sourceRef="Activity_16mfy9t" targetRef="Event_0i55mqk" />
-      <bpmn:serviceTask id="Activity_16mfy9t" name="aggregate query results" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.AggregateMeasureReports">
+      <bpmn:serviceTask id="Activity_16mfy9t" name="aggregate query results" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.AggregateMeasureReports">
         <bpmn:incoming>Flow_1kiy9bc</bpmn:incoming>
         <bpmn:outgoing>Flow_13dcknp</bpmn:outgoing>
       </bpmn:serviceTask>
@@ -74,7 +74,7 @@
     <bpmn:sequenceFlow id="Flow_1479yc4" sourceRef="Event_13wq5pb" targetRef="EndEvent" />
     <bpmn:sequenceFlow id="Flow_0wm2en5" sourceRef="Activity_1h2vwsh" targetRef="Activity_1aufhzp" />
     <bpmn:sequenceFlow id="Flow_1f790pw" sourceRef="Activity_1aufhzp" targetRef="EndEvent" />
-    <bpmn:serviceTask id="Activity_1aufhzp" name="prepare task resource for further evaluation" camunda:class="de.netzwerk_universitaetsmedizin.codex.processes.feasibility.service.PrepareForFurtherEvaluation">
+    <bpmn:serviceTask id="Activity_1aufhzp" name="prepare task resource for further evaluation" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.PrepareForFurtherEvaluation">
       <bpmn:documentation>Assign queries to organizations</bpmn:documentation>
       <bpmn:incoming>Flow_0wm2en5</bpmn:incoming>
       <bpmn:outgoing>Flow_1f790pw</bpmn:outgoing>

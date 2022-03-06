@@ -59,7 +59,7 @@
                     <arguments>
                         <argument>-classpath</argument>
                         <classpath/>
-                        <argument>de.netzwerk_universitaetsmedizin.codex.processes.tools.generator.TestDataGenerator
+                        <argument>de.medizininformatik_initiative.feasibility_dsf_process.tools.generator.TestDataGenerator
                         </argument>
                     </arguments>
                     <workingDirectory>${project.basedir}</workingDirectory>
