@@ -1,46 +1,46 @@
-/codex-process-feasibility/target/
+/feasibility-dsf-process-bpe-plugin/target/
 
-/codex-processes-ap2-docker-test-setup/certs/*.pem
-/codex-processes-ap2-docker-test-setup/certs/*.p12
+/feasibility-dsf-process-docker-test-setup/certs/*.pem
+/feasibility-dsf-process-docker-test-setup/certs/*.p12
 
-/codex-processes-ap2-docker-test-setup/.env
-/codex-processes-ap2-docker-test-setup/secrets/*.pem
+/feasibility-dsf-process-docker-test-setup/.env
+/feasibility-dsf-process-docker-test-setup/secrets/*.pem
 
-/codex-processes-ap2-docker-test-setup/dic-1/bpe/last_event/time.file
-/codex-processes-ap2-docker-test-setup/dic-1/bpe/log/*.log
-/codex-processes-ap2-docker-test-setup/dic-1/bpe/log/*.log.gz
-/codex-processes-ap2-docker-test-setup/dic-1/bpe/plugin/*.jar
-/codex-processes-ap2-docker-test-setup/dic-1/bpe/process/*.jar
-/codex-processes-ap2-docker-test-setup/dic-1/fhir/conf/bundle.xml
-/codex-processes-ap2-docker-test-setup/dic-1/fhir/conf/config.properties
-/codex-processes-ap2-docker-test-setup/dic-1/fhir/log/*.log
-/codex-processes-ap2-docker-test-setup/dic-1/fhir/log/*.log.gz
+/feasibility-dsf-process-docker-test-setup/dic-1/bpe/last_event/time.file
+/feasibility-dsf-process-docker-test-setup/dic-1/bpe/log/*.log
+/feasibility-dsf-process-docker-test-setup/dic-1/bpe/log/*.log.gz
+/feasibility-dsf-process-docker-test-setup/dic-1/bpe/plugin/*.jar
+/feasibility-dsf-process-docker-test-setup/dic-1/bpe/process/*.jar
+/feasibility-dsf-process-docker-test-setup/dic-1/fhir/conf/bundle.xml
+/feasibility-dsf-process-docker-test-setup/dic-1/fhir/conf/config.properties
+/feasibility-dsf-process-docker-test-setup/dic-1/fhir/log/*.log
+/feasibility-dsf-process-docker-test-setup/dic-1/fhir/log/*.log.gz
 
-/codex-processes-ap2-docker-test-setup/dic-2/bpe/last_event/time.file
-/codex-processes-ap2-docker-test-setup/dic-2/bpe/log/*.log
-/codex-processes-ap2-docker-test-setup/dic-2/bpe/log/*.log.gz
-/codex-processes-ap2-docker-test-setup/dic-2/bpe/plugin/*.jar
-/codex-processes-ap2-docker-test-setup/dic-2/bpe/process/*.jar
-/codex-processes-ap2-docker-test-setup/dic-2/fhir/conf/bundle.xml
-/codex-processes-ap2-docker-test-setup/dic-2/fhir/conf/config.properties
-/codex-processes-ap2-docker-test-setup/dic-2/fhir/log/*.log
-/codex-processes-ap2-docker-test-setup/dic-2/fhir/log/*.log.gz
+/feasibility-dsf-process-docker-test-setup/dic-2/bpe/last_event/time.file
+/feasibility-dsf-process-docker-test-setup/dic-2/bpe/log/*.log
+/feasibility-dsf-process-docker-test-setup/dic-2/bpe/log/*.log.gz
+/feasibility-dsf-process-docker-test-setup/dic-2/bpe/plugin/*.jar
+/feasibility-dsf-process-docker-test-setup/dic-2/bpe/process/*.jar
+/feasibility-dsf-process-docker-test-setup/dic-2/fhir/conf/bundle.xml
+/feasibility-dsf-process-docker-test-setup/dic-2/fhir/conf/config.properties
+/feasibility-dsf-process-docker-test-setup/dic-2/fhir/log/*.log
+/feasibility-dsf-process-docker-test-setup/dic-2/fhir/log/*.log.gz
 
-/codex-processes-ap2-docker-test-setup/zars/bpe/last_event/time.file
-/codex-processes-ap2-docker-test-setup/zars/bpe/log/*.log
-/codex-processes-ap2-docker-test-setup/zars/bpe/log/*.log.gz
-/codex-processes-ap2-docker-test-setup/zars/bpe/plugin/*.jar
-/codex-processes-ap2-docker-test-setup/zars/bpe/process/*.jar
-/codex-processes-ap2-docker-test-setup/zars/fhir/conf/bundle.xml
-/codex-processes-ap2-docker-test-setup/zars/fhir/conf/config.properties
-/codex-processes-ap2-docker-test-setup/zars/fhir/log/*.log
-/codex-processes-ap2-docker-test-setup/zars/fhir/log/*.log.gz
+/feasibility-dsf-process-docker-test-setup/zars/bpe/last_event/time.file
+/feasibility-dsf-process-docker-test-setup/zars/bpe/log/*.log
+/feasibility-dsf-process-docker-test-setup/zars/bpe/log/*.log.gz
+/feasibility-dsf-process-docker-test-setup/zars/bpe/plugin/*.jar
+/feasibility-dsf-process-docker-test-setup/zars/bpe/process/*.jar
+/feasibility-dsf-process-docker-test-setup/zars/fhir/conf/bundle.xml
+/feasibility-dsf-process-docker-test-setup/zars/fhir/conf/config.properties
+/feasibility-dsf-process-docker-test-setup/zars/fhir/log/*.log
+/feasibility-dsf-process-docker-test-setup/zars/fhir/log/*.log.gz
 
-/codex-processes-ap2-tools/codex-processes-ap2-test-data-generator/bundle/*.xml
-/codex-processes-ap2-tools/codex-processes-ap2-test-data-generator/cert/*/
-/codex-processes-ap2-tools/codex-processes-ap2-test-data-generator/cert/*.txt
-/codex-processes-ap2-tools/codex-processes-ap2-test-data-generator/config/*.properties
-/codex-processes-ap2-tools/codex-processes-ap2-test-data-generator/target/
+/feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/bundle/*.xml
+/feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/*/
+/feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/*.txt
+/feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/config/*.properties
+/feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/target/
 
 /docker/bpe/plugin/*.jar
 /docker/bpe/process/*.jar

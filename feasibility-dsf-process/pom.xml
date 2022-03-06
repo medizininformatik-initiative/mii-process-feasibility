@@ -3,16 +3,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>codex-process-feasibility</artifactId>
+    <artifactId>feasibility-dsf-process</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
     <parent>
-        <groupId>de.netzwerk-universitaetsmedizin.codex</groupId>
-        <artifactId>codex-processes-ap2</artifactId>
+        <groupId>de.medizininformatik-initiative</groupId>
+        <artifactId>feasibility-dsf-process-parent</artifactId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <name>CODEX Process Feasibility</name>
+    <name>MII Feasibility DSF Process</name>
 
     <dependencies>
         <dependency>
@@ -70,7 +70,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/process
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-1/bpe/process
                             </outputDirectory>
                         </configuration>
                     </execution>
@@ -87,7 +87,7 @@
                                     <artifactId>hapi-fhir-client</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/plugin</outputDirectory>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-1/bpe/plugin</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -104,7 +104,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/process
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-2/bpe/process
                             </outputDirectory>
                         </configuration>
                     </execution>
@@ -121,7 +121,7 @@
                                     <artifactId>hapi-fhir-client</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/plugin</outputDirectory>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-2/bpe/plugin</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -138,7 +138,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-ap2-docker-test-setup/zars/bpe/process</outputDirectory>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/zars/bpe/process</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -154,7 +154,7 @@
                                     <artifactId>hapi-fhir-client</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../codex-processes-ap2-docker-test-setup/zars/bpe/plugin</outputDirectory>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/zars/bpe/plugin</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -179,42 +179,42 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/plugin</directory>
+                            <directory>../feasibility-dsf-process-docker-test-setup/dic-1/bpe/plugin</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-ap2-docker-test-setup/dic-1/bpe/process</directory>
+                            <directory>../feasibility-dsf-process-docker-test-setup/dic-1/bpe/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/plugin</directory>
+                            <directory>../feasibility-dsf-process-docker-test-setup/dic-2/bpe/plugin</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-ap2-docker-test-setup/dic-2/bpe/process</directory>
+                            <directory>../feasibility-dsf-process-docker-test-setup/dic-2/bpe/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-ap2-docker-test-setup/zars/bpe/plugin</directory>
+                            <directory>../feasibility-dsf-process-docker-test-setup/zars/bpe/plugin</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>../codex-processes-ap2-docker-test-setup/zars/bpe/process</directory>
+                            <directory>../feasibility-dsf-process-docker-test-setup/zars/bpe/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>

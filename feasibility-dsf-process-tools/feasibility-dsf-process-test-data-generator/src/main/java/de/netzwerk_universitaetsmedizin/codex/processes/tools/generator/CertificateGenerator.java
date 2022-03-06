@@ -395,7 +395,7 @@ public class CertificateGenerator {
     }
 
     public void copyDockerTestClientCerts() {
-        Path baseFolder = Paths.get("../../codex-processes-ap2-docker-test-setup");
+        Path baseFolder = Paths.get("../../feasibility-dsf-process-docker-test-setup");
 
         Arrays.stream(CLIENT_COMMON_NAMES).filter(cn -> !cn.equals("Webbrowser Test User"))
                 .forEach(cn -> copyDockerTestClientCertFiles(baseFolder.resolve("secrets").toString(), cn));
@@ -419,7 +419,7 @@ public class CertificateGenerator {
     }
 
     public void copyDockerTestServerCert() {
-        Path baseFolder = Paths.get("../../codex-processes-ap2-docker-test-setup");
+        Path baseFolder = Paths.get("../../feasibility-dsf-process-docker-test-setup");
 
         final X509Certificate testCaCertificate = ca.getCertificate();
 
@@ -427,7 +427,7 @@ public class CertificateGenerator {
         logger.info("Copying Test CA certificate file to {}", testCaCertificateFile);
         writeCertificate(testCaCertificateFile, testCaCertificate);
 
-        copyDockerTestServerCertFiles("../../codex-processes-ap2-docker-test-setup/secrets");
+        copyDockerTestServerCertFiles("../../feasibility-dsf-process-docker-test-setup/secrets");
     }
 
     private void copyDockerTestServerCertFiles(String folder) {

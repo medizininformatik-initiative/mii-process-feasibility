@@ -61,7 +61,7 @@ public class EnvGenerator {
                 new EnvEntry("DIC_2_" + USER_THUMBPRINTS, dic2UserThumbprints, "DIC_2_" + USER_THUMBPRINTS_PERMANENTDELETE,
                         dic2UserThumbprintsPermanentDelete));
 
-        writeEnvFile(Paths.get("../../codex-processes-ap2-docker-test-setup/.env"), entries);
+        writeEnvFile(Paths.get("../../feasibility-dsf-process-docker-test-setup/.env"), entries);
     }
 
     private Stream<String> filterAndMapToThumbprint(Map<String, CertificateGenerator.CertificateFiles> clientCertificateFilesByCommonName,

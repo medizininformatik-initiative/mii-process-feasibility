@@ -2,14 +2,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.netzwerk-universitaetsmedizin.codex</groupId>
-    <artifactId>codex-processes-ap2</artifactId>
+    <groupId>de.medizininformatik-initiative</groupId>
+    <artifactId>feasibility-dsf-process-parent</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>codex-process-feasibility</module>
-        <module>codex-processes-ap2-tools</module>
+        <module>feasibility-dsf-process</module>
+        <module>feasibility-dsf-process-tools</module>
     </modules>
 
     <properties>
@@ -20,15 +20,15 @@
         <hapi.fhir.version>5.1.0</hapi.fhir.version>
     </properties>
 
-    <name>CODEX Processes</name>
-    <description>Business processes for the NUM CODEX project (AP2) as plugins for the HiGHmed Data Sharing Framework.
+    <name>MII Feasibility Processes</name>
+    <description>Business processes for the MII feasibility project as plugins for the HiGHmed Data Sharing Framework.
     </description>
-    <url>https://github.com/num-codex/codex-processes-ap2</url>
+    <url>https://github.com/medizininformatik-initiative/feasibility-dsf-process</url>
 
     <scm>
-        <connection>scm:git:git://github.com/num-codex/codex-processes-ap2.git</connection>
-        <developerConnection>scm:git:git@github.com:num-codex/codex-processes-ap2.git</developerConnection>
-        <url>https://github.com/num-codex/codex-processes-ap2</url>
+        <connection>scm:git:git://github.com/nmedizininformatik-initiative/feasibility-dsf-process.git</connection>
+        <developerConnection>scm:git:git@github.com:medizininformatik-initiative/feasibility-dsf-process.git</developerConnection>
+        <url>https://github.com/medizininformatik-initiative/feasibility-dsf-process</url>
     </scm>
 
     <licenses>
@@ -182,7 +182,7 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>codex-processes-ap2-docker-test-setup/dic-1/bpe/app/log</directory>
+                            <directory>feasibility-dsf-process-docker-test-setup/dic-1/bpe/app/log</directory>
                             <includes>
                                 <include>*.log</include>
                                 <include>*.log.gz</include>
@@ -190,7 +190,7 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>codex-processes-ap2-docker-test-setup/dic-1/fhir/app/log</directory>
+                            <directory>feasibility-dsf-process-docker-test-setup/dic-1/fhir/app/log</directory>
                             <includes>
                                 <include>*.log</include>
                                 <include>*.log.gz</include>
@@ -198,7 +198,7 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>codex-processes-ap2-docker-test-setup/dic-2/bpe/app/log</directory>
+                            <directory>feasibility-dsf-process-docker-test-setup/dic-2/bpe/app/log</directory>
                             <includes>
                                 <include>*.log</include>
                                 <include>*.log.gz</include>
@@ -206,7 +206,7 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>codex-processes-ap2-docker-test-setup/dic-2/fhir/app/log</directory>
+                            <directory>feasibility-dsf-process-docker-test-setup/dic-2/fhir/app/log</directory>
                             <includes>
                                 <include>*.log</include>
                                 <include>*.log.gz</include>
@@ -214,7 +214,7 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>codex-processes-ap2-docker-test-setup/zars/bpe/app/log</directory>
+                            <directory>feasibility-dsf-process-docker-test-setup/zars/bpe/app/log</directory>
                             <includes>
                                 <include>*.log</include>
                                 <include>*.log.gz</include>
@@ -222,7 +222,7 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>codex-processes-ap2-docker-test-setup/zars/fhir/app/log</directory>
+                            <directory>feasibility-dsf-process-docker-test-setup/zars/fhir/app/log</directory>
                             <includes>
                                 <include>*.log</include>
                                 <include>*.log.gz</include>
@@ -242,7 +242,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/num-codex/codex-processes-ap2</url>
+            <url>https://maven.pkg.github.com/medizininformatik-initiative/feasibility-dsf-process</url>
         </repository>
     </distributionManagement>
 
