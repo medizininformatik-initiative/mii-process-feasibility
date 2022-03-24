@@ -1,6 +1,6 @@
-# CODEX Processes
+# Feasibility Processes
 
-Business processes for the NUM CODEX project (AP2) as plugins for the [HiGHmed Data Sharing Framework][1].
+Business processes for the MII feasibility project as plugins for the [HiGHmed Data Sharing Framework][1].
 
 ## Build
 
@@ -26,21 +26,21 @@ Build the project from the root directory of this repository by executing the fo
 
 ```sh
 mvn clean package
-``` 
+```
 
 ## Usage
 
-You can test the processes by following the [README](codex-processes-ap2-docker-test-setup/README.md) in
-the `codex-processes-ap2-docker-test-setup` directory.
+You can test the processes by following the [README](feasibility-dsf-process-docker-test-setup/README.md) in
+the `feasibility-dsf-process-docker-test-setup` directory.
 
 ## Edit
-You should edit the *.bpmn files only with the standalone Camunda Modeller, because of different 
+You should edit the *.bpmn files only with the standalone Camunda Modeller, because of different
 formatting of the bpmn tools and plugins.
 https://camunda.com/download/modeler/
 
 ## License
 
-Copyright 2021 Netzwerk Universitätsmedizin
+Copyright 2021 Medizininformatik-Initiative
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
 License. You may obtain a copy of the License at

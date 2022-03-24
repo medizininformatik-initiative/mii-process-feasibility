@@ -85,7 +85,7 @@ jobs:
       run: mvn -q versions:set -DnewVersion="${{ steps.prep.outputs.version }}" -DprocessAllModules=true
 
     - name: Build with Maven
-      run: mvn -B deploy -DskipTests --file codex-process-feasibility/pom.xml
+      run: mvn -B deploy -DskipTests --file feasibility-dsf-process-bpe-plugin/pom.xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         USERNAME: ${{ github.actor }}
