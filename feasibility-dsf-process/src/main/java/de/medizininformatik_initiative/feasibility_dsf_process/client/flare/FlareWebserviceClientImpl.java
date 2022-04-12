@@ -1,4 +1,4 @@
-package de.medizininformatik_initiative.feasibility_dsf_process;
+package de.medizininformatik_initiative.feasibility_dsf_process.client.flare;
 
 import java.io.IOException;
 import java.net.URI;

@@ -1,12 +1,11 @@
-package de.medizininformatik_initiative.feasibility_dsf_process;
+package de.medizininformatik_initiative.feasibility_dsf_process.client.flare;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.FlareWebserviceClient;
-import de.medizininformatik_initiative.feasibility_dsf_process.FlareWebserviceClientImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,8 +14,6 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
-
-import javax.net.ssl.SSLSession;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -71,7 +68,7 @@ public class FlareWebserviceClientImplTest {
 
     private class StringHttpResponse implements HttpResponse<String> {
 
-        private String body;
+        private final String body;
 
         public StringHttpResponse(String body) {
             this.body = body;

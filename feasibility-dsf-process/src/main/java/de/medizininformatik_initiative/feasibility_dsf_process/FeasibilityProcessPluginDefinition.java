@@ -1,10 +1,10 @@
 package de.medizininformatik_initiative.feasibility_dsf_process;
 
 import ca.uhn.fhir.context.FhirContext;
+import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClientSpringConfig;
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.EnhancedFhirWebserviceClientProviderConfig;
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.EvaluationConfig;
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.FeasibilityConfig;
-import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.FlareWebserviceClientConfig;
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.StoreConfig;
 import org.highmed.dsf.bpe.ProcessPluginDefinition;
 import org.highmed.dsf.fhir.resources.AbstractResource;
@@ -42,7 +42,7 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
     @Override
     public Stream<Class<?>> getSpringConfigClasses() {
         return Stream.of(StoreConfig.class, FeasibilityConfig.class, EnhancedFhirWebserviceClientProviderConfig.class,
-                EvaluationConfig.class, FlareWebserviceClientConfig.class);
+                EvaluationConfig.class, FlareWebserviceClientSpringConfig.class);
     }
 
     @Override
