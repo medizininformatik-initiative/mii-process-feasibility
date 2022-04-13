@@ -1,0 +1,10 @@
+server {
+    listen 80;
+    listen [::]:80;
+
+    location / {
+        # Using docker default resolver - this is intended to be used within an integration test running docker anyway.
+        resolver 127.0.0.11;
+        proxy_pass http://$http_host$uri$is_args$args;
+    }
+}

@@ -1,4 +1,5 @@
 /feasibility-dsf-process/target/
+/feasibility-dsf-process/src/test/resources/de/medizininformatik_initiative/feasibility_dsf_process/client/store/certs
 
 /feasibility-dsf-process-docker-test-setup/certs/*.pem
 /feasibility-dsf-process-docker-test-setup/certs/*.p12

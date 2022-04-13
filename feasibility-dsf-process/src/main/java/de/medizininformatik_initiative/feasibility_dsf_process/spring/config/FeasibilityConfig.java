@@ -45,7 +45,7 @@ public class FeasibilityConfig {
     private final FlareWebserviceClient flareWebserviceClient;
 
     public FeasibilityConfig(@Qualifier("clientProvider") FhirWebserviceClientProvider fhirClientProvider,
-                             @Qualifier("store") IGenericClient storeClient,
+                             @Qualifier("store-client") IGenericClient storeClient,
                              OrganizationProvider organizationProvider,
                              EndpointProvider endpointProvider,
                              TaskHelper taskHelper,
