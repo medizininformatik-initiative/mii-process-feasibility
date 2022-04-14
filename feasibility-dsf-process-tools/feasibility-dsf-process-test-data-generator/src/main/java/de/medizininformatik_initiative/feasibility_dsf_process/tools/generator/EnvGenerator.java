@@ -51,6 +51,11 @@ public class EnvGenerator {
         Stream<String> dic2UserThumbprintsPermanentDelete = filterAndMapToThumbprint(clientCertificateFilesByCommonName,
                 "dic-2-client", "Webbrowser Test User");
 
+        Stream<String> dic3UserThumbprints = filterAndMapToThumbprint(clientCertificateFilesByCommonName, "dic-3-client",
+                "Webbrowser Test User");
+        Stream<String> dic3UserThumbprintsPermanentDelete = filterAndMapToThumbprint(clientCertificateFilesByCommonName,
+                "dic-3-client", "Webbrowser Test User");
+
         List<EnvEntry> entries = List.of(
                 new EnvEntry("ZARS_" + USER_THUMBPRINTS, zarsUserThumbprints, "ZARS_" + USER_THUMBPRINTS_PERMANENTDELETE,
                         zarsUserThumbprintsPermanentDelete),
@@ -59,7 +64,10 @@ public class EnvGenerator {
                         dic1UserThumbprintsPermanentDelete),
 
                 new EnvEntry("DIC_2_" + USER_THUMBPRINTS, dic2UserThumbprints, "DIC_2_" + USER_THUMBPRINTS_PERMANENTDELETE,
-                        dic2UserThumbprintsPermanentDelete));
+                        dic2UserThumbprintsPermanentDelete),
+
+                new EnvEntry("DIC_3_" + USER_THUMBPRINTS, dic3UserThumbprints, "DIC_3_" + USER_THUMBPRINTS_PERMANENTDELETE,
+                        dic3UserThumbprintsPermanentDelete));
 
         writeEnvFile(Paths.get("../../feasibility-dsf-process-docker-test-setup/.env"), entries);
     }

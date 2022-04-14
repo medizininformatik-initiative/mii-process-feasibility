@@ -125,6 +125,40 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>copy-process-plugin-to-dic-3</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-3/bpe/process
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-hapi-fhir-client-to-dic-3</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>ca.uhn.hapi.fhir</groupId>
+                                    <artifactId>hapi-fhir-client</artifactId>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-3/bpe/plugin</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>copy-process-plugin-to-zars</id>
                         <phase>package</phase>
                         <goals>
@@ -201,6 +235,20 @@
                         </fileset>
                         <fileset>
                             <directory>../feasibility-dsf-process-docker-test-setup/dic-2/bpe/process</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>../feasibility-dsf-process-docker-test-setup/dic-3/bpe/plugin</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>../feasibility-dsf-process-docker-test-setup/dic-3/bpe/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>

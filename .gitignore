@@ -5,6 +5,7 @@
 
 /feasibility-dsf-process-docker-test-setup/.env
 /feasibility-dsf-process-docker-test-setup/secrets/*.pem
+/feasibility-dsf-process-docker-test-setup/secrets/*.p12
 
 /feasibility-dsf-process-docker-test-setup/dic-1/bpe/last_event/time.file
 /feasibility-dsf-process-docker-test-setup/dic-1/bpe/log/*.log
