@@ -46,3 +46,4 @@
 /docker/bpe/process/*.jar
 
 **/.idea/
+**/**.iml

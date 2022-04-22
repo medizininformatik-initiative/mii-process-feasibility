@@ -27,22 +27,24 @@ If you changed a lot of things and like to start fresh, it's a good idea to dele
 docker-compose down -v
 ```
 
+Add the following entries to `/etc/hosts`:
+
+```
+127.0.0.1       zars
+127.0.0.1       dic-1
+127.0.0.1       dic-2
+```
+
 After that, you can start the ZARS FHIR Inbox using:
 
 ```sh
-docker-compose up -d zars-fhir-app
-```
-
-It's a good idea to keep the log of the ZARS FHIR Inbox open:
-
-```sh
-docker-compose logs -f zars-fhir-app
+docker-compose up -d zars-fhir-app && docker-compose logs -f zars-fhir-app
 ```
 
 After that, you can query the [CapabilityStatement][1] of the inbox:
 
 ```sh
-curl --resolve zars:443:127.0.0.1 \
+curl \
   --cacert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/ca/testca_certificate.pem \
   --cert-type P12 \
   --cert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
@@ -59,20 +61,19 @@ your `/etc/hosts`. The next line in the command is about Client and CA Certifica
 After that, you can start the ZARS Business Process Engine in a separate terminal:
 
 ```sh
-docker-compose up zars-bpe-app
+docker-compose up -d zars-bpe-app && docker-compose logs -f zars-fhir-app zars-bpe-app
 ```
 
 After starting the ZARS, you can start the DIC-1 FHIR Inbox using:
 
 ```sh
-docker-compose up -d dic-1-fhir-app
-docker-compose logs -f dic-1-fhir-app
+docker-compose up -d dic-1-fhir-app && docker-compose logs -f dic-1-fhir-app
 ```
 
 The following command should return the CapabilityStatement:
 
 ```sh
-curl --resolve dic-1:443:127.0.0.1 \
+curl \
   --cacert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/ca/testca_certificate.pem \
   --cert-type P12 \
   --cert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
@@ -84,7 +85,7 @@ curl --resolve dic-1:443:127.0.0.1 \
 After that, you can start the DIC-1 Business Process Engine and Blaze:
 
 ```sh
-docker-compose up dic-1-bpe-app
+docker-compose up -d dic-1-bpe-app && docker-compose logs -f dic-1-fhir-app dic-1-bpe-app
 ```
 
 Continue with DIC-2.
@@ -92,7 +93,7 @@ Continue with DIC-2.
 After that we can POST the first Task to the ZARS:
 
 ```sh
-curl --resolve zars:443:127.0.0.1 \
+curl \
   --cacert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/ca/testca_certificate.pem \
   --cert-type P12 \
   --cert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
@@ -106,7 +107,7 @@ curl --resolve zars:443:127.0.0.1 \
 After exporting the Task ID to $TASK_ID, you can fetch the task:
 
 ```sh
-curl --resolve zars:443:127.0.0.1 \
+curl \
   --cacert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/ca/testca_certificate.pem \
   --cert-type P12 \
   --cert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
@@ -114,6 +115,8 @@ curl --resolve zars:443:127.0.0.1 \
   -s "https://zars/fhir/Task/${TASK_ID}" |\
   jq .
 ```
+
+"3d141f14-69bd-4ac1-82d3-411ca3904d29"
 
 The task should be completed and contain an output with the reference of the MeasureReport created.
 
