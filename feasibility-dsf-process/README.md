@@ -131,5 +131,5 @@ This version of the process is compatible with the following components:
 [5]: <https://www.hl7.org/fhir/operation-measure-evaluate-measure.html>
 [6]: <https://www.hl7.org/fhir/measurereport.html>
 [7]: <https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation>
-[8]: <https://github.com/highmed/highmed-dsf/wiki/DSF-0.5.4-Configuration-Parameters#dsf-bpe>
+[8]: <https://github.com/highmed/highmed-dsf/wiki/DSF-0.5.5-Configuration-Parameters#dsf-bpe>
 [9]: <https://github.com/rwth-imi/flare-query>

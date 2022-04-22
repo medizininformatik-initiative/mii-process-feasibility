@@ -68,7 +68,7 @@ services:
 
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
-    image: ghcr.io/highmed/fhir:0.5.4
+    image: ghcr.io/highmed/fhir:0.5.5
     restart: on-failure
     secrets:
     - db_liquibase.password
@@ -114,7 +114,7 @@ services:
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: ghcr.io/highmed/bpe:0.5.4
+    image: ghcr.io/highmed/bpe:0.5.5
     restart: on-failure
     secrets:
     - db_liquibase.password
@@ -165,7 +165,7 @@ services:
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
-    image: ghcr.io/highmed/fhir:0.5.4
+    image: ghcr.io/highmed/fhir:0.5.5
     restart: on-failure
     secrets:
     - db_liquibase.password
@@ -211,7 +211,7 @@ services:
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: ghcr.io/highmed/bpe:0.5.4
+    image: ghcr.io/highmed/bpe:0.5.5
     restart: on-failure
     secrets:
     - db_liquibase.password
@@ -267,7 +267,7 @@ services:
 
   # ---- DIC-1 - FHIR Data Store ----------------------------------------------
   dic-1-store:
-    image: ghcr.io/medizininformatik-initiative/feasibility-flare:0.0.1
+    image: ghcr.io/rwth-imi/flare-query:1.0-rc11
     restart: always
     ports:
     - "5000:5000"
@@ -314,7 +314,7 @@ services:
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-app:
-    image: ghcr.io/highmed/fhir:0.5.4
+    image: ghcr.io/highmed/fhir:0.5.5
     restart: on-failure
     secrets:
     - db_liquibase.password
@@ -360,7 +360,7 @@ services:
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: ghcr.io/highmed/bpe:0.5.4
+    image: ghcr.io/highmed/bpe:0.5.5
     restart: on-failure
     secrets:
     - db_liquibase.password
@@ -522,4 +522,4 @@ volumes:
     name: "dic-2-store-data"
 
   db-data:
-    name: "db-data"
+    name: "db-data-mii-dsf-process-feasibility"

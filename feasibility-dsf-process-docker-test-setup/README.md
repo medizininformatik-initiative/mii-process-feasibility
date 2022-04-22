@@ -30,7 +30,7 @@ docker-compose down -v
 After that, you can start the ZARS FHIR Inbox using:
 
 ```sh
-docker-compose up -d zars-fhir-proxy
+docker-compose up -d zars-fhir-app
 ```
 
 It's a good idea to keep the log of the ZARS FHIR Inbox open:
@@ -63,7 +63,7 @@ docker-compose up zars-bpe-app
 After starting the ZARS, you can start the DIC-1 FHIR Inbox using:
 
 ```sh
-docker-compose up -d dic-1-fhir-proxy
+docker-compose up -d dic-1-fhir-app
 docker-compose logs -f dic-1-fhir-app
 ```
 
