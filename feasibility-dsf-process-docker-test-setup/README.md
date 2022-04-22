@@ -43,7 +43,9 @@ After that, you can query the [CapabilityStatement][1] of the inbox:
 
 ```sh
 curl --resolve zars:443:127.0.0.1 \
-  --cacert certs/ca.pem --cert-type P12 --cert certs/test-user.p12:password \
+  --cacert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/ca/testca_certificate.pem \
+  --cert-type P12 \
+  --cert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
   -H accept:application/fhir+json \
   -s https://zars/fhir/metadata |\
   jq '.software, .implementation'
@@ -71,7 +73,9 @@ The following command should return the CapabilityStatement:
 
 ```sh
 curl --resolve dic-1:443:127.0.0.1 \
-  --cacert certs/ca.pem --cert-type P12 --cert certs/test-user.p12:password \
+  --cacert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/ca/testca_certificate.pem \
+  --cert-type P12 \
+  --cert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
   -H accept:application/fhir+json \
   -s https://dic-1/fhir/metadata |\
   jq '.software, .implementation'
@@ -89,7 +93,9 @@ After that we can POST the first Task to the ZARS:
 
 ```sh
 curl --resolve zars:443:127.0.0.1 \
-  --cacert certs/ca.pem --cert-type P12 --cert certs/test-user.p12:password \
+  --cacert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/ca/testca_certificate.pem \
+  --cert-type P12 \
+  --cert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
   -H accept:application/fhir+json \
   -H content-type:application/fhir+json \
   -d @data/feasibility-bundle.json \
@@ -101,7 +107,9 @@ After exporting the Task ID to $TASK_ID, you can fetch the task:
 
 ```sh
 curl --resolve zars:443:127.0.0.1 \
-  --cacert certs/ca.pem --cert-type P12 --cert certs/test-user.p12:password \
+  --cacert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/ca/testca_certificate.pem \
+  --cert-type P12 \
+  --cert ../feasibility-dsf-process-tools/feasibility-dsf-process-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
   -H accept:application/fhir+json \
   -s "https://zars/fhir/Task/${TASK_ID}" |\
   jq .
