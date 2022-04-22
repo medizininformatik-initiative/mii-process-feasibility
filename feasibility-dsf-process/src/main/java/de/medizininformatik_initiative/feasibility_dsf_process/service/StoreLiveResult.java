@@ -13,8 +13,6 @@ import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.TaskOutputComponent;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.Objects;
-
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
@@ -24,8 +22,6 @@ import static de.medizininformatik_initiative.feasibility_dsf_process.variables.
  */
 public class StoreLiveResult extends AbstractServiceDelegate implements InitializingBean {
 
-    private final OrganizationProvider organizationProvider;
-
     /**
      * Instantiates a new Store live result.
      *
@@ -33,18 +29,8 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
      * @param taskHelper     the task helper
      */
     public StoreLiveResult(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                           ReadAccessHelper readAccessHelper, OrganizationProvider organizationProvider) {
+                           ReadAccessHelper readAccessHelper) {
         super(clientProvider, taskHelper, readAccessHelper);
-
-        this.organizationProvider = organizationProvider;
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception
-    {
-        super.afterPropertiesSet();
-
-        Objects.requireNonNull(organizationProvider, "organizationProvider");
     }
 
     @Override
@@ -66,8 +52,7 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
 
     private void addReadAccessTag(MeasureReport measureReport)
     {
-        String identifier = organizationProvider.getLocalIdentifierValue();
-        getReadAccessHelper().addOrganization(measureReport, identifier);
+        getReadAccessHelper().addLocal(measureReport);
     }
 
     private MeasureReport storeMeasureReport(MeasureReport measureReport) {
