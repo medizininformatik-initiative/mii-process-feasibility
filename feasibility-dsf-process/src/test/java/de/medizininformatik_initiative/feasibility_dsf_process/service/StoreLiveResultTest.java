@@ -1,11 +1,14 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreLiveResult;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelperImpl;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
+import org.highmed.dsf.fhir.organization.OrganizationProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.highmed.fhir.client.FhirWebserviceClient;
 import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
@@ -50,6 +53,12 @@ public class StoreLiveResultTest {
     private DelegateExecution execution;
 
     @Mock
+    private OrganizationProvider organizationProvider;
+
+    @Mock
+    private ReadAccessHelper readAccessHelper;
+
+    @Mock
     private TaskHelper taskHelper;
 
     @InjectMocks
@@ -61,6 +70,7 @@ public class StoreLiveResultTest {
     @Before
     public void setUp() {
         task = new Task();
+
         measureReport = new MeasureReport();
         measureReport.setIdElement(new IdType(MEASURE_REPORT_ID));
     }
@@ -71,6 +81,10 @@ public class StoreLiveResultTest {
                 .thenReturn(measureReport);
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
+
+        when(organizationProvider.getLocalIdentifierValue()).thenReturn("local-id");
+        when(readAccessHelper.addOrganization(measureReport, "local-id")).thenReturn(
+                new ReadAccessHelperImpl().addOrganization(measureReport, "local-id"));
 
         TaskOutputComponent taskOutputComponent = new TaskOutputComponent();
         when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
@@ -97,6 +111,10 @@ public class StoreLiveResultTest {
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
 
+        when(organizationProvider.getLocalIdentifierValue()).thenReturn("requester-id");
+        when(readAccessHelper.addOrganization(measureReport, "requester-id")).thenReturn(
+                new ReadAccessHelperImpl().addOrganization(measureReport, "requester-id"));
+
         when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
                 refCaptor.capture()))
                 .thenReturn(new TaskOutputComponent());
@@ -108,6 +126,6 @@ public class StoreLiveResultTest {
 
         assertEquals(MEASURE_REPORT_ID, measureReportCaptor.getValue().getIdElement().getIdPart());
         assertEquals("http://highmed.org/fhir/CodeSystem/read-access-tag", measureReportCaptor.getValue().getMeta().getTagFirstRep().getSystem());
-        assertEquals("ALL", measureReportCaptor.getValue().getMeta().getTagFirstRep().getCode());
+        assertEquals("LOCAL", measureReportCaptor.getValue().getMeta().getTagFirstRep().getCode());
     }
 }
