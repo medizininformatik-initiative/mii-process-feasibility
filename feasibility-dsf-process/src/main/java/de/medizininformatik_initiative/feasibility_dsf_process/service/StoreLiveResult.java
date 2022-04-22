@@ -4,7 +4,6 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
 import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.organization.OrganizationProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.MeasureReport;
@@ -52,7 +51,12 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
 
     private void addReadAccessTag(MeasureReport measureReport)
     {
-        getReadAccessHelper().addLocal(measureReport);
+        measureReport.getMeta().getTag().removeIf(t -> !"LOCAL".equals(t.getCode()));
+
+        if (!getReadAccessHelper().hasLocal(measureReport))
+        {
+            getReadAccessHelper().addLocal(measureReport);
+        }
     }
 
     private MeasureReport storeMeasureReport(MeasureReport measureReport) {

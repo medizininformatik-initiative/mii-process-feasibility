@@ -120,5 +120,6 @@ public class StoreLiveResultTest {
         assertEquals(MEASURE_REPORT_ID, measureReportCaptor.getValue().getIdElement().getIdPart());
         assertEquals("http://highmed.org/fhir/CodeSystem/read-access-tag", measureReportCaptor.getValue().getMeta().getTagFirstRep().getSystem());
         assertEquals("LOCAL", measureReportCaptor.getValue().getMeta().getTagFirstRep().getCode());
+        assertEquals(1, measureReportCaptor.getValue().getMeta().getTag().size());
     }
 }
