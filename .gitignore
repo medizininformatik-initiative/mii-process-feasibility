@@ -45,4 +45,4 @@
 /docker/bpe/plugin/*.jar
 /docker/bpe/process/*.jar
 
-./idea
+**/.idea/
