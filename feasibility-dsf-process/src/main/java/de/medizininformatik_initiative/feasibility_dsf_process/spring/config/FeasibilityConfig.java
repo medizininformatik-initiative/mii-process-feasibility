@@ -95,7 +95,7 @@ public class FeasibilityConfig {
 
     @Bean
     public StoreLiveResult storeLiveResult() {
-        return new StoreLiveResult(fhirClientProvider, taskHelper, readAccessHelper);
+        return new StoreLiveResult(fhirClientProvider, taskHelper, readAccessHelper, organizationProvider);
     }
 
     @Bean
