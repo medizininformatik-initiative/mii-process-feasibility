@@ -263,6 +263,7 @@ services:
     depends_on:
     - db
     - dic-1-fhir-app
+    - dic-1-store
 
   # ---- DIC-1 - FHIR Data Store ----------------------------------------------
   dic-1-store:
