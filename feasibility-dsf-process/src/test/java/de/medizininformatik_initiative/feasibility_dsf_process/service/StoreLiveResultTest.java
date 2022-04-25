@@ -19,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
@@ -30,7 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@RunWith(MockitoJUnitRunner.class)
 public class StoreLiveResultTest {
 
     private static final String MEASURE_REPORT_ID = "4adfdef6-fc5b-4650-bdf5-80258a61e732";
@@ -51,10 +52,10 @@ public class StoreLiveResultTest {
     private DelegateExecution execution;
 
     @Mock
-    private ReadAccessHelper readAccessHelper;
-
-    @Mock
     private TaskHelper taskHelper;
+
+    @Spy
+    private ReadAccessHelper readAccessHelper = new ReadAccessHelperImpl();
 
     @InjectMocks
     private StoreLiveResult service;
@@ -76,9 +77,6 @@ public class StoreLiveResultTest {
                 .thenReturn(measureReport);
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
-
-        when(readAccessHelper.addLocal(measureReport)).thenReturn(
-                new ReadAccessHelperImpl().addLocal(measureReport));
 
         TaskOutputComponent taskOutputComponent = new TaskOutputComponent();
         when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
@@ -105,9 +103,6 @@ public class StoreLiveResultTest {
         when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
                 .thenReturn(task);
 
-        when(readAccessHelper.addLocal(measureReport)).thenReturn(
-                new ReadAccessHelperImpl().addLocal(measureReport));
-
         when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
                 refCaptor.capture()))
                 .thenReturn(new TaskOutputComponent());
@@ -118,8 +113,8 @@ public class StoreLiveResultTest {
         service.execute(execution);
 
         assertEquals(MEASURE_REPORT_ID, measureReportCaptor.getValue().getIdElement().getIdPart());
+        assertEquals(1, measureReportCaptor.getValue().getMeta().getTag().size());
         assertEquals("http://highmed.org/fhir/CodeSystem/read-access-tag", measureReportCaptor.getValue().getMeta().getTagFirstRep().getSystem());
         assertEquals("LOCAL", measureReportCaptor.getValue().getMeta().getTagFirstRep().getCode());
-        assertEquals(1, measureReportCaptor.getValue().getMeta().getTag().size());
     }
 }

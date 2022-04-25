@@ -58,7 +58,7 @@ zars, but also the other sites, you have to use the domain name `zars` here. Wit
 resolver, which will resolve the host `zars` to localhost. An alternative would be to create an entry in
 your `/etc/hosts`. The next line in the command is about Client and CA Certificates.
 
-After that, you can start the ZARS Business Process Engine in a separate terminal:
+After that, you can stop the ZARS FHIR Inbox log output and start the ZARS Business Process Engine in the same terminal:
 
 ```sh
 docker-compose up -d zars-bpe-app && docker-compose logs -f zars-fhir-app zars-bpe-app
@@ -82,7 +82,7 @@ curl \
   jq '.software, .implementation'
 ```
 
-After that, you can start the DIC-1 Business Process Engine and Blaze:
+After that, you can stop the DIC-1 FHIR Inbox log output and start the DIC-1 Business Process Engine and Blaze in the same terminal:
 
 ```sh
 docker-compose up -d dic-1-bpe-app && docker-compose logs -f dic-1-fhir-app dic-1-bpe-app
@@ -115,8 +115,6 @@ curl \
   -s "https://zars/fhir/Task/${TASK_ID}" |\
   jq .
 ```
-
-"3d141f14-69bd-4ac1-82d3-411ca3904d29"
 
 The task should be completed and contain an output with the reference of the MeasureReport created.
 
