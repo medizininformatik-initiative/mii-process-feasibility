@@ -1,5 +1,6 @@
 <Bundle xmlns="http://hl7.org/fhir">
     <type value="transaction"/>
+    <!-- Organization -->
     <entry>
         <fullUrl value="urn:uuid:bb73165c-c7b9-4342-8e28-531f07fa7735"/>
         <resource>
@@ -114,6 +115,46 @@
             <ifNoneExist value="identifier=http://highmed.org/sid/organization-identifier|Test_DIC_2"/>
         </request>
     </entry>
+    <entry>
+        <fullUrl value="urn:uuid:c9c81955-3ca6-40f9-9143-878bdef8bc96"/>
+        <resource>
+            <Organization xmlns="http://hl7.org/fhir">
+                <meta>
+                    <profile value="http://highmed.org/fhir/StructureDefinition/organization"/>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+                        <code value="ALL"/>
+                    </tag>
+                </meta>
+                <extension url="http://highmed.org/fhir/StructureDefinition/extension-certificate-thumbprint">
+                    <valueString value="TODO"/>
+                </extension>
+                <identifier>
+                    <system value="http://highmed.org/sid/organization-identifier"/>
+                    <value value="Test_DIC_3"/>
+                </identifier>
+                <active value="true"/>
+                <type>
+                    <coding>
+                        <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                        <code value="MeDIC"/>
+                    </coding>
+                </type>
+                <name value="Test DIC 3"/>
+                <endpoint>
+                    <reference value="urn:uuid:d2de89b2-8eb4-45c4-8e6f-6c64a7af2b69"/>
+                    <type value="Endpoint"/>
+                </endpoint>
+            </Organization>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="Organization"/>
+            <ifNoneExist value="identifier=http://highmed.org/sid/organization-identifier|Test_DIC_3"/>
+        </request>
+    </entry>
+
+    <!-- Endpoint -->
     <entry>
         <fullUrl value="urn:uuid:e6af43e9-76ff-46d7-b9aa-e5ee74562ab1"/>
         <resource>
@@ -240,7 +281,50 @@
                     value="identifier=http://highmed.org/sid/endpoint-identifier|Test_DIC_2_Endpoint"/>
         </request>
     </entry>
+    <entry>
+        <fullUrl value="urn:uuid:d2de89b2-8eb4-45c4-8e6f-6c64a7af2b69"/>
+        <resource>
+            <Endpoint xmlns="http://hl7.org/fhir">
+                <meta>
+                    <profile value="http://highmed.org/fhir/StructureDefinition/endpoint"/>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+                        <code value="ALL"/>
+                    </tag>
+                </meta>
+                <identifier>
+                    <system value="http://highmed.org/sid/endpoint-identifier"/>
+                    <value value="Test_DIC_3_Endpoint"/>
+                </identifier>
+                <status value="active"/>
+                <connectionType>
+                    <system value="http://terminology.hl7.org/CodeSystem/endpoint-connection-type"/>
+                    <code value="hl7-fhir-rest"/>
+                </connectionType>
+                <managingOrganization>
+                    <reference value="urn:uuid:c9c81955-3ca6-40f9-9143-878bdef8bc96"/>
+                    <type value="Organization"/>
+                </managingOrganization>
+                <payloadType>
+                    <coding>
+                        <system value="http://hl7.org/fhir/resource-types"/>
+                        <code value="Task"/>
+                    </coding>
+                </payloadType>
+                <payloadMimeType value="application/fhir+json"/>
+                <payloadMimeType value="application/fhir+xml"/>
+                <address value="https://dic-3/fhir"/>
+            </Endpoint>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="Endpoint"/>
+            <ifNoneExist
+                    value="identifier=http://highmed.org/sid/endpoint-identifier|Test_DIC_3_Endpoint"/>
+        </request>
+    </entry>
 
+    <!-- Organization Affiliation -->
     <entry>
         <fullUrl value="urn:uuid:c4a7b553-01b1-4b50-bcb3-1467f5ae6791"/>
         <resource>
@@ -267,8 +351,6 @@
                     value="identifier=http://highmed.org/sid/organization-identifier|netzwerk-universitaetsmedizin.de"/>
         </request>
     </entry>
-
-
     <entry>
         <fullUrl value="urn:uuid:6da23450-e2e2-49e1-8591-02c553d53e3b"/>
         <resource>
@@ -348,6 +430,7 @@
                     value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|netzwerk-universitaetsmedizin.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_DIC_1"/>
         </request>
     </entry>
+
     <entry>
         <fullUrl value="urn:uuid:01a2d3fa-8c4d-4cf3-b383-de2bb356245a"/>
         <resource>
@@ -385,6 +468,46 @@
             <url value="OrganizationAffiliation"/>
             <ifNoneExist
                     value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|netzwerk-universitaetsmedizin.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_DIC_2"/>
+        </request>
+    </entry>
+
+    <entry>
+        <fullUrl value="urn:uuid:69b7dfc3-e700-4c4f-9cdc-bb297d7a704e"/>
+        <resource>
+            <OrganizationAffiliation xmlns="http://hl7.org/fhir">
+                <meta>
+                    <profile value="http://highmed.org/fhir/StructureDefinition/organization-affiliation"/>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+                        <code value="ALL"/>
+                    </tag>
+                </meta>
+                <active value="true"/>
+                <organization>
+                    <reference value="urn:uuid:c4a7b553-01b1-4b50-bcb3-1467f5ae6791"/>
+                    <type value="Organization"/>
+                </organization>
+                <participatingOrganization>
+                    <reference value="urn:uuid:c9c81955-3ca6-40f9-9143-878bdef8bc96"/>
+                    <type value="Organization"/>
+                </participatingOrganization>
+                <code>
+                    <coding>
+                        <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                        <code value="MeDIC"/>
+                    </coding>
+                </code>
+                <endpoint>
+                    <reference value="urn:uuid:d2de89b2-8eb4-45c4-8e6f-6c64a7af2b69"/>
+                    <type value="Endpoint"/>
+                </endpoint>
+            </OrganizationAffiliation>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="OrganizationAffiliation"/>
+            <ifNoneExist
+                    value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|netzwerk-universitaetsmedizin.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_DIC_3"/>
         </request>
     </entry>
 </Bundle>

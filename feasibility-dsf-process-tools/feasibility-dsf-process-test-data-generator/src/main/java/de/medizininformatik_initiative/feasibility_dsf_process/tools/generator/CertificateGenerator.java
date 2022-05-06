@@ -22,15 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.InvalidKeyException;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -38,11 +30,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,8 +41,8 @@ public class CertificateGenerator {
 
     private static final char[] CERT_PASSWORD = "password".toCharArray();
 
-    private static final String[] SERVER_COMMON_NAMES = {"localhost", "dic-1", "dic-2", "zars"};
-    private static final String[] CLIENT_COMMON_NAMES = {"dic-1-client", "dic-2-client", "zars-client", "Webbrowser Test User"};
+    private static final String[] SERVER_COMMON_NAMES = {"localhost", "dic-1", "dic-2", "dic-3", "zars"};
+    private static final String[] CLIENT_COMMON_NAMES = {"dic-1-client", "dic-2-client", "dic-3-client", "zars-client", "Webbrowser Test User"};
 
     private static final BouncyCastleProvider PROVIDER = new BouncyCastleProvider();
 
@@ -73,7 +61,7 @@ public class CertificateGenerator {
         private final byte[] certificateSha512Thumbprint;
 
 
-        CertificateFiles(String commonName, KeyPair keyPair, Path keyPairPrivateKeyFile, X509Certificate certificate,
+        CertificateFiles(String commonName, KeyPair keyPair, X509Certificate certificate,
                          byte[] certificateSha512Thumbprint) {
             this.commonName = commonName;
             this.keyPair = keyPair;
@@ -208,16 +196,15 @@ public class CertificateGenerator {
                 certificateType, keyPair, commonName, dnsNames);
 
         Path certificatePemFile = createFolderIfNotExists(getCertPemPath(commonName));
-        X509Certificate certificate = signOrReadCertificate(certificatePemFile, certificateRequest,
-                keyPair.getPrivate(), commonName, certificateType);
+        X509Certificate certificate = signOrReadCertificate(certificatePemFile, certificateRequest, commonName,
+                certificateType);
 
-        return new CertificateFiles(commonName, keyPair, privateKeyFile, certificate,
+        return new CertificateFiles(commonName, keyPair, certificate,
                 calculateSha512CertificateThumbprint(certificate));
     }
 
-    private X509Certificate signOrReadCertificate(Path certificateFile,
-                                                  JcaPKCS10CertificationRequest certificateRequest, PrivateKey privateKey, String commonName,
-                                                  CertificateType certificateType) {
+    private X509Certificate signOrReadCertificate(Path certificateFile, JcaPKCS10CertificationRequest certificateRequest,
+                                                  String commonName, CertificateType certificateType) {
         if (Files.isReadable(certificateFile)) {
             logger.info("Reading certificate (pem) from {} [{}]", certificateFile, commonName);
             return readCertificate(certificateFile);
@@ -244,7 +231,7 @@ public class CertificateGenerator {
                     throw new RuntimeException("Unknown certificate type " + certificateType);
             }
         } catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | OperatorCreationException
-                | CertificateException | IllegalStateException | IOException e) {
+                 | CertificateException | IllegalStateException | IOException e) {
             logger.error("Error while signing " + certificateType.toString().toLowerCase() + " certificate", e);
             throw new RuntimeException(e);
         }
@@ -476,7 +463,7 @@ public class CertificateGenerator {
             return CertificateHelper.toPkcs12KeyStore(privateKey,
                     new Certificate[]{certificate, ca.getCertificate()}, commonName, CERT_PASSWORD);
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IllegalStateException
-                | IOException e) {
+                 | IOException e) {
             logger.error("Error while creating P12 key-store", e);
             throw new RuntimeException(e);
         }

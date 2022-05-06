@@ -27,11 +27,14 @@ services:
         ipv4_address: 172.10.0.82
       dic-2-fhir-frontend:
         ipv4_address: 172.10.0.98
+      dic-3-fhir-frontend:
+        ipv4_address: 172.10.0.114
       internet:
         aliases:
         - zars
         - dic-1
         - dic-2
+        - dic-3
     environment:
       TZ: Europe/Berlin
 
@@ -52,9 +55,11 @@ services:
     - zars-fhir-backend
     - dic-1-fhir-backend
     - dic-2-fhir-backend
+    - dic-3-fhir-backend
     - zars-bpe-backend
     - dic-1-bpe-backend
     - dic-2-bpe-backend
+    - dic-3-bpe-backend
     secrets:
     - db_liquibase.password
     volumes:
@@ -252,8 +257,8 @@ services:
       ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_1_camunda_server_user
       ORG_HIGHMED_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_1
       ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-1/fhir
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_FLARE_WEBSERVICE_BASEURL: http://dic-1-store:5000/
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_FLARE_WEBSERVICE_CONNECTTIMEOUT: 2000
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_WEBSERVICE_BASE_URL: http://dic-1-store:5000/
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_WEBSERVICE_CONNECT_TIMEOUT: 2000
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: structured-query
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
     networks:
@@ -401,7 +406,7 @@ services:
       ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_2_camunda_server_user
       ORG_HIGHMED_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_2
       ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-2/fhir
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_STORE_URL: http://dic-2-store:8080/fhir
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-2-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
     networks:
@@ -430,6 +435,160 @@ services:
     - type: volume
       source: dic-2-store-data
       target: /app/data
+
+  # ---- DIC-3 - FHIR ---------------------------------------------------------
+  dic-3-fhir-app:
+    image: ghcr.io/highmed/fhir:0.5.4
+    restart: on-failure
+    secrets:
+      - db_liquibase.password
+      - db_fhir_dic_3_user.password
+      - db_fhir_dic_3_user_permanent_delete.password
+      - app_client_trust_certificates.pem
+      - app_dic_3_client_certificate.pem
+      - app_dic_3_client_certificate_private_key.pem
+      - app_client_certificate_private_key.pem.password
+    volumes:
+      - type: bind
+        source: ./dic-3/fhir/conf/bundle.xml
+        target: /opt/fhir/conf/bundle.xml
+      - type: bind
+        source: ./dic-3/fhir/log
+        target: /opt/fhir/log
+    environment:
+      TZ: Europe/Berlin
+      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      ORG_HIGHMED_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_3_user.password
+      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_3_user_permanent_delete.password
+      ORG_HIGHMED_DSF_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
+      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_3_client_certificate.pem
+      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_3_client_certificate_private_key.pem
+      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://db/dic_3_fhir
+      ORG_HIGHMED_DSF_FHIR_DB_USER_GROUP: dic_3_fhir_users
+      ORG_HIGHMED_DSF_FHIR_DB_USER_USERNAME: dic_3_fhir_server_user
+      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: dic_3_fhir_permanent_delete_users
+      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: dic_3_fhir_server_permanent_delete_user
+      ORG_HIGHMED_DSF_FHIR_SERVER_BASE_URL: https://dic-3/fhir
+      ORG_HIGHMED_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_3
+      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS: ${DIC_3_USER_THUMBPRINTS}
+      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS_PERMANENT_DELETE: ${DIC_3_USER_THUMBPRINTS_PERMANENT_DELETE}
+    networks:
+      dic-3-fhir-frontend:
+        ipv4_address: 172.10.0.115
+      dic-3-fhir-backend:
+      internet:
+    depends_on:
+      - db
+      - proxy
+
+  # ---- DIC-3 - BPE ----------------------------------------------------------
+  dic-3-bpe-app:
+    image: ghcr.io/highmed/bpe:0.5.4
+    restart: on-failure
+    secrets:
+      - db_liquibase.password
+      - db_dic_3_bpe_user.password
+      - db_dic_3_bpe_user_camunda.password
+      - app_client_trust_certificates.pem
+      - dic_3_store_proxy_self_signed_ca.p12
+      - app_dic_3_client_certificate.pem
+      - app_dic_3_client_certificate_private_key.pem
+      - app_client_certificate_private_key.pem.password
+    volumes:
+      - type: bind
+        source: ./dic-3/bpe/plugin
+        target: /opt/bpe/plugin
+        read_only: true
+      - type: bind
+        source: ./dic-3/bpe/process
+        target: /opt/bpe/process
+        read_only: true
+      - type: bind
+        source: ./dic-3/bpe/log
+        target: /opt/bpe/log
+      - type: bind
+        source: ./dic-3/bpe/last_event
+        target: /opt/bpe/last_event
+    environment:
+      TZ: Europe/Berlin
+      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      ORG_HIGHMED_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_3_bpe_user.password
+      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_dic_3_bpe_user_camunda.password
+      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
+      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_3_client_certificate.pem
+      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_3_client_certificate_private_key.pem
+      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://db/dic_3_bpe
+      ORG_HIGHMED_DSF_BPE_DB_USER_GROUP: dic_3_bpe_users
+      ORG_HIGHMED_DSF_BPE_DB_USER_USERNAME: dic_3_bpe_server_user
+      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_3_camunda_users
+      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_3_camunda_server_user
+      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_3
+      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-3/fhir
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_PROXY_HOST: dic-3-store-proxy
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_PROXY_PORT: 443
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_PROXY_USERNAME: test
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_PROXY_PASSWORD: PF4Q4pEpXFkYToPSDre5tFr9P9MkqeDc
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_TRUST_STORE_PATH: /run/secrets/dic_3_store_proxy_self_signed_ca.p12
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_TRUST_STORE_PASSWORD: testpw
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-3-store:8080/fhir
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
+    networks:
+      dic-3-bpe-frontend:
+      dic-3-bpe-backend:
+      internet:
+    depends_on:
+      - db
+      - dedicated-dic-3-store-proxy
+      - proxy
+
+  # ---- DIC-3 - DEDICATED PROXY WITH SELF SIGNED CERT ------------------------
+  dedicated-dic-3-store-proxy:
+    image: nginx:1.21
+    restart: on-failure
+    ports:
+    - "127.0.0.1:10443:443"
+    secrets:
+    - dic_3_store_proxy_cert_bundle.pem
+    - dic_3_store_proxy_cert_key.pem
+    - dic_3_store_proxy.htpasswd
+    volumes:
+    - type: bind
+      source: ./dic-3-store-proxy/nginx.conf
+      target: /etc/nginx/nginx.conf
+      read_only: true
+    networks:
+      dic-3-fhir-frontend:
+        ipv4_address: 172.10.0.116
+      dic-3-bpe-backend:
+      internet:
+        aliases:
+        - dic-3-store-proxy
+    environment:
+      TZ: Europe/Berlin
+    depends_on:
+    - dic-3-store
+
+  # ---- DIC-3 - FHIR Data Store ----------------------------------------------
+  dic-3-store:
+    image: samply/blaze:0.10.3
+    restart: on-failure
+    ports:
+    - "8072:8080"
+    environment:
+      BASE_URL: http://localhost:8072
+      LOG_LEVEL: debug
+    networks:
+      dic-3-fhir-frontend:
+        ipv4_address: 172.10.0.117
+      dic-3-bpe-backend:
+    volumes:
+    - type: volume
+      source: dic-3-store-data
+      target: /app/data
+
 
 secrets:
   proxy_certificate_and_int_cas.pem:
@@ -486,6 +645,28 @@ secrets:
   db_fhir_dic_2_user_permanent_delete.password:
     file: ./secrets/db_fhir_dic_2_user_permanent_delete.password
 
+  db_dic_3_bpe_user.password:
+    file: secrets/db_dic_3_bpe_user.password
+  db_dic_3_bpe_user_camunda.password:
+    file: secrets/db_dic_3_bpe_user_camunda.password
+  app_dic_3_client_certificate.pem:
+    file: ./secrets/app_dic_3_client_certificate.pem
+  app_dic_3_client_certificate_private_key.pem:
+    file: ./secrets/app_dic_3_client_certificate_private_key.pem
+  db_fhir_dic_3_user.password:
+    file: ./secrets/db_fhir_dic_3_user.password
+  db_fhir_dic_3_user_permanent_delete.password:
+    file: ./secrets/db_fhir_dic_3_user_permanent_delete.password
+
+  dic_3_store_proxy.htpasswd:
+    file: ./secrets/dic_3_store_proxy.htpasswd
+  dic_3_store_proxy_cert_bundle.pem:
+    file: ./secrets/dic_3_store_proxy_cert_bundle.pem
+  dic_3_store_proxy_cert_key.pem:
+    file: ./secrets/dic_3_store_proxy_cert_key.pem
+  dic_3_store_proxy_self_signed_ca.p12:
+    file: ./secrets/dic_3_store_proxy_self_signed_ca.p12
+
 networks:
   internet:
   zars-fhir-frontend:
@@ -515,6 +696,15 @@ networks:
   dic-2-fhir-backend:
   dic-2-bpe-frontend:
   dic-2-bpe-backend:
+  dic-3-fhir-frontend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.112/28
+  dic-3-fhir-backend:
+  dic-3-bpe-frontend:
+  dic-3-bpe-backend:
 
 volumes:
   dic-1-store-data:
@@ -522,6 +712,9 @@ volumes:
 
   dic-2-store-data:
     name: "dic-2-store-data"
+
+  dic-3-store-data:
+    name: "dic-3-store-data"
 
   db-data:
     name: "db-data-mii-dsf-process-feasibility"

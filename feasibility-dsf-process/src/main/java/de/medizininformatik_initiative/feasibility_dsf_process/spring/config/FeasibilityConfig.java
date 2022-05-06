@@ -6,7 +6,7 @@ import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebse
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProviderImpl;
 import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationSettingsProvider;
 import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCountObfuscator;
-import de.medizininformatik_initiative.feasibility_dsf_process.FlareWebserviceClient;
+import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicRequest;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicResponse;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.AggregateMeasureReports;
@@ -45,7 +45,7 @@ public class FeasibilityConfig {
     private final FlareWebserviceClient flareWebserviceClient;
 
     public FeasibilityConfig(@Qualifier("clientProvider") FhirWebserviceClientProvider fhirClientProvider,
-                             @Qualifier("store") IGenericClient storeClient,
+                             @Qualifier("store-client") IGenericClient storeClient,
                              OrganizationProvider organizationProvider,
                              EndpointProvider endpointProvider,
                              TaskHelper taskHelper,

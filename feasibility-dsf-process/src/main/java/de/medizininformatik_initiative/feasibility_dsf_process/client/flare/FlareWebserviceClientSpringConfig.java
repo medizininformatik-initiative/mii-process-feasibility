@@ -1,7 +1,5 @@
-package de.medizininformatik_initiative.feasibility_dsf_process.spring.config;
+package de.medizininformatik_initiative.feasibility_dsf_process.client.flare;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.FlareWebserviceClient;
-import de.medizininformatik_initiative.feasibility_dsf_process.FlareWebserviceClientImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +9,12 @@ import java.net.http.HttpClient;
 import java.time.Duration;
 
 @Configuration
-public class FlareWebserviceClientConfig {
+public class FlareWebserviceClientSpringConfig {
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.flare.webservice.baseUrl:}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.webservice.base_url:}")
     private String flareBaseUrl;
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.flare.webservice.connectTimeout:2000}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.webservice.connect_timeout:2000}")
     private int connectTimeout;
 
     @Bean
