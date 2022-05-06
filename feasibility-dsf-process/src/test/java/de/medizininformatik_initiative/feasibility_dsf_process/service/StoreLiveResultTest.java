@@ -1,7 +1,8 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreLiveResult;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelperImpl;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.highmed.fhir.client.FhirWebserviceClient;
@@ -18,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
@@ -29,7 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@RunWith(MockitoJUnitRunner.class)
 public class StoreLiveResultTest {
 
     private static final String MEASURE_REPORT_ID = "4adfdef6-fc5b-4650-bdf5-80258a61e732";
@@ -52,6 +54,9 @@ public class StoreLiveResultTest {
     @Mock
     private TaskHelper taskHelper;
 
+    @Spy
+    private ReadAccessHelper readAccessHelper = new ReadAccessHelperImpl();
+
     @InjectMocks
     private StoreLiveResult service;
 
@@ -61,6 +66,7 @@ public class StoreLiveResultTest {
     @Before
     public void setUp() {
         task = new Task();
+
         measureReport = new MeasureReport();
         measureReport.setIdElement(new IdType(MEASURE_REPORT_ID));
     }
@@ -107,7 +113,8 @@ public class StoreLiveResultTest {
         service.execute(execution);
 
         assertEquals(MEASURE_REPORT_ID, measureReportCaptor.getValue().getIdElement().getIdPart());
+        assertEquals(1, measureReportCaptor.getValue().getMeta().getTag().size());
         assertEquals("http://highmed.org/fhir/CodeSystem/read-access-tag", measureReportCaptor.getValue().getMeta().getTagFirstRep().getSystem());
-        assertEquals("ALL", measureReportCaptor.getValue().getMeta().getTagFirstRep().getCode());
+        assertEquals("LOCAL", measureReportCaptor.getValue().getMeta().getTagFirstRep().getCode());
     }
 }
