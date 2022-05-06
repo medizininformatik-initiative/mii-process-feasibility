@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 BASE_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-TARGET_DIR="${BASE_DIR}/../src/test/resources/de/medizininformatik_initiative/feasibility_dsf_process/client/store/certs"
+TARGET_DIR=$(readlink -f "${BASE_DIR}/../src/test/resources/de/medizininformatik_initiative/feasibility_dsf_process/client/store/certs")
 
 mkdir -p "${TARGET_DIR}"
 
@@ -50,6 +50,7 @@ openssl x509 -req -days 7 -sha256 -in ${TARGET_DIR}/client_cert_csr.pem \
 
 ## CLEANUP
 rm -f ${BASE_DIR}/.srl
+rm -f ${TARGET_DIR}/ca.srl
 rm -f ${TARGET_DIR}/ca_key.pem
 rm -f ${TARGET_DIR}/server_cert_csr.pem
 rm -f ${TARGET_DIR}/server_cert.pem
