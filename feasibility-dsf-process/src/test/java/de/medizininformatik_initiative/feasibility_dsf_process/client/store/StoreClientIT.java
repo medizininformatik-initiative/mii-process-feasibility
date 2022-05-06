@@ -12,10 +12,7 @@ import okhttp3.tls.HandshakeCertificates;
 import okhttp3.tls.HeldCertificate;
 import org.apache.http.ssl.SSLContexts;
 import org.hl7.fhir.r4.model.CapabilityStatement;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.NginxContainer;
@@ -179,6 +176,7 @@ public class StoreClientIT {
         proxyServer.close();
     }
 
+    @Disabled
     @Test
     public void testRequestToReverseProxyWithClientCert() throws KeyStoreException, CertificateException, IOException,
             NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
