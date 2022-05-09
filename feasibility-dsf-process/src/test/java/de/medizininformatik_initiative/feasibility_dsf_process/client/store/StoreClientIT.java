@@ -176,7 +176,6 @@ public class StoreClientIT {
         proxyServer.close();
     }
 
-    @Disabled
     @Test
     public void testRequestToReverseProxyWithClientCert() throws KeyStoreException, CertificateException, IOException,
             NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
