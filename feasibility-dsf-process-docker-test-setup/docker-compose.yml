@@ -438,7 +438,7 @@ services:
 
   # ---- DIC-3 - FHIR ---------------------------------------------------------
   dic-3-fhir-app:
-    image: ghcr.io/highmed/fhir:0.5.4
+    image: ghcr.io/highmed/fhir:0.5.5
     restart: on-failure
     secrets:
       - db_liquibase.password
@@ -484,7 +484,7 @@ services:
 
   # ---- DIC-3 - BPE ----------------------------------------------------------
   dic-3-bpe-app:
-    image: ghcr.io/highmed/bpe:0.5.4
+    image: ghcr.io/highmed/bpe:0.5.5
     restart: on-failure
     secrets:
       - db_liquibase.password
@@ -573,7 +573,7 @@ services:
 
   # ---- DIC-3 - FHIR Data Store ----------------------------------------------
   dic-3-store:
-    image: samply/blaze:0.10.3
+    image: samply/blaze:0.16.4
     restart: on-failure
     ports:
     - "8072:8080"
