@@ -11,10 +11,18 @@ openssl req -x509 -sha256 -days 365 -nodes -newkey rsa:2048 -keyout ${BASE_DIR}/
   -subj "/C=DE/ST=Berlin/L=Berlin/O=Foo/CN=Foo Root CA"
 
 # Convert certificate to PKCS12 format
-openssl pkcs12 -export -keypbe NONE -certpbe NONE -in ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.pem \
-  -nokeys \
-  -out ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.p12 \
-  -passout pass:testpw
+# This is done using keytool instead of openssl since keytool adds a proprietary attribute that openssl does not.
+# Without this attribute Java cannot properly process the resulting P12 file.
+keytool -genkeypair -alias tmp -storepass testpw \
+  -keystore ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.p12 \
+  -dname "CN=tmp, OU=tmp, O=tmp, L=tmp, ST=tmp, C=tmp"
+keytool -delete -alias tmp -storepass testpw \
+  -keystore ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.p12
+keytool -importcert -file ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.pem \
+  -keystore ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.p12 \
+  -storepass testpw \
+  -noprompt \
+  -alias "CA"
 
 # Issue certificate using said self signed CA
 openssl req -nodes -sha256 -new -newkey rsa:2048 -keyout ${BASE_DIR}/secrets/dic_3_store_proxy_cert_key.pem \
