@@ -1,18 +1,18 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT_ID;
-
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
 import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Measure;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
 
 public class StoreMeasureReport extends AbstractServiceDelegate implements InitializingBean
 {
@@ -29,7 +29,10 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
 	protected void doExecute(DelegateExecution execution)
 	{
 		MeasureReport measureReport = (MeasureReport) execution.getVariable(VARIABLE_MEASURE_REPORT);
-        addReadAccessTag(measureReport);
+		Measure associatedMeasure = (Measure) execution.getVariable(VARIABLE_MEASURE);
+
+		addReadAccessTag(measureReport);
+		referenceZarsMeasure(measureReport, associatedMeasure);
 
 		IdType measureReportId = storeMeasureReport(measureReport);
 		logger.debug("Stored MeasureReport {}", measureReportId);
@@ -42,6 +45,10 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
         String identifier = getLeadingTaskFromExecutionVariables().getRequester().getIdentifier().getValue();
         getReadAccessHelper().addOrganization(measureReport, identifier);
     }
+
+	private void referenceZarsMeasure(MeasureReport measureReport, Measure zarsMeasure) {
+		measureReport.setMeasure(zarsMeasure.getUrl());
+	}
 
 	private IdType storeMeasureReport(MeasureReport measureReport)
 	{
