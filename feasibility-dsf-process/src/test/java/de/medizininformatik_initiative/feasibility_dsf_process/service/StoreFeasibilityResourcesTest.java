@@ -1,28 +1,21 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreFeasibilityResources;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.hl7.fhir.r4.model.Attachment;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Library;
-import org.hl7.fhir.r4.model.Measure;
+import org.hl7.fhir.r4.model.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
+import java.util.UUID;
 
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE;
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_ID;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +25,7 @@ public class StoreFeasibilityResourcesTest {
     public static final String ID = "foo";
 
     @Captor
-    ArgumentCaptor<Bundle> bundleCaptor;
+    ArgumentCaptor<Resource> resourceCaptor;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private IGenericClient storeClient;
@@ -53,19 +46,16 @@ public class StoreFeasibilityResourcesTest {
         when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(measure);
         when(execution.getVariable(VARIABLE_LIBRARY)).thenReturn(library);
 
-        Bundle transactionResponse = new Bundle();
-        transactionResponse.addEntry().getResponse().setLocation("http://localhost/some-location/" + ID);
+        var libraryServerId = UUID.randomUUID();
+        var libraryMethodOutcome = new MethodOutcome(new IdType(libraryServerId.toString()));
+        var measureMethodOutcome = new MethodOutcome(new IdType(ID));
 
-        when(storeClient.transaction().withBundle(bundleCaptor.capture()).execute())
-                .thenReturn(transactionResponse);
+        when(storeClient.create().resource(any(Resource.class)).execute())
+                .thenReturn(libraryMethodOutcome, measureMethodOutcome);
 
         service.doExecute(execution);
 
         verify(execution).setVariable(VARIABLE_MEASURE_ID, ID);
-        assertEquals(measure, bundleCaptor.getValue().getEntry().get(0).getResource());
-        assertEquals(library, bundleCaptor.getValue().getEntry().get(1).getResource());
-        assertEquals("Measure", bundleCaptor.getValue().getEntry().get(0).getRequest().getUrl());
-        assertEquals("Library", bundleCaptor.getValue().getEntry().get(1).getRequest().getUrl());
     }
 
     @Test
@@ -83,17 +73,19 @@ public class StoreFeasibilityResourcesTest {
         when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(measure);
         when(execution.getVariable(VARIABLE_LIBRARY)).thenReturn(library);
 
-        Bundle transactionResponse = new Bundle();
-        transactionResponse.addEntry().getResponse().setLocation("http://localhost/some-location/" + ID);
+        var libraryServerId = UUID.randomUUID();
+        var libraryMethodOutcome = new MethodOutcome(new IdType(libraryServerId.toString()));
 
-        when(storeClient.transaction().withBundle(bundleCaptor.capture()).execute())
-                .thenReturn(transactionResponse);
+        var measureServerId = UUID.randomUUID();
+        var measureMethodOutcome = new MethodOutcome(new IdType(measureServerId.toString()));
+
+        when(storeClient.create().resource(resourceCaptor.capture()).execute())
+                .thenReturn(libraryMethodOutcome, measureMethodOutcome);
 
         service.doExecute(execution);
 
-        var bundledLibrary = (Library) bundleCaptor.getValue().getEntry().get(1).getResource();
-        assertEquals(1, bundledLibrary.getContent().size());
-        assertEquals("text/cql", bundledLibrary.getContent().get(0).getContentType());
+        var capturedLibrary = (Library) resourceCaptor.getAllValues().get(0);
+        assertEquals("text/cql", capturedLibrary.getContent().get(0).getContentType());
     }
 
     @Test
