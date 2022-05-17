@@ -3,6 +3,7 @@ package de.medizininformatik_initiative.feasibility_dsf_process.service;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelperImpl;
 import org.hl7.fhir.r4.model.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,8 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,6 +23,9 @@ import static org.mockito.Mockito.when;
 public class StoreFeasibilityResourcesTest {
 
     public static final String ID = "foo";
+
+    @Spy
+    private ReadAccessHelperImpl readAccessHelper;
 
     @Captor
     ArgumentCaptor<Resource> resourceCaptor;
@@ -56,6 +59,39 @@ public class StoreFeasibilityResourcesTest {
         service.doExecute(execution);
 
         verify(execution).setVariable(VARIABLE_MEASURE_ID, ID);
+    }
+
+    @Test
+    public void testDoExecute_ReadAccessTagsGetStripped() {
+        var measure = new Measure();
+        measure.getMeta().addTag("foo", "bar", "1234");
+        measure = readAccessHelper.addLocal(measure);
+
+        var library = new Library();
+        library = readAccessHelper.addAll(library);
+        library.setContent(List.of(new Attachment()
+                .setContentType("text/cql")
+                .setData("foo".getBytes())));
+        when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(measure);
+        when(execution.getVariable(VARIABLE_LIBRARY)).thenReturn(library);
+
+        var libraryServerId = UUID.randomUUID();
+        var libraryMethodOutcome = new MethodOutcome(new IdType(libraryServerId.toString()));
+        var measureMethodOutcome = new MethodOutcome(new IdType(ID));
+
+        when(storeClient.create().resource(resourceCaptor.capture()).execute())
+                .thenReturn(libraryMethodOutcome, measureMethodOutcome);
+
+        service.doExecute(execution);
+
+        var capturedResources = resourceCaptor.getAllValues();
+        var capturedLibrary = (Library) capturedResources.get(0);
+        var capturedMeasure = (Measure) capturedResources.get(1);
+        assertFalse(readAccessHelper.hasLocal(capturedLibrary));
+        assertFalse(readAccessHelper.hasAll(capturedLibrary));
+        assertFalse(readAccessHelper.hasLocal(capturedMeasure));
+        assertFalse(readAccessHelper.hasAll(capturedMeasure));
+        assertNotNull(capturedMeasure.getMeta().getTag("foo", "bar"));
     }
 
     @Test

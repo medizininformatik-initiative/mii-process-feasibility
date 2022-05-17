@@ -11,12 +11,15 @@ import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Library;
 import org.hl7.fhir.r4.model.Measure;
+import org.hl7.fhir.r4.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.List;
 import java.util.Objects;
+
+import static org.highmed.dsf.fhir.authorization.read.ReadAccessHelper.READ_ACCESS_TAG_SYSTEM;
 
 public class StoreFeasibilityResources extends AbstractServiceDelegate implements InitializingBean {
 
@@ -44,10 +47,16 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
         Measure measure = (Measure) execution.getVariable(ConstantsFeasibility.VARIABLE_MEASURE);
         Library library = (Library) execution.getVariable(ConstantsFeasibility.VARIABLE_LIBRARY);
 
-        var libraryRes = storeLibraryResource(stripNonCqlAttachments(library));
-        var measureRes = storeMeasureResource(measure, libraryRes.getId());
+        var cleanedLibrary = stripReadAccessInformation(stripNonCqlAttachments(library));
+        var libraryRes = storeLibraryResource(cleanedLibrary);
+        var measureRes = storeMeasureResource(stripReadAccessInformation(measure), libraryRes.getId());
 
         execution.setVariable(ConstantsFeasibility.VARIABLE_MEASURE_ID, measureRes.getId().getIdPart());
+    }
+
+    private <T extends Resource> T stripReadAccessInformation(T resource) {
+        resource.getMeta().getTag().removeIf(t -> READ_ACCESS_TAG_SYSTEM.equals(t.getSystem()));
+        return resource;
     }
 
     private Library stripNonCqlAttachments(Library library) {
