@@ -19,6 +19,7 @@ import static de.medizininformatik_initiative.feasibility_dsf_process.variables.
 import static java.util.stream.Collectors.toList;
 import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_LEADING_TASK;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -53,10 +54,15 @@ public class StoreMeasureReportTest
 		var measureId = UUID.randomUUID();
 		initialMeasureFromZars.setId(new IdType(measureId.toString()));
         initialMeasureFromZars.setUrl("http://some.domain/fhir/Measure/" + measureId);
-		MeasureReport measureReport = new MeasureReport();
 
-		Task task = new Task();
-		Reference requesterReference = new Reference().setIdentifier(
+		var measureReport = new MeasureReport();
+        var patient = new Patient();
+        patient.setId("foo");
+        var patientRef = new Reference(patient);
+        measureReport = measureReport.setEvaluatedResource(List.of(patientRef));
+
+		var task = new Task();
+		var requesterReference = new Reference().setIdentifier(
 				new Identifier().setSystem("http://localhost/systems/sample-system").setValue("requester-id"));
 		task.setRequester(requesterReference);
 
@@ -74,15 +80,16 @@ public class StoreMeasureReportTest
 
         var capturedMeasureReport = measureReportCaptor.getValue();
         assertEquals("http://some.domain/fhir/Measure/" + measureId, capturedMeasureReport.getMeasure());
+        assertTrue(capturedMeasureReport.getEvaluatedResource().isEmpty());
 
-        List<Coding> tags =  capturedMeasureReport.getMeta().getTag().stream().filter(c -> "http://highmed.org/fhir/CodeSystem/read-access-tag".equals(c.getSystem())).collect(toList());
+        var tags =  capturedMeasureReport.getMeta().getTag().stream().filter(c -> "http://highmed.org/fhir/CodeSystem/read-access-tag".equals(c.getSystem())).collect(toList());
 		assertEquals(2, tags.size());
 		assertEquals(1 , tags.stream().filter(c -> "LOCAL".equals(c.getCode())).count());
 
-		List<Coding> organizationTags = tags.stream().filter(c -> "ORGANIZATION".equals(c.getCode())).collect(toList());
+		var organizationTags = tags.stream().filter(c -> "ORGANIZATION".equals(c.getCode())).collect(toList());
 		assertEquals(1 , organizationTags.size());
 
-		List<Extension> organizationExtensions = organizationTags.stream().flatMap(c -> c.getExtension().stream())
+		var organizationExtensions = organizationTags.stream().flatMap(c -> c.getExtension().stream())
 				.filter(e -> "http://highmed.org/fhir/StructureDefinition/extension-read-access-organization".equals(
 						e.getUrl())).collect(toList());
 		assertEquals(1, organizationExtensions.size());

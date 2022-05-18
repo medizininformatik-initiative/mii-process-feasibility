@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
+import java.util.List;
+
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
 
 public class StoreMeasureReport extends AbstractServiceDelegate implements InitializingBean
@@ -33,6 +35,7 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
 
 		addReadAccessTag(measureReport);
 		referenceZarsMeasure(measureReport, associatedMeasure);
+		stripEvaluatedResources(measureReport);
 
 		IdType measureReportId = storeMeasureReport(measureReport);
 		logger.debug("Stored MeasureReport {}", measureReportId);
@@ -48,6 +51,10 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
 
 	private void referenceZarsMeasure(MeasureReport measureReport, Measure zarsMeasure) {
 		measureReport.setMeasure(zarsMeasure.getUrl());
+	}
+
+	private void stripEvaluatedResources(MeasureReport measureReport) {
+		measureReport.setEvaluatedResource(List.of());
 	}
 
 	private IdType storeMeasureReport(MeasureReport measureReport)
