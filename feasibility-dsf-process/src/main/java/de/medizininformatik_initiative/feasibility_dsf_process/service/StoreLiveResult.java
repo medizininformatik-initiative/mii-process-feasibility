@@ -12,9 +12,8 @@ import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.TaskOutputComponent;
 import org.springframework.beans.factory.InitializingBean;
 
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
+import static org.highmed.dsf.fhir.authorization.read.ReadAccessHelper.READ_ACCESS_TAG_VALUE_LOCAL;
 
 /**
  * The type Store live result.
@@ -49,12 +48,10 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
         return (MeasureReport) execution.getVariable(VARIABLE_MEASURE_REPORT);
     }
 
-    private void addReadAccessTag(MeasureReport measureReport)
-    {
-        measureReport.getMeta().getTag().removeIf(t -> !"LOCAL".equals(t.getCode()));
+    private void addReadAccessTag(MeasureReport measureReport) {
+        measureReport.getMeta().getTag().removeIf(t -> !READ_ACCESS_TAG_VALUE_LOCAL.equals(t.getCode()));
 
-        if (!getReadAccessHelper().hasLocal(measureReport))
-        {
+        if (!getReadAccessHelper().hasLocal(measureReport)) {
             getReadAccessHelper().addLocal(measureReport);
         }
     }
