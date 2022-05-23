@@ -100,15 +100,31 @@ The BPMN model of the `execute` process is straightforward and already explained
 
 ## Configuration
 
-Besides the [common DSF settings controlled by different environment variables][8], there are some additional ones specific to this process:
+Besides the [common DSF settings controlled by different environment variables][8], there are some additional ones specific to this process.
 
-| EnvVar                                                                                       | Description                                                                                                                                   | Default |
-|----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_FLARE_WEBSERVICE_BASEURL        | Base URL to a Flare instance. Only required when evaluation strategy is set to `structured-query`.                                            |         |
-| DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_FLARE_WEBSERVICE_CONNECTTIMEOUT | Timeout in ms when trying to connect to a Flare instance.                                                                                     | `2000`  |
-| DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_EVALUATION_STRATEGY             | How the feasibility shall be evaluated. Possible values are `cql` and `structured-query`. When using the latter a Flare instance is required. | `cql`   |
-| DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_EVALUATION_OBFUSCATE            | Whether the feasibility results shall be obfuscated.                                                                                          | `true`  |
-| DE_NETZWERK_UNIVERSITAETSMEDIZIN_CODEX_PROCESSES_FEASIBILITY_STORE_URL                       | Base URL to a FHIR store used for feasibility evaluation. Only required when evaluation strategy is set to `cql`.                             | `foo`   |
+**All of them share the same prefix `DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_`:**
+
+| EnvVar                               | Description                                                                                                                                                                    | Default |
+|--------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| CLIENT_STORE_PROXY_HOST              | Forward proxy host.                                                                                                                                                            | `null`  |
+| CLIENT_STORE_PROXY_PORT              | Forward proxy port.                                                                                                                                                            | ``      |
+| CLIENT_STORE_PROXY_USERNAME          | Username for a forward proxy if it requires one.                                                                                                                               | `null`  |
+| CLIENT_STORE_PROXY_PASSWORD          | Password for a forward proxy if it requires one.                                                                                                                               | `null`  |
+| CLIENT_STORE_AUTH_BEARER_TOKEN       | Bearer token used for authentication against a client target. Do not prefix this with `Bearer `!                                                                               | `null`  |
+| CLIENT_STORE_AUTH_BASIC_USERNAME     | Username for basic authentication against a FHIR server client target.                                                                                                         | `null`  |
+| CLIENT_STORE_AUTH_BASIC_PASSWORD     | Password for basic authentication against a FHIR server client target.                                                                                                         | `null`  |
+| CLIENT_STORE_TIMEOUT_CONNECT         | Timeout for establishing a connection to a FHIR server client target in `ms`.                                                                                                  | `2000`  |
+| CLIENT_STORE_TIMEOUT_CONNECT_REQUEST | Timeout for requesting a connection to a FHIR server client target in `ms`.                                                                                                    | `20000` |
+| CLIENT_STORE_TIMEOUT_SOCKET          | Timeout for blocking a read / write network operation to a FHIR server without failing in `ms`.                                                                                | `20000` |
+| CLIENT_STORE_TRUST_STORE_PATH        | Path to a trust store used for connecting to a FHIR server. Necessary when using self-signed certificates.                                                                     | `null`  |
+| CLIENT_STORE_TRUST_STORE_PASSWORD    | Password for opening the trust store used for connecting to a FHIR server.                                                                                                     | `null`  |
+| CLIENT_STORE_KEY_STORE_PATH          | Path to a key store used for authenticating against a FHIR server or proxy using a client certificate.                                                                         | `null`  |
+| CLIENT_STORE_KEY_STORE_PASSWORD      | Password for opening the key store used for authenticating against a FHIR server or proxy.                                                                                     | `null`  |
+| CLIENT_STORE_BASE_URL                | Base URL to a FHIR server or proxy for feasibility evaluation. This can also be the base URL of a reverse proxy if used. Only required if evaluation strategy is set to `cql`. | ``      |
+| CLIENT_FLARE_BASE_URL                | Base URL to a FLARE instance. Only required if evaluation strategy is set to `structured-query`.                                                                               | ``      |
+| CLIENT_FLARE_TIMEOUT_CONNECT         | Timeout for establishing a connection to a FLARE client target in `ms`.                                                                                                        | `2000`  |
+| EVALUATION_STRATEGY                  | Defines whether the feasibility shall be evaluated using `cql` or `structured-query`. Using the latter requires a FLARE instance.                                              | `cql`   |
+| EVALUATION_OBFUSCATE                 | Defines whether the feasibility evaluation result shall be obfuscated.                                                                                                         | `true`  |
 
 ## Compatibility
 
