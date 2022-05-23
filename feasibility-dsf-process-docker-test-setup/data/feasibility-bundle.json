@@ -11,7 +11,7 @@
             "https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-request-simple-feasibility"
           ]
         },
-        "instantiatesUri": "http://www.netzwerk-universitaetsmedizin.de/bpe/Process/requestSimpleFeasibility/0.1.0",
+        "instantiatesUri": "http://www.netzwerk-universitaetsmedizin.de/bpe/Process/requestSimpleFeasibility/0.2.0",
         "status": "requested",
         "intent": "order",
         "authoredOn": "2021",

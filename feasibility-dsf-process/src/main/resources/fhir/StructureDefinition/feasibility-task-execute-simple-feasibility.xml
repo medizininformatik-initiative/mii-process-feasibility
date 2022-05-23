@@ -22,7 +22,7 @@
     <differential>
         <element id="Task.instantiatesUri">
             <path value="Task.instantiatesUri"/>
-            <fixedUri value="http://www.netzwerk-universitaetsmedizin.de/bpe/Process/executeSimpleFeasibility/0.1.0"/>
+            <fixedUri value="http://www.netzwerk-universitaetsmedizin.de/bpe/Process/executeSimpleFeasibility/${version}"/>
         </element>
         <element id="Task.input">
             <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
