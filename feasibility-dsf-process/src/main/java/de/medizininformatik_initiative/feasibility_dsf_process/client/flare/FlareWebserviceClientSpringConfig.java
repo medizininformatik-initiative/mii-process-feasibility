@@ -11,10 +11,10 @@ import java.time.Duration;
 @Configuration
 public class FlareWebserviceClientSpringConfig {
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.webservice.base_url:}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url:}")
     private String flareBaseUrl;
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.webservice.connect_timeout:2000}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.timeout.connect:2000}")
     private int connectTimeout;
 
     @Bean
