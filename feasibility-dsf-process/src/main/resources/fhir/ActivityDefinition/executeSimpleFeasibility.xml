@@ -11,7 +11,7 @@
         </extension>
         <extension url="task-profile">
             <valueCanonical
-                    value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-execute-simple-feasibility|${version}"/>
+                    value="http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-task-execute-simple-feasibility|${version}"/>
         </extension>
         <extension url="requester">
             <valueCoding>
@@ -20,7 +20,7 @@
                     <extension url="consortium">
                         <valueIdentifier>
                             <system value="http://highmed.org/sid/organization-identifier"/>
-                            <value value="netzwerk-universitaetsmedizin.de"/>
+                            <value value="medizininformatik-initiative.de"/>
                         </valueIdentifier>
                     </extension>
                     <extension url="role">
@@ -41,7 +41,7 @@
                     <extension url="consortium">
                         <valueIdentifier>
                             <system value="http://highmed.org/sid/organization-identifier"/>
-                            <value value="netzwerk-universitaetsmedizin.de"/>
+                            <value value="medizininformatik-initiative.de"/>
                         </valueIdentifier>
                     </extension>
                     <extension url="role">
@@ -56,7 +56,7 @@
             </valueCoding>
         </extension>
     </extension>
-    <url value="http://www.netzwerk-universitaetsmedizin.de/bpe/Process/executeSimpleFeasibility"/>
+    <url value="http://medizininformatik-initiative.de/bpe/Process/executeSimpleFeasibility"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
     <name value="ExecuteSimpleFeasibility"/>

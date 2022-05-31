@@ -10,11 +10,11 @@ public interface ConstantsFeasibility {
     String VARIABLE_EVALUATION_STRATEGY = "evaluation-strategy";
     String VARIABLE_EVALUATION_OBFUSCATION = "evaluation-obfuscation";
 
-    String CODESYSTEM_FEASIBILITY = "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/feasibility";
+    String CODESYSTEM_FEASIBILITY = "http://medizininformatik-initiative.de/fhir/CodeSystem/feasibility";
     String CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE = "measure-reference";
     String CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE = "measure-report-reference";
     String CODESYSTEM_MEASURE_POPULATION = "http://terminology.hl7.org/CodeSystem/measure-population";
     String CODESYSTEM_MEASURE_POPULATION_VALUE_INITIAL_POPULATION = "initial-population";
 
-    String EXTENSION_DIC_URI = "https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/dic";
+    String EXTENSION_DIC_URI = "http://medizininformatik-initiative.de/fhir/StructureDefinition/dic";
 }

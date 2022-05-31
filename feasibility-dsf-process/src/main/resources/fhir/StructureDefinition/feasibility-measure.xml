@@ -5,7 +5,7 @@
             <code value="ALL"/>
         </tag>
     </meta>
-    <url value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-measure"/>
+    <url value="http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-measure"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
     <name value="Measure"/>
@@ -37,7 +37,7 @@
             <type>
                 <code value="canonical"/>
                 <targetProfile
-                        value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-library"/>
+                        value="http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-library"/>
             </type>
             <mustSupport value="true"/>
         </element>

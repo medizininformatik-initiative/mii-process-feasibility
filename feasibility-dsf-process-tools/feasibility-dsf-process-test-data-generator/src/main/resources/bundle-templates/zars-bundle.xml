@@ -338,7 +338,7 @@
                 </meta>
                 <identifier>
                     <system value="http://highmed.org/sid/organization-identifier"/>
-                    <value value="netzwerk-universitaetsmedizin.de"/>
+                    <value value="medizininformatik-initiative.de"/>
                 </identifier>
                 <active value="true"/>
                 <name value="Netzwerk Universitätsmedizin"/>
@@ -348,7 +348,7 @@
             <method value="POST"/>
             <url value="Organization"/>
             <ifNoneExist
-                    value="identifier=http://highmed.org/sid/organization-identifier|netzwerk-universitaetsmedizin.de"/>
+                    value="identifier=http://highmed.org/sid/organization-identifier|medizininformatik-initiative.de"/>
         </request>
     </entry>
     <entry>
@@ -387,7 +387,7 @@
             <method value="POST"/>
             <url value="OrganizationAffiliation"/>
             <ifNoneExist
-                    value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|netzwerk-universitaetsmedizin.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_ZARS"/>
+                    value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|medizininformatik-initiative.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_ZARS"/>
         </request>
     </entry>
 
@@ -427,7 +427,7 @@
             <method value="POST"/>
             <url value="OrganizationAffiliation"/>
             <ifNoneExist
-                    value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|netzwerk-universitaetsmedizin.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_DIC_1"/>
+                    value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|medizininformatik-initiative.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_DIC_1"/>
         </request>
     </entry>
 
@@ -467,7 +467,7 @@
             <method value="POST"/>
             <url value="OrganizationAffiliation"/>
             <ifNoneExist
-                    value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|netzwerk-universitaetsmedizin.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_DIC_2"/>
+                    value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|medizininformatik-initiative.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_DIC_2"/>
         </request>
     </entry>
 
@@ -507,7 +507,7 @@
             <method value="POST"/>
             <url value="OrganizationAffiliation"/>
             <ifNoneExist
-                    value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|netzwerk-universitaetsmedizin.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_DIC_3"/>
+                    value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|medizininformatik-initiative.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_DIC_3"/>
         </request>
     </entry>
 </Bundle>

@@ -27,7 +27,7 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
 
     @Override
     public String getName() {
-        return "feasibility-dsf-process";
+        return "mii-process-feasibility";
     }
 
     @Override
@@ -75,9 +75,9 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
         var vF = ValueSetResource.file("fhir/ValueSet/feasibility.xml");
 
         Map<String, List<AbstractResource>> resourcesByProcessKeyAndVersion = Map.of(
-                "wwwnetzwerk-universitaetsmedizinde_executeSimpleFeasibility/" + VERSION,
+                "medizininformatik-initiativede_executeSimpleFeasibility/" + VERSION,
                 Arrays.asList(aExe, sTExe, sTResS, vF, cF, sMeasure, sMeasureReport, sLibrary),
-                "wwwnetzwerk-universitaetsmedizinde_requestSimpleFeasibility/" + VERSION,
+                "medizininformatik-initiativede_requestSimpleFeasibility/" + VERSION,
                 Arrays.asList(aReq, sTReq, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary));
 
         return ResourceProvider.read(VERSION,

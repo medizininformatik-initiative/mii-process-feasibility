@@ -28258,7 +28258,7 @@
     "key": {
       "code": "02",
       "display": "Study enrolment due to Covid-19",
-      "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/ecrf-parameter-codes"
+      "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/ecrf-parameter-codes"
     },
     "termCodeSearchParameter": "code",
     "valueSearchParameter": "value-concept"
@@ -31464,7 +31464,7 @@
     "key": {
       "code": "03",
       "display": "Interventional studies participation",
-      "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/ecrf-parameter-codes"
+      "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/ecrf-parameter-codes"
     },
     "termCodeSearchParameter": "code",
     "valueSearchParameter": "value-concept"
@@ -52883,7 +52883,7 @@
     "key": {
       "code": "06",
       "display": "SOFA-Score",
-      "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/ecrf-parameter-codes"
+      "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/ecrf-parameter-codes"
     },
     "termCodeSearchParameter": "code",
     "valueSearchParameter": "value-quantity"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0drkcb5" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0">
-  <bpmn:process id="wwwnetzwerk-universitaetsmedizinde_executeSimpleFeasibility" isExecutable="true" camunda:versionTag="0.2.0">
+  <bpmn:process id="medizininformatik-initiativede_executeSimpleFeasibility" isExecutable="true" camunda:versionTag="0.2.0">
     <bpmn:startEvent id="StartEvent" name="start">
       <bpmn:outgoing>SequenceFlow_14cn0vs</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_0sjtzj6" messageRef="Message_1yz2a31" />
@@ -14,8 +14,8 @@
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="messageName">resultSingleDicSimpleFeasibilityMessage</camunda:inputParameter>
-          <camunda:inputParameter name="instantiatesUri">http://www.netzwerk-universitaetsmedizin.de/bpe/Process/requestSimpleFeasibility/0.2.0</camunda:inputParameter>
-          <camunda:inputParameter name="profile">https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility|0.2.0</camunda:inputParameter>
+          <camunda:inputParameter name="instantiatesUri">http://medizininformatik-initiative.de/bpe/Process/requestSimpleFeasibility/0.2.0</camunda:inputParameter>
+          <camunda:inputParameter name="profile">http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility|0.2.0</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0ascyjc</bpmn:incoming>
@@ -85,7 +85,7 @@
   <bpmn:message id="Message_1yz2a31" name="executeSimpleFeasibilityMessage" />
   <bpmn:message id="Message_1dr71re" name="resultSingleDicSimpleFeasibilityMessage" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="wwwnetzwerk-universitaetsmedizinde_executeSimpleFeasibility">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="medizininformatik-initiativede_executeSimpleFeasibility">
       <bpmndi:BPMNEdge id="Flow_10dmu4o_di" bpmnElement="Flow_10dmu4o">
         <di:waypoint x="1050" y="160" />
         <di:waypoint x="1050" y="250" />

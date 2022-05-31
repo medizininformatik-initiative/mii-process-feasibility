@@ -5,7 +5,7 @@
             <code value="ALL"/>
         </tag>
     </meta>
-    <url value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-execute-simple-feasibility"/>
+    <url value="http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-task-execute-simple-feasibility"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
     <name value="TaskExecuteSimpleFeasibility"/>
@@ -22,7 +22,7 @@
     <differential>
         <element id="Task.instantiatesUri">
             <path value="Task.instantiatesUri"/>
-            <fixedUri value="http://www.netzwerk-universitaetsmedizin.de/bpe/Process/executeSimpleFeasibility/${version}"/>
+            <fixedUri value="http://medizininformatik-initiative.de/bpe/Process/executeSimpleFeasibility/${version}"/>
         </element>
         <element id="Task.input">
             <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
@@ -75,7 +75,7 @@
                     <valueString value="TaskInputParameterType"/>
                 </extension>
                 <strength value="required"/>
-                <valueSet value="https://www.netzwerk-universitaetsmedizin.de/fhir/ValueSet/feasibility"/>
+                <valueSet value="http://medizininformatik-initiative.de/fhir/ValueSet/feasibility"/>
             </binding>
         </element>
         <element id="Task.input:measure.type.coding">
@@ -86,7 +86,7 @@
         <element id="Task.input:measure.type.coding.system">
             <path value="Task.input.type.coding.system"/>
             <min value="1"/>
-            <fixedUri value="https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/feasibility"/>
+            <fixedUri value="http://medizininformatik-initiative.de/fhir/CodeSystem/feasibility"/>
         </element>
         <element id="Task.input:measure.type.coding.code">
             <path value="Task.input.type.coding.code"/>
@@ -97,7 +97,7 @@
             <path value="Task.input.value[x]"/>
             <type>
                 <code value="Reference"/>
-                <targetProfile value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-measure"/>
+                <targetProfile value="http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-measure"/>
             </type>
         </element>
     </differential>
