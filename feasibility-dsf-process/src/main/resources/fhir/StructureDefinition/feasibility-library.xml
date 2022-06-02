@@ -5,7 +5,7 @@
             <code value="ALL"/>
         </tag>
     </meta>
-    <url value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-library"/>
+    <url value="http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-library"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
     <name value="Library"/>

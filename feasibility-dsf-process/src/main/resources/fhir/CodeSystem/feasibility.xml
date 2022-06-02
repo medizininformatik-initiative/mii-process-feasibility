@@ -5,7 +5,7 @@
             <code value="ALL"/>
         </tag>
     </meta>
-    <url value="https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/feasibility"/>
+    <url value="http://medizininformatik-initiative.de/fhir/CodeSystem/feasibility"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
     <name value="Codex_Feasibility"/>
