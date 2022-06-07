@@ -8,13 +8,13 @@
         "resourceType": "Task",
         "meta": {
           "profile": [
-            "http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-task-request-simple-feasibility"
+            "http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-request"
           ]
         },
-        "instantiatesUri": "http://medizininformatik-initiative.de/bpe/Process/requestSimpleFeasibility/0.2.0",
+        "instantiatesUri": "http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest/0.2.0",
         "status": "requested",
         "intent": "order",
-        "authoredOn": "2021",
+        "authoredOn": "2022",
         "requester": {
           "type": "Organization",
           "identifier": {
@@ -43,7 +43,7 @@
                 }
               ]
             },
-            "valueString": "requestSimpleFeasibilityMessage"
+            "valueString": "feasibilityRequestMessage"
           },
           {
             "type": {
@@ -88,7 +88,7 @@
             }
           ],
           "profile": [
-            "http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-measure"
+            "http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-measure"
           ]
         },
         "url": "https://zars/Measure/7a142223-616f-41a1-97da-2ae726031b71",
@@ -142,7 +142,7 @@
             }
           ],
           "profile": [
-            "http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-library"
+            "http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-library"
           ]
         },
         "url": "urn:uuid:30561ba6-106f-4d52-bb8d-e49e20a40d40",
