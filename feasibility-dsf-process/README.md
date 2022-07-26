@@ -130,12 +130,12 @@ Besides the [common DSF settings controlled by different environment variables][
 
 This version of the process is compatible with the following components:
 
-| Component | Compatible Version(s) |
-|-----------|-----------------------|
-| DSF FHIR  | `0.5.x`               |
-| DSF BPE   | `0.5.x`               |
-| Blaze     | `>= 0.12`             |
-| Flare     | `1.0`                 |
+| Component | Compatible Version(s)     |
+|-----------|---------------------------|
+| DSF FHIR  | `0.5.x`, `0.6.0`, `0.7.0` |
+| DSF BPE   | `0.5.x`, `0.6.0`, `0.7.0` |
+| Blaze     | `>= 0.12`                 |
+| Flare     | `1.0`                     |
 
 **Note:** Flare got rewritten. Only the [new project][9] is supported.
 
