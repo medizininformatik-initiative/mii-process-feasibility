@@ -75,7 +75,7 @@ public class FeasibilityConfig {
     }
 
     //
-    // process requestSimpleFeasibility implementations
+    // process requestFeasibility implementations
     //
 
     @Bean
@@ -109,7 +109,7 @@ public class FeasibilityConfig {
     }
 
     //
-    // process executeSimpleFeasibility implementations
+    // process executeFeasibility implementations
     //
 
     @Bean

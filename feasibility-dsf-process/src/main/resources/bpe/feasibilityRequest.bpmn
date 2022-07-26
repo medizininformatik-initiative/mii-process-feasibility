@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0inb4ax" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0">
-  <bpmn:process id="medizininformatik-initiativede_requestSimpleFeasibility" name="storeResult" isExecutable="true" camunda:versionTag="0.2.0">
+  <bpmn:process id="medizininformatik-initiativede_feasibilityRequest" name="storeResult" isExecutable="true" camunda:versionTag="0.2.0">
     <bpmn:startEvent id="StartEvent" name="start">
       <bpmn:outgoing>SequenceFlow_11k77gx</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_10c2suu" messageRef="Message_1pq9qxp" />
@@ -12,9 +12,9 @@
     <bpmn:sendTask id="sendRequestToDics" name="send request to dics" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicRequest">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="instantiatesUri">http://medizininformatik-initiative.de/bpe/Process/executeSimpleFeasibility/0.2.0</camunda:inputParameter>
-          <camunda:inputParameter name="messageName">executeSimpleFeasibilityMessage</camunda:inputParameter>
-          <camunda:inputParameter name="profile">http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-task-execute-simple-feasibility|0.2.0</camunda:inputParameter>
+          <camunda:inputParameter name="instantiatesUri">http://medizininformatik-initiative.de/bpe/Process/feasibilityExecute/0.2.0</camunda:inputParameter>
+          <camunda:inputParameter name="messageName">feasibilityExecuteMessage</camunda:inputParameter>
+          <camunda:inputParameter name="profile">http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-execute|0.2.0</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0b5s4ef</bpmn:incoming>
@@ -80,21 +80,21 @@
       <bpmn:outgoing>Flow_1f790pw</bpmn:outgoing>
     </bpmn:serviceTask>
   </bpmn:process>
-  <bpmn:message id="Message_1pq9qxp" name="requestSimpleFeasibilityMessage" />
-  <bpmn:message id="Message_07ayhv1" name="resultSimpleFeasibilityMessage" />
+  <bpmn:message id="Message_1pq9qxp" name="feasibilityRequestMessage" />
+  <bpmn:message id="Message_07ayhv1" name="feasibilityResultMessage" />
   <bpmn:error id="Error_0dl03kn" />
   <bpmn:error id="Error_07exqe7" />
   <bpmn:error id="Error_1jhmarr" />
-  <bpmn:message id="Message_0qfng3q" name="receiveMultiMedicCohortSizeResultMessage" />
-  <bpmn:message id="Message_0srg3vv" name="resultMultiMedicSimpleFeasibilityMessage" />
-  <bpmn:message id="Message_0nmxozg" name="errorSimpleFeasibilityMessage" />
-  <bpmn:message id="Message_1y0yxv0" name="resultMultiMedicSimpleFeasibilityMessage" />
-  <bpmn:message id="Message_0v1bo0o" name="errorSimpleFeasibilityMessage" />
-  <bpmn:message id="Message_10vqhu0" name="errorMultiMedicSimpleFeasibilityMessage" />
-  <bpmn:message id="Message_1vrxfsk" name="resultMultiMedicSimpleFeasibilityMessage" />
-  <bpmn:message id="Message_18ld88c" name="resultSingleDicSimpleFeasibilityMessage" />
+  <bpmn:message id="Message_0qfng3q" name="feasibilityMultiMedicCohortSizeResultMessage" />
+  <bpmn:message id="Message_0srg3vv" name="feasibilityMultiMedicResultMessage" />
+  <bpmn:message id="Message_0nmxozg" name="feasibilityErrorMessage" />
+  <bpmn:message id="Message_1y0yxv0" name="feasibilityMultiMedicResultMessage" />
+  <bpmn:message id="Message_0v1bo0o" name="feasibilityErrorMessage" />
+  <bpmn:message id="Message_10vqhu0" name="feasibilityMultiMedicErrorMessage" />
+  <bpmn:message id="Message_1vrxfsk" name="feasibilityMultiMedicResultMessage" />
+  <bpmn:message id="Message_18ld88c" name="feasibilitySingleDicResultMessage" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="medizininformatik-initiativede_requestSimpleFeasibility">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="medizininformatik-initiativede_feasibilityRequest">
       <bpmndi:BPMNEdge id="Flow_1f790pw_di" bpmnElement="Flow_1f790pw">
         <di:waypoint x="1560" y="155" />
         <di:waypoint x="1612" y="155" />

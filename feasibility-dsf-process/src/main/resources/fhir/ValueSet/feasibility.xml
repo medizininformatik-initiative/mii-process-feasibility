@@ -8,13 +8,13 @@
     <url value="http://medizininformatik-initiative.de/fhir/ValueSet/feasibility"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
-    <name value="Codex_Feasibility"/>
-    <title value="Codex Feasibility"/>
+    <name value="Feasibility"/>
+    <title value="Feasibility"/>
     <!-- status managed by bpe -->
     <status value="unknown"/>
     <experimental value="false"/>
-    <date value="2021-08-22"/>
-    <publisher value="Codex"/>
+    <date value="2022-06-07"/>
+    <publisher value="MII"/>
     <description value="ValueSet with standard values for feasibility processes"/>
     <immutable value="true"/>
     <compose>

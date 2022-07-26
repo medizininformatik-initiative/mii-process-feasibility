@@ -7,11 +7,11 @@
     </meta>
     <extension url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization">
         <extension url="message-name">
-            <valueString value="requestSimpleFeasibilityMessage"/>
+            <valueString value="feasibilityRequestMessage"/>
         </extension>
         <extension url="task-profile">
             <valueCanonical
-                    value="http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-task-request-simple-feasibility|${version}"/>
+                    value="http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-request|${version}"/>
         </extension>
         <extension url="requester">
             <valueCoding>
@@ -58,11 +58,11 @@
     </extension>
     <extension url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization">
         <extension url="message-name">
-            <valueString value="resultSingleDicSimpleFeasibilityMessage"/>
+            <valueString value="feasibilitySingleDicResultMessage"/>
         </extension>
         <extension url="task-profile">
             <valueCanonical
-                    value="http://medizininformatik-initiative.de/fhir/StructureDefinition/codex-task-single-dic-result-simple-feasibility|${version}"/>
+                    value="http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-single-dic-result|${version}"/>
         </extension>
         <extension url="requester">
             <valueCoding>
@@ -107,25 +107,25 @@
             </valueCoding>
         </extension>
     </extension>
-    <url value="http://medizininformatik-initiative.de/bpe/Process/requestSimpleFeasibility"/>
+    <url value="http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
-    <name value="RequestSimpleFeasibility"/>
-    <title value="Request simple feasibility"/>
+    <name value="FeasibilityRequest"/>
+    <title value="Feasibility Request"/>
     <subtitle value="Feasibility Request Process"/>
     <!-- status managed by bpe -->
     <status value="unknown"/>
     <experimental value="false"/>
-    <date value="2021-08-22"/>
-    <publisher value="Codex"/>
+    <date value="2022-06-07"/>
+    <publisher value="MII"/>
     <contact>
-        <name value="Codex"/>
+        <name value="MII"/>
         <telecom>
             <system value="email"/>
             <value value="akiel@life.uni-leipzig.de"/>
         </telecom>
     </contact>
     <description
-            value="Process to start a simple feasibility, process sends messages to all DICs, receives result from all DICs"/>
+            value="Process to start a feasibility query, process sends messages to all DICs, receives result from all DICs"/>
     <kind value="Task"/>
 </ActivityDefinition>
