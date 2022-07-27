@@ -5,7 +5,7 @@
             <code value="ALL"/>
         </tag>
     </meta>
-    <url value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/dic"/>
+    <url value="http://medizininformatik-initiative.de/fhir/StructureDefinition/dic"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
     <name value="Dic"/>
@@ -31,7 +31,7 @@
         </element>
         <element id="Extension.url">
             <path value="Extension.url"/>
-            <fixedUri value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/dic"/>
+            <fixedUri value="http://medizininformatik-initiative.de/fhir/StructureDefinition/dic"/>
         </element>
         <element id="Extension.value[x]">
             <path value="Extension.value[x]"/>

@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>feasibility-dsf-process</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0</version>
 
     <parent>
         <groupId>de.medizininformatik-initiative</groupId>
         <artifactId>feasibility-dsf-process-parent</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.2.0</version>
     </parent>
 
     <name>MII Feasibility DSF Process</name>
@@ -18,23 +18,60 @@
         <dependency>
             <groupId>org.highmed.dsf</groupId>
             <artifactId>dsf-bpe-process-base</artifactId>
-            <version>0.5.4</version>
+            <version>0.7.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.22</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- test dependencies -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.2</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>4.9.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp-tls</artifactId>
+            <version>4.9.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>1.16.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>nginx</artifactId>
+            <version>1.16.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>1.16.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -45,13 +82,44 @@
         <dependency>
             <groupId>org.highmed.dsf</groupId>
             <artifactId>dsf-fhir-validation</artifactId>
-            <version>0.5.4</version>
+            <version>0.7.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.0.0-M6</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${basedir}/scripts/create_certs_for_store_client_tests.sh</executable>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -87,7 +155,8 @@
                                     <artifactId>hapi-fhir-client</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-1/bpe/plugin</outputDirectory>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-1/bpe/plugin
+                            </outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -121,7 +190,43 @@
                                     <artifactId>hapi-fhir-client</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-2/bpe/plugin</outputDirectory>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-2/bpe/plugin
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-process-plugin-to-dic-3</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-3/bpe/process
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-hapi-fhir-client-to-dic-3</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>ca.uhn.hapi.fhir</groupId>
+                                    <artifactId>hapi-fhir-client</artifactId>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-3/bpe/plugin
+                            </outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -138,7 +243,8 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/zars/bpe/process</outputDirectory>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/zars/bpe/process
+                            </outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -154,7 +260,8 @@
                                     <artifactId>hapi-fhir-client</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/zars/bpe/plugin</outputDirectory>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/zars/bpe/plugin
+                            </outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -201,6 +308,20 @@
                         </fileset>
                         <fileset>
                             <directory>../feasibility-dsf-process-docker-test-setup/dic-2/bpe/process</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>../feasibility-dsf-process-docker-test-setup/dic-3/bpe/plugin</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>../feasibility-dsf-process-docker-test-setup/dic-3/bpe/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>

@@ -91,7 +91,6 @@ public class EvaluateCqlMeasureTest {
     @Parameters(name = "{0}")
     public static Collection<Object[]> measureReports() {
         return Arrays.asList(new Object[][]{
-                {"MissingMeasureReportDate", Optional.of("Missing MeasureReport date"), new MeasureReport()},
                 {"MissingMeasureReportGroup", Optional.of("Missing MeasureReport group"), new MeasureReport()
                         .setDate(Date.from(Instant.parse("2007-12-03T10:15:30.00Z")))},
                 {"MissingMeasureReportPopulation", Optional.of("Missing MeasureReport population"), new MeasureReport()

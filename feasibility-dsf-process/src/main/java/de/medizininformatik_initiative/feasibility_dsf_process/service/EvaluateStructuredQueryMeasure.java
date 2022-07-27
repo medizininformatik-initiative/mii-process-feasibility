@@ -1,6 +1,6 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.FlareWebserviceClient;
+import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
 import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;

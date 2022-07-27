@@ -62,9 +62,6 @@ public class EvaluateCqlMeasure extends AbstractServiceDelegate implements Initi
     }
 
     private void validateMeasureReport(MeasureReport report) {
-        if (report.getDate() == null) {
-            throw new RuntimeException("Missing MeasureReport date");
-        }
         if (!report.hasGroup()) {
             throw new RuntimeException("Missing MeasureReport group");
         }

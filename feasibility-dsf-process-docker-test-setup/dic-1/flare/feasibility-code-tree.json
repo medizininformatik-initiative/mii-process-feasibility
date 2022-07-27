@@ -17857,7 +17857,7 @@
           "termCode": {
             "code": "1",
             "display": "Very Fit",
-            "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/frailty-score"
+            "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/frailty-score"
           }
         },
         {
@@ -17865,7 +17865,7 @@
           "termCode": {
             "code": "2",
             "display": "Well",
-            "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/frailty-score"
+            "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/frailty-score"
           }
         },
         {
@@ -17873,7 +17873,7 @@
           "termCode": {
             "code": "3",
             "display": "Managing Well",
-            "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/frailty-score"
+            "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/frailty-score"
           }
         },
         {
@@ -17881,7 +17881,7 @@
           "termCode": {
             "code": "4",
             "display": "Vulnerable",
-            "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/frailty-score"
+            "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/frailty-score"
           }
         },
         {
@@ -17889,7 +17889,7 @@
           "termCode": {
             "code": "5",
             "display": "Mildly Frail",
-            "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/frailty-score"
+            "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/frailty-score"
           }
         },
         {
@@ -17897,7 +17897,7 @@
           "termCode": {
             "code": "6",
             "display": "Moderately Frail",
-            "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/frailty-score"
+            "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/frailty-score"
           }
         },
         {
@@ -17905,7 +17905,7 @@
           "termCode": {
             "code": "7",
             "display": "Severely Frail",
-            "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/frailty-score"
+            "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/frailty-score"
           }
         },
         {
@@ -17913,7 +17913,7 @@
           "termCode": {
             "code": "8",
             "display": "Very Severely Frail",
-            "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/frailty-score"
+            "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/frailty-score"
           }
         },
         {
@@ -17921,7 +17921,7 @@
           "termCode": {
             "code": "9",
             "display": "Terminally Ill",
-            "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/frailty-score"
+            "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/frailty-score"
           }
         },
         {
@@ -23075,7 +23075,7 @@
           "termCode": {
             "code": "02",
             "display": "Study enrolment due to Covid-19",
-            "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/ecrf-parameter-codes"
+            "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/ecrf-parameter-codes"
           }
         },
         {
@@ -23083,7 +23083,7 @@
           "termCode": {
             "code": "03",
             "display": "Interventional studies participation",
-            "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/ecrf-parameter-codes"
+            "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/ecrf-parameter-codes"
           }
         }
       ],
@@ -23574,7 +23574,7 @@
           "termCode": {
             "code": "06",
             "display": "SOFA-Score",
-            "system": "https://www.netzwerk-universitaetsmedizin.de/fhir/CodeSystem/ecrf-parameter-codes"
+            "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/ecrf-parameter-codes"
           }
         },
         {

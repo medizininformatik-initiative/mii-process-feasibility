@@ -5,20 +5,15 @@ import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
 import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
-import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.MeasureReport;
-import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.TaskOutputComponent;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.List;
-
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
+import static org.highmed.dsf.fhir.authorization.read.ReadAccessHelper.READ_ACCESS_TAG_VALUE_LOCAL;
 
 /**
  * The type Store live result.
@@ -38,8 +33,11 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
 
     @Override
     protected void doExecute(DelegateExecution execution) {
-        MeasureReport measureReport = getMeasureReport(execution);
         Task task = getCurrentTaskFromExecutionVariables();
+
+        MeasureReport measureReport = getMeasureReport(execution);
+        addReadAccessTag(measureReport);
+
         MeasureReport storedMeasureReport = storeMeasureReport(measureReport);
         addMeasureReportReferenceToTaskOutput(task, storedMeasureReport.getIdElement());
 
@@ -50,14 +48,15 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
         return (MeasureReport) execution.getVariable(VARIABLE_MEASURE_REPORT);
     }
 
+    private void addReadAccessTag(MeasureReport measureReport) {
+        measureReport.getMeta().getTag().removeIf(t -> !READ_ACCESS_TAG_VALUE_LOCAL.equals(t.getCode()));
+
+        if (!getReadAccessHelper().hasLocal(measureReport)) {
+            getReadAccessHelper().addLocal(measureReport);
+        }
+    }
+
     private MeasureReport storeMeasureReport(MeasureReport measureReport) {
-        measureReport.setMeta(
-                new Meta().setTag(
-                        List.of(new Coding()
-                                .setSystem("http://highmed.org/fhir/CodeSystem/read-access-tag")
-                                .setCode("ALL"))
-                )
-        );
         return getFhirWebserviceClientProvider().getLocalWebserviceClient()
                 .create(measureReport);
     }

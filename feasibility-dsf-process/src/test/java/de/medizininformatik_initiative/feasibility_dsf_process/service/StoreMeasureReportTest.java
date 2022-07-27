@@ -1,51 +1,98 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreMeasureReport;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelperImpl;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.fhir.client.FhirWebserviceClient;
 import org.highmed.fhir.client.PreferReturnMinimalWithRetry;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.MeasureReport;
+import org.hl7.fhir.r4.model.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT_ID;
+import java.util.List;
+import java.util.UUID;
+
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
+import static java.util.stream.Collectors.toList;
+import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_LEADING_TASK;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class StoreMeasureReportTest {
+@RunWith(MockitoJUnitRunner.class)
+public class StoreMeasureReportTest
+{
+	@Mock
+	private FhirWebserviceClientProvider clientProvider;
 
-    @Mock
-    private FhirWebserviceClientProvider clientProvider;
+	@Mock
+	private FhirWebserviceClient localWebserviceClient;
 
-    @Mock
-    private FhirWebserviceClient localWebserviceClient;
+	@Mock
+	private PreferReturnMinimalWithRetry returnMinimal;
 
-    @Mock
-    private PreferReturnMinimalWithRetry returnMinimal;
+	@Mock
+	private DelegateExecution execution;
 
-    @Mock
-    private DelegateExecution execution;
+	@Spy
+	private ReadAccessHelper readAccessHelper = new ReadAccessHelperImpl();
 
-    @InjectMocks
-    private StoreMeasureReport service;
+	@Captor
+	private ArgumentCaptor<MeasureReport> measureReportCaptor;
 
-    @Test
-    public void testDoExecute() {
-        when(clientProvider.getLocalWebserviceClient()).thenReturn(localWebserviceClient);
-        when(localWebserviceClient.withMinimalReturn()).thenReturn(returnMinimal);
-        MeasureReport measureReport = new MeasureReport();
-        when(returnMinimal.create(measureReport)).thenReturn(new IdType("id-094601"));
-        when(execution.getVariable(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
+	@InjectMocks
+	private StoreMeasureReport service;
 
-        service.doExecute(execution);
+	@Test
+	public void testDoExecute() throws Exception
+	{
+		var initialMeasureFromZars = new Measure();
+		var measureId = UUID.randomUUID();
+		initialMeasureFromZars.setId(new IdType(measureId.toString()));
+        initialMeasureFromZars.setUrl("http://some.domain/fhir/Measure/" + measureId);
 
-        verify(execution).setVariable(VARIABLE_MEASURE_REPORT_ID, "id-094601");
-    }
+		var measureReport = new MeasureReport();
+        var patient = new Patient();
+        patient.setId("foo");
+        var patientRef = new Reference(patient);
+        measureReport = measureReport.setEvaluatedResource(List.of(patientRef));
+
+		var task = new Task();
+		var requesterReference = new Reference().setIdentifier(
+				new Identifier().setSystem("http://localhost/systems/sample-system").setValue("requester-id"));
+		task.setRequester(requesterReference);
+
+        when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(initialMeasureFromZars);
+		when(execution.getVariable(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
+		when(execution.getVariable(BPMN_EXECUTION_VARIABLE_LEADING_TASK)).thenReturn(task);
+		when(clientProvider.getLocalWebserviceClient()).thenReturn(localWebserviceClient);
+		when(localWebserviceClient.withMinimalReturn()).thenReturn(returnMinimal);
+		when(returnMinimal.create(measureReportCaptor.capture())).thenReturn(new IdType("id-094601"));
+
+		service.execute(execution);
+
+		verify(execution).setVariable(VARIABLE_MEASURE_REPORT_ID, "id-094601");
+
+
+        var capturedMeasureReport = measureReportCaptor.getValue();
+        assertEquals("http://some.domain/fhir/Measure/" + measureId, capturedMeasureReport.getMeasure());
+        assertTrue(capturedMeasureReport.getEvaluatedResource().isEmpty());
+
+        var tags =  capturedMeasureReport.getMeta().getTag().stream().filter(c -> "http://highmed.org/fhir/CodeSystem/read-access-tag".equals(c.getSystem())).collect(toList());
+		assertEquals(2, tags.size());
+		assertEquals(1 , tags.stream().filter(c -> "LOCAL".equals(c.getCode())).count());
+
+		var organizationTags = tags.stream().filter(c -> "ORGANIZATION".equals(c.getCode())).collect(toList());
+		assertEquals(1 , organizationTags.size());
+
+		var organizationExtensions = organizationTags.stream().flatMap(c -> c.getExtension().stream())
+				.filter(e -> "http://highmed.org/fhir/StructureDefinition/extension-read-access-organization".equals(
+						e.getUrl())).collect(toList());
+		assertEquals(1, organizationExtensions.size());
+		assertEquals("requester-id", ((Identifier)organizationExtensions.get(0).getValue()).getValue());
+	}
 }

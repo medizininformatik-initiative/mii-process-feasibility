@@ -1,5 +1,6 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -7,16 +8,18 @@ import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
 import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Library;
 import org.hl7.fhir.r4.model.Measure;
+import org.hl7.fhir.r4.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.List;
 import java.util.Objects;
+
+import static org.highmed.dsf.fhir.authorization.read.ReadAccessHelper.READ_ACCESS_TAG_SYSTEM;
 
 public class StoreFeasibilityResources extends AbstractServiceDelegate implements InitializingBean {
 
@@ -44,9 +47,16 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
         Measure measure = (Measure) execution.getVariable(ConstantsFeasibility.VARIABLE_MEASURE);
         Library library = (Library) execution.getVariable(ConstantsFeasibility.VARIABLE_LIBRARY);
 
-        Bundle transactionResponse = storeResources(measure, stripNonCqlAttachments(library));
+        var cleanedLibrary = stripReadAccessInformation(stripNonCqlAttachments(library));
+        var libraryRes = storeLibraryResource(cleanedLibrary);
+        var measureRes = storeMeasureResource(stripReadAccessInformation(measure), libraryRes.getId());
 
-        execution.setVariable(ConstantsFeasibility.VARIABLE_MEASURE_ID, extractMeasureId(transactionResponse));
+        execution.setVariable(ConstantsFeasibility.VARIABLE_MEASURE_ID, measureRes.getId().getIdPart());
+    }
+
+    private <T extends Resource> T stripReadAccessInformation(T resource) {
+        resource.getMeta().getTag().removeIf(t -> READ_ACCESS_TAG_SYSTEM.equals(t.getSystem()));
+        return resource;
     }
 
     private Library stripNonCqlAttachments(Library library) {
@@ -59,18 +69,15 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
         return library.setContent(List.of(cqlAttachment));
     }
 
-    private Bundle storeResources(Measure measure, Library library) {
-        logger.info("Store Measure `{}` and Library `{}`", measure.getId(), library.getUrl());
-
-        Bundle bundle = new Bundle().setType(Bundle.BundleType.TRANSACTION);
-        bundle.addEntry().setResource(measure).getRequest()
-                .setMethod(Bundle.HTTPVerb.POST).setUrl("Measure");
-        bundle.addEntry().setResource(library).getRequest()
-                .setMethod(Bundle.HTTPVerb.POST).setUrl("Library");
-        return storeClient.transaction().withBundle(bundle).execute();
+    private MethodOutcome storeLibraryResource(Library library) {
+        logger.info("Store Library `{}`", library.getId());
+        return storeClient.create().resource(library).execute();
     }
 
-    private String extractMeasureId(Bundle transactionResponse) {
-        return new IdType(transactionResponse.getEntryFirstRep().getResponse().getLocation()).getIdPart();
+    private MethodOutcome storeMeasureResource(Measure measure, IIdType libraryId) {
+        logger.info("Store Measure `{}`", measure.getId());
+        measure.getLibrary().clear();
+        measure.addLibrary("Library/" + libraryId.getIdPart());
+        return storeClient.create().resource(measure).execute();
     }
 }

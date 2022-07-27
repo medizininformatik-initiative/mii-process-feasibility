@@ -1,10 +1,12 @@
 /feasibility-dsf-process/target/
+/feasibility-dsf-process/src/test/resources/de/medizininformatik_initiative/feasibility_dsf_process/client/store/certs
 
 /feasibility-dsf-process-docker-test-setup/certs/*.pem
 /feasibility-dsf-process-docker-test-setup/certs/*.p12
 
 /feasibility-dsf-process-docker-test-setup/.env
 /feasibility-dsf-process-docker-test-setup/secrets/*.pem
+/feasibility-dsf-process-docker-test-setup/secrets/*.p12
 
 /feasibility-dsf-process-docker-test-setup/dic-1/bpe/last_event/time.file
 /feasibility-dsf-process-docker-test-setup/dic-1/bpe/log/*.log
@@ -26,6 +28,16 @@
 /feasibility-dsf-process-docker-test-setup/dic-2/fhir/log/*.log
 /feasibility-dsf-process-docker-test-setup/dic-2/fhir/log/*.log.gz
 
+/feasibility-dsf-process-docker-test-setup/dic-3/bpe/last_event/time.file
+/feasibility-dsf-process-docker-test-setup/dic-3/bpe/log/*.log
+/feasibility-dsf-process-docker-test-setup/dic-3/bpe/log/*.log.gz
+/feasibility-dsf-process-docker-test-setup/dic-3/bpe/plugin/*.jar
+/feasibility-dsf-process-docker-test-setup/dic-3/bpe/process/*.jar
+/feasibility-dsf-process-docker-test-setup/dic-3/fhir/conf/bundle.xml
+/feasibility-dsf-process-docker-test-setup/dic-3/fhir/conf/config.properties
+/feasibility-dsf-process-docker-test-setup/dic-3/fhir/log/*.log
+/feasibility-dsf-process-docker-test-setup/dic-3/fhir/log/*.log.gz
+
 /feasibility-dsf-process-docker-test-setup/zars/bpe/last_event/time.file
 /feasibility-dsf-process-docker-test-setup/zars/bpe/log/*.log
 /feasibility-dsf-process-docker-test-setup/zars/bpe/log/*.log.gz
@@ -44,3 +56,6 @@
 
 /docker/bpe/plugin/*.jar
 /docker/bpe/process/*.jar
+
+**/.idea/
+**/**.iml

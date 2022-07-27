@@ -1,11 +1,12 @@
 package de.medizininformatik_initiative.feasibility_dsf_process;
 
 import ca.uhn.fhir.context.FhirContext;
+import de.medizininformatik_initiative.feasibility_dsf_process.client.store.StoreClientSpringConfig;
+import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.BaseConfig;
+import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClientSpringConfig;
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.EnhancedFhirWebserviceClientProviderConfig;
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.EvaluationConfig;
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.FeasibilityConfig;
-import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.FlareWebserviceClientConfig;
-import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.StoreConfig;
 import org.highmed.dsf.bpe.ProcessPluginDefinition;
 import org.highmed.dsf.fhir.resources.AbstractResource;
 import org.highmed.dsf.fhir.resources.ActivityDefinitionResource;
@@ -22,11 +23,11 @@ import java.util.stream.Stream;
 
 public class FeasibilityProcessPluginDefinition implements ProcessPluginDefinition {
 
-    public static final String VERSION = "0.1.0";
+    public static final String VERSION = "0.2.0";
 
     @Override
     public String getName() {
-        return "feasibility-dsf-process";
+        return "mii-process-feasibility";
     }
 
     @Override
@@ -36,20 +37,21 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
 
     @Override
     public Stream<String> getBpmnFiles() {
-        return Stream.of("bpe/requestSimpleFeasibility.bpmn", "bpe/executeSimpleFeasibility.bpmn");
+        return Stream.of("bpe/feasibilityRequest.bpmn", "bpe/feasibilityExecute.bpmn");
     }
 
     @Override
     public Stream<Class<?>> getSpringConfigClasses() {
-        return Stream.of(StoreConfig.class, FeasibilityConfig.class, EnhancedFhirWebserviceClientProviderConfig.class,
-                EvaluationConfig.class, FlareWebserviceClientConfig.class);
+        return Stream.of(BaseConfig.class, StoreClientSpringConfig.class, FeasibilityConfig.class,
+                EnhancedFhirWebserviceClientProviderConfig.class, EvaluationConfig.class,
+                FlareWebserviceClientSpringConfig.class);
     }
 
     @Override
     public ResourceProvider getResourceProvider(FhirContext fhirContext, ClassLoader classLoader,
                                                 PropertyResolver propertyResolver) {
-        var aExe = ActivityDefinitionResource.file("fhir/ActivityDefinition/executeSimpleFeasibility.xml");
-        var aReq = ActivityDefinitionResource.file("fhir/ActivityDefinition/requestSimpleFeasibility.xml");
+        var aExe = ActivityDefinitionResource.file("fhir/ActivityDefinition/feasibilityExecute.xml");
+        var aReq = ActivityDefinitionResource.file("fhir/ActivityDefinition/feasibilityRequest.xml");
 
         var cF = CodeSystemResource.file("fhir/CodeSystem/feasibility.xml");
 
@@ -64,18 +66,18 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
                 .file("fhir/StructureDefinition/feasibility-library.xml");
 
         var sTExe = StructureDefinitionResource
-                .file("fhir/StructureDefinition/feasibility-task-execute-simple-feasibility.xml");
+                .file("fhir/StructureDefinition/feasibility-task-execute.xml");
         var sTReq = StructureDefinitionResource
-                .file("fhir/StructureDefinition/feasibility-task-request-simple-feasibility.xml");
+                .file("fhir/StructureDefinition/feasibility-task-request.xml");
         var sTResS = StructureDefinitionResource
-                .file("fhir/StructureDefinition/feasibility-task-single-dic-result-simple-feasibility.xml");
+                .file("fhir/StructureDefinition/feasibility-task-single-dic-result.xml");
 
         var vF = ValueSetResource.file("fhir/ValueSet/feasibility.xml");
 
         Map<String, List<AbstractResource>> resourcesByProcessKeyAndVersion = Map.of(
-                "wwwnetzwerk-universitaetsmedizinde_executeSimpleFeasibility/" + VERSION,
+                "medizininformatik-initiativede_feasibilityExecute/" + VERSION,
                 Arrays.asList(aExe, sTExe, sTResS, vF, cF, sMeasure, sMeasureReport, sLibrary),
-                "wwwnetzwerk-universitaetsmedizinde_requestSimpleFeasibility/" + VERSION,
+                "medizininformatik-initiativede_feasibilityRequest/" + VERSION,
                 Arrays.asList(aReq, sTReq, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary));
 
         return ResourceProvider.read(VERSION,

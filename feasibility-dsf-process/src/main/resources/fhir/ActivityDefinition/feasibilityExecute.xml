@@ -7,11 +7,11 @@
     </meta>
     <extension url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization">
         <extension url="message-name">
-            <valueString value="executeSimpleFeasibilityMessage"/>
+            <valueString value="feasibilityExecuteMessage"/>
         </extension>
         <extension url="task-profile">
             <valueCanonical
-                    value="https://www.netzwerk-universitaetsmedizin.de/fhir/StructureDefinition/codex-task-execute-simple-feasibility|${version}"/>
+                    value="http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-execute|${version}"/>
         </extension>
         <extension url="requester">
             <valueCoding>
@@ -20,7 +20,7 @@
                     <extension url="consortium">
                         <valueIdentifier>
                             <system value="http://highmed.org/sid/organization-identifier"/>
-                            <value value="netzwerk-universitaetsmedizin.de"/>
+                            <value value="medizininformatik-initiative.de"/>
                         </valueIdentifier>
                     </extension>
                     <extension url="role">
@@ -41,7 +41,7 @@
                     <extension url="consortium">
                         <valueIdentifier>
                             <system value="http://highmed.org/sid/organization-identifier"/>
-                            <value value="netzwerk-universitaetsmedizin.de"/>
+                            <value value="medizininformatik-initiative.de"/>
                         </valueIdentifier>
                     </extension>
                     <extension url="role">
@@ -56,24 +56,24 @@
             </valueCoding>
         </extension>
     </extension>
-    <url value="http://www.netzwerk-universitaetsmedizin.de/bpe/Process/executeSimpleFeasibility"/>
+    <url value="http://medizininformatik-initiative.de/bpe/Process/feasibilityExecute"/>
     <!-- version managed by bpe -->
     <version value="${version}"/>
-    <name value="ExecuteSimpleFeasibility"/>
-    <title value="Execute a Simple Feasibility"/>
-    <subtitle value="Process to execute a simple feasibility query"/>
+    <name value="ExecuteFeasibility"/>
+    <title value="Executes a Feasibility Query"/>
+    <subtitle value="Process to execute a feasibility query"/>
     <!-- status managed by bpe -->
     <status value="unknown"/>
     <experimental value="false"/>
-    <date value="2021-08-22"/>
-    <publisher value="Codex"/>
+    <date value="2022-06-07"/>
+    <publisher value="MII"/>
     <contact>
-        <name value="Codex"/>
+        <name value="MII"/>
         <telecom>
             <system value="email"/>
             <value value="akiel@life.uni-leipzig.de"/>
         </telecom>
     </contact>
-    <description value="Process to execute a simple feasibility query received from a DIC and to send result to a DIC"/>
+    <description value="Process to execute a feasibility query received from a DIC and to send result to a DIC"/>
     <kind value="Task"/>
 </ActivityDefinition>
