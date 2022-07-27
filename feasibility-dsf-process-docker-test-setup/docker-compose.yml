@@ -73,8 +73,13 @@ services:
 
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
-    image: ghcr.io/highmed/fhir:0.5.5
+    image: ghcr.io/highmed/fhir:0.7.0
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
     secrets:
     - db_liquibase.password
     - db_fhir_zars_user.password
@@ -119,8 +124,13 @@ services:
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: ghcr.io/highmed/bpe:0.5.5
+    image: ghcr.io/highmed/bpe:0.7.0
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
     secrets:
     - db_liquibase.password
     - db_zars_bpe_user.password
@@ -144,6 +154,9 @@ services:
     - type: bind
       source: ./zars/bpe/last_event
       target: /opt/bpe/last_event
+    - type: bind
+      source: ./zars/bpe/cache
+      target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
       ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
@@ -170,8 +183,13 @@ services:
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
-    image: ghcr.io/highmed/fhir:0.5.5
+    image: ghcr.io/highmed/fhir:0.7.0
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
     secrets:
     - db_liquibase.password
     - db_fhir_dic_1_user.password
@@ -216,8 +234,13 @@ services:
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: ghcr.io/highmed/bpe:0.5.5
+    image: ghcr.io/highmed/bpe:0.7.0
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
     secrets:
     - db_liquibase.password
     - db_dic_1_bpe_user.password
@@ -241,6 +264,9 @@ services:
     - type: bind
       source: ./dic-1/bpe/last_event
       target: /opt/bpe/last_event
+    - type: bind
+      source: ./dic-1/bpe/cache
+      target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
       ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
@@ -319,8 +345,13 @@ services:
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-app:
-    image: ghcr.io/highmed/fhir:0.5.5
+    image: ghcr.io/highmed/fhir:0.7.0
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
     secrets:
     - db_liquibase.password
     - db_fhir_dic_2_user.password
@@ -365,8 +396,13 @@ services:
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: ghcr.io/highmed/bpe:0.5.5
+    image: ghcr.io/highmed/bpe:0.7.0
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
     secrets:
     - db_liquibase.password
     - db_dic_2_bpe_user.password
@@ -390,6 +426,9 @@ services:
     - type: bind
       source: ./dic-2/bpe/last_event
       target: /opt/bpe/last_event
+    - type: bind
+      source: ./dic-2/bpe/cache
+      target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
       ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
@@ -438,8 +477,13 @@ services:
 
   # ---- DIC-3 - FHIR ---------------------------------------------------------
   dic-3-fhir-app:
-    image: ghcr.io/highmed/fhir:0.5.5
+    image: ghcr.io/highmed/fhir:0.7.0
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
     secrets:
       - db_liquibase.password
       - db_fhir_dic_3_user.password
@@ -484,8 +528,13 @@ services:
 
   # ---- DIC-3 - BPE ----------------------------------------------------------
   dic-3-bpe-app:
-    image: ghcr.io/highmed/bpe:0.5.5
+    image: ghcr.io/highmed/bpe:0.7.0
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
     secrets:
       - db_liquibase.password
       - db_dic_3_bpe_user.password
@@ -510,6 +559,9 @@ services:
       - type: bind
         source: ./dic-3/bpe/last_event
         target: /opt/bpe/last_event
+      - type: bind
+        source: ./dic-3/bpe/cache
+        target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
       ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
