@@ -447,7 +447,7 @@ services:
       ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-2/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-2-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "true"
     networks:
       dic-2-bpe-frontend:
       dic-2-bpe-backend:
@@ -459,7 +459,7 @@ services:
 
   # ---- DIC-2 - FHIR Data Store ----------------------------------------------
   dic-2-store:
-    image: samply/blaze:0.16.4
+    image: samply/blaze:0.17.12
     restart: on-failure
     ports:
     - "127.0.0.1:8080:8080"

@@ -1,44 +1,50 @@
 package de.medizininformatik_initiative.feasibility_dsf_process;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCountObfuscator;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
 
-@RunWith(Parameterized.class)
+@RunWith(MockitoJUnitRunner.class)
 public class FeasibilityCountObfuscatorTest {
 
-    private FeasibilityCountObfuscator obfuscator;
+    @Mock
+    private RandomNumberGenerator randomNumberGenerator;
 
-    @Before
-    public void setUp() {
-        obfuscator = new FeasibilityCountObfuscator();
-    }
-
-    @Parameters
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {0, 10}, {5, 10}, {10, 20}, {20, 30}, {100, 110}, {113, 120}
-        });
-    }
-
-    @Parameter
-    public int feasibilityCount;
-
-    @Parameter(1)
-    public int expectedObfuscatedFeasibilityCount;
-
+    @InjectMocks
+    private FeasibilityCountObfuscator feasibilityCountObfuscator;
 
     @Test
-    public void testObfuscateFeasibility() {
-        assertEquals(expectedObfuscatedFeasibilityCount, obfuscator.obfuscate(feasibilityCount));
+    public void testObfuscateFeasibility_ObfuscatedResultsLowerThanFiveGetReturnedAsZero() {
+        when(randomNumberGenerator.generateRandomNumber(anyInt())).thenReturn(1, 2, 3, 4);
+
+        int nonObfuscatedFeasibilityResult = 5;
+        List<Integer> obfuscatedFeasibilityResults = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            obfuscatedFeasibilityResults.add(feasibilityCountObfuscator.obfuscate(nonObfuscatedFeasibilityResult));
+        }
+
+        assertIterableEquals(List.of(0, 0, 0, 0), obfuscatedFeasibilityResults);
+    }
+
+    @Test
+    public void testObfuscateFeasibility_ObfustedResultsGreaterOrEqualToFiveAreKept() {
+        when(randomNumberGenerator.generateRandomNumber(anyInt())).thenReturn(0, 5, 10);
+
+        int nonObfuscatedFeasibilityResult = 10;
+        List<Integer> obfuscatedFeasibilityResults = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            obfuscatedFeasibilityResults.add(feasibilityCountObfuscator.obfuscate(nonObfuscatedFeasibilityResult));
+        }
+
+        assertIterableEquals(List.of(5, 10, 15), obfuscatedFeasibilityResults);
     }
 }

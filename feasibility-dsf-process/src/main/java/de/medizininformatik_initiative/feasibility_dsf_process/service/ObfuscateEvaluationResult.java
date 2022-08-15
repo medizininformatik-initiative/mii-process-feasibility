@@ -1,6 +1,6 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCountObfuscator;
+import de.medizininformatik_initiative.feasibility_dsf_process.Obfuscator;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
 import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
@@ -15,10 +15,10 @@ import static de.medizininformatik_initiative.feasibility_dsf_process.variables.
 
 public class ObfuscateEvaluationResult extends AbstractServiceDelegate implements InitializingBean {
 
-    private final FeasibilityCountObfuscator obfuscator;
+    private final Obfuscator<Integer> obfuscator;
 
     public ObfuscateEvaluationResult(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                                     ReadAccessHelper readAccessHelper, FeasibilityCountObfuscator obfuscator) {
+                                     ReadAccessHelper readAccessHelper, Obfuscator<Integer> obfuscator) {
         super(clientProvider, taskHelper, readAccessHelper);
         this.obfuscator = obfuscator;
     }

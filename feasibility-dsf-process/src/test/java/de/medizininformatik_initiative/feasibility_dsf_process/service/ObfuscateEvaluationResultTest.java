@@ -1,8 +1,10 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCountObfuscator;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.ObfuscateEvaluationResult;
+import de.medizininformatik_initiative.feasibility_dsf_process.Obfuscator;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
+import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
+import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MeasureReport;
@@ -10,20 +12,18 @@ import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
 import org.hl7.fhir.r4.model.Period;
 import org.joda.time.LocalDate;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Date;
 import java.util.List;
 
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_MEASURE_POPULATION;
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_MEASURE_POPULATION_VALUE_INITIAL_POPULATION;
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 import static org.junit.Assert.assertEquals;
@@ -39,13 +39,25 @@ public class ObfuscateEvaluationResultTest {
     private ArgumentCaptor<MeasureReport> measureReportCaptor;
 
     @Mock
-    private FeasibilityCountObfuscator feasibilityCountObfuscator;
+    private FhirWebserviceClientProvider clientProvider;
+
+    @Mock
+    private TaskHelper taskHelper;
+
+    @Mock
+    private ReadAccessHelper readAccessHelper;
 
     @Mock
     private DelegateExecution execution;
 
-    @InjectMocks
     private ObfuscateEvaluationResult service;
+
+    @Before
+    public void setUp() {
+        var incrementFeasibilityCountObfuscator = new FeasibilityCountIncrementObfuscator();
+        service = new ObfuscateEvaluationResult(clientProvider, taskHelper, readAccessHelper,
+                incrementFeasibilityCountObfuscator);
+    }
 
     @Test
     public void testDoExecute() throws Exception {
@@ -69,12 +81,11 @@ public class ObfuscateEvaluationResultTest {
                         .setPopulation(List.of(populationGroup)));
 
         when(execution.getVariable(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
-        when(feasibilityCountObfuscator.obfuscate(feasibilityCount)).thenCallRealMethod();
 
         service.execute(execution);
         verify(execution).setVariable(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
 
-        var expectedFeasibilityCount = 10;
+        var expectedFeasibilityCount = feasibilityCount + 1;
         var expectedObfuscatedMeasureReport = measureReport.copy();
         expectedObfuscatedMeasureReport.getGroupFirstRep().getPopulationFirstRep().setCount(expectedFeasibilityCount);
 
@@ -82,5 +93,12 @@ public class ObfuscateEvaluationResultTest {
         assertEquals(expectedFeasibilityCount, obfuscatedMeasureReport.getGroupFirstRep().getPopulationFirstRep()
                 .getCount());
         assertTrue(expectedObfuscatedMeasureReport.equalsDeep(obfuscatedMeasureReport));
+    }
+
+    private static class FeasibilityCountIncrementObfuscator implements Obfuscator<Integer> {
+        @Override
+        public Integer obfuscate(Integer value) {
+            return ++value;
+        }
     }
 }
