@@ -8,7 +8,6 @@
 /feasibility-dsf-process-docker-test-setup/secrets/*.pem
 /feasibility-dsf-process-docker-test-setup/secrets/*.p12
 
-/feasibility-dsf-process-docker-test-setup/dic-1/bpe/last_event/time.file
 /feasibility-dsf-process-docker-test-setup/dic-1/bpe/log/*.log
 /feasibility-dsf-process-docker-test-setup/dic-1/bpe/log/*.log.gz
 /feasibility-dsf-process-docker-test-setup/dic-1/bpe/plugin/*.jar
@@ -18,7 +17,6 @@
 /feasibility-dsf-process-docker-test-setup/dic-1/fhir/log/*.log
 /feasibility-dsf-process-docker-test-setup/dic-1/fhir/log/*.log.gz
 
-/feasibility-dsf-process-docker-test-setup/dic-2/bpe/last_event/time.file
 /feasibility-dsf-process-docker-test-setup/dic-2/bpe/log/*.log
 /feasibility-dsf-process-docker-test-setup/dic-2/bpe/log/*.log.gz
 /feasibility-dsf-process-docker-test-setup/dic-2/bpe/plugin/*.jar
@@ -28,7 +26,6 @@
 /feasibility-dsf-process-docker-test-setup/dic-2/fhir/log/*.log
 /feasibility-dsf-process-docker-test-setup/dic-2/fhir/log/*.log.gz
 
-/feasibility-dsf-process-docker-test-setup/dic-3/bpe/last_event/time.file
 /feasibility-dsf-process-docker-test-setup/dic-3/bpe/log/*.log
 /feasibility-dsf-process-docker-test-setup/dic-3/bpe/log/*.log.gz
 /feasibility-dsf-process-docker-test-setup/dic-3/bpe/plugin/*.jar
@@ -38,7 +35,6 @@
 /feasibility-dsf-process-docker-test-setup/dic-3/fhir/log/*.log
 /feasibility-dsf-process-docker-test-setup/dic-3/fhir/log/*.log.gz
 
-/feasibility-dsf-process-docker-test-setup/zars/bpe/last_event/time.file
 /feasibility-dsf-process-docker-test-setup/zars/bpe/log/*.log
 /feasibility-dsf-process-docker-test-setup/zars/bpe/log/*.log.gz
 /feasibility-dsf-process-docker-test-setup/zars/bpe/plugin/*.jar
