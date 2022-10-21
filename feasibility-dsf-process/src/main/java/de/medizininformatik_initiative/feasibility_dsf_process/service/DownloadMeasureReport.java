@@ -42,7 +42,7 @@ public class DownloadMeasureReport extends AbstractServiceDelegate implements In
 
     @Override
     protected void doExecute(DelegateExecution execution) {
-        Task task = getCurrentTaskFromExecutionVariables();
+        Task task = getCurrentTaskFromExecutionVariables(execution);
         IdType measureReportId = getMeasureReportId(task);
         FhirWebserviceClient client = ((EnhancedFhirWebserviceClientProvider) getFhirWebserviceClientProvider())
                 .getWebserviceClientByReference(measureReportId);

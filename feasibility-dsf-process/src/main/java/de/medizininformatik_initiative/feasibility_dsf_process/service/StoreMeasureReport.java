@@ -8,6 +8,7 @@ import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Measure;
 import org.hl7.fhir.r4.model.MeasureReport;
+import org.hl7.fhir.r4.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,10 +31,12 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
 	@Override
 	protected void doExecute(DelegateExecution execution)
 	{
-		MeasureReport measureReport = (MeasureReport) execution.getVariable(VARIABLE_MEASURE_REPORT);
+        var leadingTask = getLeadingTaskFromExecutionVariables(execution);
+
+        MeasureReport measureReport = (MeasureReport) execution.getVariable(VARIABLE_MEASURE_REPORT);
 		Measure associatedMeasure = (Measure) execution.getVariable(VARIABLE_MEASURE);
 
-		addReadAccessTag(measureReport);
+		addReadAccessTag(measureReport, leadingTask);
 		referenceZarsMeasure(measureReport, associatedMeasure);
 		stripEvaluatedResources(measureReport);
 
@@ -43,9 +46,9 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
 		execution.setVariable(VARIABLE_MEASURE_REPORT_ID, measureReportId.getValue());
 	}
 
-    private void addReadAccessTag(MeasureReport measureReport)
+    private void addReadAccessTag(MeasureReport measureReport, Task leadingTask)
     {
-        String identifier = getLeadingTaskFromExecutionVariables().getRequester().getIdentifier().getValue();
+		String identifier = leadingTask.getRequester().getIdentifier().getValue();
         getReadAccessHelper().addOrganization(measureReport, identifier);
     }
 

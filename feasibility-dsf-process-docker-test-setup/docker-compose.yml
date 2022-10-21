@@ -73,7 +73,7 @@ services:
 
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
-    image: ghcr.io/highmed/fhir:0.7.0
+    image: ghcr.io/highmed/fhir:0.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
@@ -124,7 +124,7 @@ services:
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: ghcr.io/highmed/bpe:0.7.0
+    image: ghcr.io/highmed/bpe:0.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
@@ -151,9 +151,6 @@ services:
     - type: bind
       source: ./zars/bpe/log
       target: /opt/bpe/log
-    - type: bind
-      source: ./zars/bpe/last_event
-      target: /opt/bpe/last_event
     - type: bind
       source: ./zars/bpe/cache
       target: /opt/bpe/cache
@@ -183,7 +180,7 @@ services:
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
-    image: ghcr.io/highmed/fhir:0.7.0
+    image: ghcr.io/highmed/fhir:0.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
@@ -234,7 +231,7 @@ services:
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: ghcr.io/highmed/bpe:0.7.0
+    image: ghcr.io/highmed/bpe:0.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
@@ -261,9 +258,6 @@ services:
     - type: bind
       source: ./dic-1/bpe/log
       target: /opt/bpe/log
-    - type: bind
-      source: ./dic-1/bpe/last_event
-      target: /opt/bpe/last_event
     - type: bind
       source: ./dic-1/bpe/cache
       target: /opt/bpe/cache
@@ -345,7 +339,7 @@ services:
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-app:
-    image: ghcr.io/highmed/fhir:0.7.0
+    image: ghcr.io/highmed/fhir:0.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
@@ -396,7 +390,7 @@ services:
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: ghcr.io/highmed/bpe:0.7.0
+    image: ghcr.io/highmed/bpe:0.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
@@ -423,9 +417,6 @@ services:
     - type: bind
       source: ./dic-2/bpe/log
       target: /opt/bpe/log
-    - type: bind
-      source: ./dic-2/bpe/last_event
-      target: /opt/bpe/last_event
     - type: bind
       source: ./dic-2/bpe/cache
       target: /opt/bpe/cache
@@ -477,7 +468,7 @@ services:
 
   # ---- DIC-3 - FHIR ---------------------------------------------------------
   dic-3-fhir-app:
-    image: ghcr.io/highmed/fhir:0.7.0
+    image: ghcr.io/highmed/fhir:0.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
@@ -528,7 +519,7 @@ services:
 
   # ---- DIC-3 - BPE ----------------------------------------------------------
   dic-3-bpe-app:
-    image: ghcr.io/highmed/bpe:0.7.0
+    image: ghcr.io/highmed/bpe:0.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
@@ -556,9 +547,6 @@ services:
       - type: bind
         source: ./dic-3/bpe/log
         target: /opt/bpe/log
-      - type: bind
-        source: ./dic-3/bpe/last_event
-        target: /opt/bpe/last_event
       - type: bind
         source: ./dic-3/bpe/cache
         target: /opt/bpe/cache

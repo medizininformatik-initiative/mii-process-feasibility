@@ -34,7 +34,7 @@ public class AggregateMeasureReports extends AbstractServiceDelegate implements 
 
     @Override
     protected void doExecute(DelegateExecution execution) {
-        Task task = getCurrentTaskFromExecutionVariables();
+        Task task = getCurrentTaskFromExecutionVariables(execution);
         Map<Reference, MeasureReport> measureReports = getMeasureReportMap(execution);
         measureReports.put(task.getRequester(), getMeasureReport(execution));
         execution.setVariable(VARIABLE_MEASURE_REPORT_MAP, measureReports);
