@@ -13,6 +13,7 @@ openssl req -x509 -sha256 -days 365 -nodes -newkey rsa:2048 -keyout ${BASE_DIR}/
 # Convert certificate to PKCS12 format
 # This is done using keytool instead of openssl since keytool adds a proprietary attribute that openssl does not.
 # Without this attribute Java cannot properly process the resulting P12 file.
+rm -f ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.p12
 keytool -genkeypair -alias tmp -storepass testpw \
   -keystore ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.p12 \
   -dname "CN=tmp, OU=tmp, O=tmp, L=tmp, ST=tmp, C=tmp"
