@@ -591,8 +591,8 @@ services:
       internet:
     depends_on:
       - db
+      - dic-3-fhir-app
       - dedicated-dic-3-store-proxy
-      - proxy
 
   # ---- DIC-3 - DEDICATED PROXY WITH SELF SIGNED CERT ------------------------
   dedicated-dic-3-store-proxy:
