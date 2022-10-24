@@ -39,7 +39,7 @@ public class PrepareForFurtherEvaluation extends AbstractServiceDelegate impleme
     @Override
     protected void doExecute(DelegateExecution execution) {
         for (Map.Entry<Reference, MeasureReport> entry : getMeasureReportMap(execution).entrySet()) {
-            getLeadingTaskFromExecutionVariables().addOutput(
+            getLeadingTaskFromExecutionVariables(execution).addOutput(
                     addOrganizationReference(createMeasureReportReferenceOutput(entry.getValue()), entry.getKey()));
         }
     }

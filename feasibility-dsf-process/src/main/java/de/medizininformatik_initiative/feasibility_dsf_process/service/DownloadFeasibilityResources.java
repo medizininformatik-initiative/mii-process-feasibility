@@ -43,7 +43,7 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate implem
 
     @Override
     protected void doExecute(DelegateExecution execution) {
-        Task task = getCurrentTaskFromExecutionVariables();
+        Task task = getCurrentTaskFromExecutionVariables(execution);
 
         IdType measureId = getMeasureId(task);
         FhirWebserviceClient client = ((EnhancedFhirWebserviceClientProvider) getFhirWebserviceClientProvider())
