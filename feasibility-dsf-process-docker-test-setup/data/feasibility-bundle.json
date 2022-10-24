@@ -11,7 +11,7 @@
             "http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-request"
           ]
         },
-        "instantiatesUri": "http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest/0.3.0",
+        "instantiatesUri": "http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest/0.4.0",
         "status": "requested",
         "intent": "order",
         "authoredOn": "2022",
