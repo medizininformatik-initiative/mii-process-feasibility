@@ -30,6 +30,8 @@ Add the following entries to `/etc/hosts`:
 127.0.0.1       zars
 127.0.0.1       dic-1
 127.0.0.1       dic-2
+127.0.0.1       dic-3
+127.0.0.1       dic-4
 ```
 
 After that, you can start the ZARS FHIR Inbox using:
