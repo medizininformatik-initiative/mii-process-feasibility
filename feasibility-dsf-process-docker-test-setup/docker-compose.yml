@@ -29,12 +29,15 @@ services:
         ipv4_address: 172.10.0.98
       dic-3-fhir-frontend:
         ipv4_address: 172.10.0.114
+      dic-4-fhir-frontend:
+        ipv4_address: 172.10.0.130
       internet:
         aliases:
         - zars
         - dic-1
         - dic-2
         - dic-3
+        - dic-4
     environment:
       TZ: Europe/Berlin
 
@@ -56,10 +59,12 @@ services:
     - dic-1-fhir-backend
     - dic-2-fhir-backend
     - dic-3-fhir-backend
+    - dic-4-fhir-backend
     - zars-bpe-backend
     - dic-1-bpe-backend
     - dic-2-bpe-backend
     - dic-3-bpe-backend
+    - dic-4-bpe-backend
     secrets:
     - db_liquibase.password
     volumes:
@@ -627,6 +632,180 @@ services:
       source: dic-3-store-data
       target: /app/data
 
+  # ---- DIC-4 - FHIR ---------------------------------------------------------
+  dic-4-fhir-app:
+    image: ghcr.io/highmed/fhir:0.9.0
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
+    secrets:
+    - db_liquibase.password
+    - db_fhir_dic_4_user.password
+    - db_fhir_dic_4_user_permanent_delete.password
+    - app_client_trust_certificates.pem
+    - app_dic_4_client_certificate.pem
+    - app_dic_4_client_certificate_private_key.pem
+    - app_client_certificate_private_key.pem.password
+    volumes:
+    - type: bind
+      source: ./dic-4/fhir/conf/bundle.xml
+      target: /opt/fhir/conf/bundle.xml
+    - type: bind
+      source: ./dic-4/fhir/log
+      target: /opt/fhir/log
+    environment:
+      TZ: Europe/Berlin
+      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      ORG_HIGHMED_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_4_user.password
+      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_4_user_permanent_delete.password
+      ORG_HIGHMED_DSF_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
+      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_4_client_certificate.pem
+      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_4_client_certificate_private_key.pem
+      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://db/dic_4_fhir
+      ORG_HIGHMED_DSF_FHIR_DB_USER_GROUP: dic_4_fhir_users
+      ORG_HIGHMED_DSF_FHIR_DB_USER_USERNAME: dic_4_fhir_server_user
+      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: dic_4_fhir_permanent_delete_users
+      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: dic_4_fhir_server_permanent_delete_user
+      ORG_HIGHMED_DSF_FHIR_SERVER_BASE_URL: https://dic-4/fhir
+      ORG_HIGHMED_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_4
+      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS: ${DIC_4_USER_THUMBPRINTS}
+      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS_PERMANENT_DELETE: ${DIC_4_USER_THUMBPRINTS_PERMANENT_DELETE}
+    networks:
+      dic-4-fhir-frontend:
+        ipv4_address: 172.10.0.131
+      dic-4-fhir-backend:
+      internet:
+    depends_on:
+    - db
+    - proxy
+  
+  # ---- DIC-4 - BPE ----------------------------------------------------------
+  dic-4-bpe-app:
+    image: ghcr.io/highmed/bpe:0.9.0
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
+    secrets:
+      - db_liquibase.password
+      - db_dic_4_bpe_user.password
+      - db_dic_4_bpe_user_camunda.password
+      - app_client_trust_certificates.pem
+      - app_dic_4_client_certificate.pem
+      - app_dic_4_client_certificate_private_key.pem
+      - app_client_certificate_private_key.pem.password
+    volumes:
+      - type: bind
+        source: ./dic-4/bpe/plugin
+        target: /opt/bpe/plugin
+        read_only: true
+      - type: bind
+        source: ./dic-4/bpe/process
+        target: /opt/bpe/process
+        read_only: true
+      - type: bind
+        source: ./dic-4/bpe/log
+        target: /opt/bpe/log
+      - type: bind
+        source: ./dic-4/bpe/cache
+        target: /opt/bpe/cache
+    environment:
+      TZ: Europe/Berlin
+      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      ORG_HIGHMED_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_4_bpe_user.password
+      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_dic_4_bpe_user_camunda.password
+      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
+      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_4_client_certificate.pem
+      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_4_client_certificate_private_key.pem
+      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://db/dic_4_bpe
+      ORG_HIGHMED_DSF_BPE_DB_USER_GROUP: dic_4_bpe_users
+      ORG_HIGHMED_DSF_BPE_DB_USER_USERNAME: dic_4_bpe_server_user
+      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_4_camunda_users
+      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_4_camunda_server_user
+      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_4
+      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-4/fhir
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-4-store:8080/fhir
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
+    networks:
+      dic-4-bpe-frontend:
+      dic-4-bpe-backend:
+      internet:
+    depends_on:
+      db:
+        condition: service_healthy
+      dic-4-fhir-app:
+        condition: service_healthy
+      dic-4-store-init:
+        condition: service_completed_successfully
+
+  # ---- DIC-4 - FHIR Data Store ----------------------------------------------
+  dic-4-store:
+    image: hapiproject/hapi:v5.4.1
+    restart: always
+    ports:
+    - "8082:8080"
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://dic-4-store-db:5432/fhir?currentSchema=public"
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_DRIVERCLASSNAME: org.postgresql.Driver
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQL10Dialect
+      VALIDATION_REQUESTS_ENABLED: "false"
+      HAPI_FHIR_USE_APACHE_ADDRESS_STRATEGY: "true"
+      HAPI_FHIR_CQL_ENABLED: "true"
+    networks:
+      dic-4-bpe-backend:
+    depends_on:
+    - dic-4-store-db
+
+  dic-4-store-init:
+    image: curlimages/curl:7.85.0
+    entrypoint:
+      - /bin/sh
+    command:
+      - /tmp/init.sh
+    volumes:
+      - type: bind
+        source: ./dic-4-store-init/init.sh
+        target: /tmp/init.sh
+      - type: bind
+        source: ./dic-4-store-init/library-fhir-helpers.json
+        target: /tmp/library-fhir-helpers.json
+      - type: bind
+        source: ./dic-4-store-init/library-fhir-model-definition.json
+        target: /tmp/library-fhir-model-definition.json
+    networks:
+      dic-4-bpe-backend:
+    depends_on:
+      dic-4-store:
+#        service_healthy not possible since the HAPI image does not offer a possibility to enable health checks
+        condition: service_started
+
+  dic-4-store-db:
+    image: postgres:12.6-alpine
+    networks:
+      dic-4-bpe-backend:
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+    - type: volume
+      source: dic-4-store-data
+      target: /var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fhir
 
 secrets:
   proxy_certificate_and_int_cas.pem:
@@ -705,6 +884,19 @@ secrets:
   dic_3_store_proxy_self_signed_ca.p12:
     file: ./secrets/dic_3_store_proxy_self_signed_ca.p12
 
+  db_dic_4_bpe_user.password:
+    file: secrets/db_dic_4_bpe_user.password
+  db_dic_4_bpe_user_camunda.password:
+    file: secrets/db_dic_4_bpe_user_camunda.password
+  app_dic_4_client_certificate.pem:
+    file: ./secrets/app_dic_4_client_certificate.pem
+  app_dic_4_client_certificate_private_key.pem:
+    file: ./secrets/app_dic_4_client_certificate_private_key.pem
+  db_fhir_dic_4_user.password:
+    file: ./secrets/db_fhir_dic_4_user.password
+  db_fhir_dic_4_user_permanent_delete.password:
+    file: ./secrets/db_fhir_dic_4_user_permanent_delete.password
+
 networks:
   internet:
   zars-fhir-frontend:
@@ -743,6 +935,15 @@ networks:
   dic-3-fhir-backend:
   dic-3-bpe-frontend:
   dic-3-bpe-backend:
+  dic-4-fhir-frontend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.128/28
+  dic-4-fhir-backend:
+  dic-4-bpe-frontend:
+  dic-4-bpe-backend:
 
 volumes:
   dic-1-store-data:
@@ -753,6 +954,9 @@ volumes:
 
   dic-3-store-data:
     name: "dic-3-store-data"
+
+  dic-4-store-data:
+    name: "dic-4-store-data"
 
   db-data:
     name: "db-data-mii-dsf-process-feasibility"

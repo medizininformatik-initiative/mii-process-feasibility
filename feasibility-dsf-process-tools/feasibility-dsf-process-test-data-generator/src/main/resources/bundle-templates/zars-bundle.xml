@@ -153,6 +153,44 @@
             <ifNoneExist value="identifier=http://highmed.org/sid/organization-identifier|Test_DIC_3"/>
         </request>
     </entry>
+    <entry>
+        <fullUrl value="urn:uuid:9e40709b-c9a4-4f83-adfe-5a9f12c49cda"/>
+        <resource>
+            <Organization xmlns="http://hl7.org/fhir">
+                <meta>
+                    <profile value="http://highmed.org/fhir/StructureDefinition/organization"/>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+                        <code value="ALL"/>
+                    </tag>
+                </meta>
+                <extension url="http://highmed.org/fhir/StructureDefinition/extension-certificate-thumbprint">
+                    <valueString value="TODO"/>
+                </extension>
+                <identifier>
+                    <system value="http://highmed.org/sid/organization-identifier"/>
+                    <value value="Test_DIC_4"/>
+                </identifier>
+                <active value="true"/>
+                <type>
+                    <coding>
+                        <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                        <code value="MeDIC"/>
+                    </coding>
+                </type>
+                <name value="Test DIC 4"/>
+                <endpoint>
+                    <reference value="urn:uuid:5e60441a-2f97-4e73-9552-232f1349d079"/>
+                    <type value="Endpoint"/>
+                </endpoint>
+            </Organization>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="Organization"/>
+            <ifNoneExist value="identifier=http://highmed.org/sid/organization-identifier|Test_DIC_4"/>
+        </request>
+    </entry>
 
     <!-- Endpoint -->
     <entry>
@@ -321,6 +359,48 @@
             <url value="Endpoint"/>
             <ifNoneExist
                     value="identifier=http://highmed.org/sid/endpoint-identifier|Test_DIC_3_Endpoint"/>
+        </request>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:5e60441a-2f97-4e73-9552-232f1349d079"/>
+        <resource>
+            <Endpoint xmlns="http://hl7.org/fhir">
+                <meta>
+                    <profile value="http://highmed.org/fhir/StructureDefinition/endpoint"/>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+                        <code value="ALL"/>
+                    </tag>
+                </meta>
+                <identifier>
+                    <system value="http://highmed.org/sid/endpoint-identifier"/>
+                    <value value="Test_DIC_4_Endpoint"/>
+                </identifier>
+                <status value="active"/>
+                <connectionType>
+                    <system value="http://terminology.hl7.org/CodeSystem/endpoint-connection-type"/>
+                    <code value="hl7-fhir-rest"/>
+                </connectionType>
+                <managingOrganization>
+                    <reference value="urn:uuid:9e40709b-c9a4-4f83-adfe-5a9f12c49cda"/>
+                    <type value="Organization"/>
+                </managingOrganization>
+                <payloadType>
+                    <coding>
+                        <system value="http://hl7.org/fhir/resource-types"/>
+                        <code value="Task"/>
+                    </coding>
+                </payloadType>
+                <payloadMimeType value="application/fhir+json"/>
+                <payloadMimeType value="application/fhir+xml"/>
+                <address value="https://dic-4/fhir"/>
+            </Endpoint>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="Endpoint"/>
+            <ifNoneExist
+                    value="identifier=http://highmed.org/sid/endpoint-identifier|Test_DIC_4_Endpoint"/>
         </request>
     </entry>
 
@@ -508,6 +588,46 @@
             <url value="OrganizationAffiliation"/>
             <ifNoneExist
                     value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|medizininformatik-initiative.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_DIC_3"/>
+        </request>
+    </entry>
+
+    <entry>
+        <fullUrl value="urn:uuid:2c17b93a-9317-466f-a568-277c3f43e789"/>
+        <resource>
+            <OrganizationAffiliation xmlns="http://hl7.org/fhir">
+                <meta>
+                    <profile value="http://highmed.org/fhir/StructureDefinition/organization-affiliation"/>
+                    <tag>
+                        <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+                        <code value="ALL"/>
+                    </tag>
+                </meta>
+                <active value="true"/>
+                <organization>
+                    <reference value="urn:uuid:c4a7b553-01b1-4b50-bcb3-1467f5ae6791"/>
+                    <type value="Organization"/>
+                </organization>
+                <participatingOrganization>
+                    <reference value="urn:uuid:9e40709b-c9a4-4f83-adfe-5a9f12c49cda"/>
+                    <type value="Organization"/>
+                </participatingOrganization>
+                <code>
+                    <coding>
+                        <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                        <code value="MeDIC"/>
+                    </coding>
+                </code>
+                <endpoint>
+                    <reference value="urn:uuid:5e60441a-2f97-4e73-9552-232f1349d079"/>
+                    <type value="Endpoint"/>
+                </endpoint>
+            </OrganizationAffiliation>
+        </resource>
+        <request>
+            <method value="POST"/>
+            <url value="OrganizationAffiliation"/>
+            <ifNoneExist
+                    value="primary-organization:identifier=http://highmed.org/sid/organization-identifier|medizininformatik-initiative.de&amp;participating-organization:identifier=http://highmed.org/sid/organization-identifier|Test_DIC_4"/>
         </request>
     </entry>
 </Bundle>
