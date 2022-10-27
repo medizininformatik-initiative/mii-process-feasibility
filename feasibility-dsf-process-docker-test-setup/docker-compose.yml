@@ -302,7 +302,7 @@ services:
     ports:
     - "5000:8080"
     environment:
-      FHIR_BASE_URL: http://dic-1-store-fhir-server:8080/fhir
+      FLARE_FHIR_SERVER_URL: http://dic-1-store-fhir-server:8080/fhir/
     networks:
       dic-1-bpe-backend:
     volumes:
