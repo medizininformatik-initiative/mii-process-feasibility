@@ -305,9 +305,6 @@ services:
       FLARE_FHIR_SERVER_URL: http://dic-1-store-fhir-server:8080/fhir/
     networks:
       dic-1-bpe-backend:
-    volumes:
-    - ./dic-1/flare/feasibility-code-tree.json:/opt/flare/src/query_parser/feasibility/feasibility-code-tree.json
-    - ./dic-1/flare/feasibility-mapping.json:/opt/flare/src/query_parser/feasibility/feasibility-mapping.json
     depends_on:
     - dic-1-store-fhir-server
 
