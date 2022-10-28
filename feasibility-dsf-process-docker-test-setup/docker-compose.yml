@@ -282,7 +282,7 @@ services:
       ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_1_camunda_server_user
       ORG_HIGHMED_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_1
       ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-1/fhir
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_BASE_URL: http://dic-1-store:5000/
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_BASE_URL: http://dic-1-store:8080/
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_TIMEOUT_CONNECT: 2000
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: structured-query
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
@@ -297,17 +297,14 @@ services:
 
   # ---- DIC-1 - FHIR Data Store ----------------------------------------------
   dic-1-store:
-    image: ghcr.io/rwth-imi/flare-query:1.0-rc11
+    image: ghcr.io/rwth-imi/flare-query:1.0.0
     restart: always
     ports:
-    - "5000:5000"
+    - "5000:8080"
     environment:
-      FHIR_BASE_URL: http://dic-1-store-fhir-server:8080/fhir
+      FLARE_FHIR_SERVER_URL: http://dic-1-store-fhir-server:8080/fhir/
     networks:
       dic-1-bpe-backend:
-    volumes:
-    - ./dic-1/flare/feasibility-code-tree.json:/opt/flare/src/query_parser/feasibility/feasibility-code-tree.json
-    - ./dic-1/flare/feasibility-mapping.json:/opt/flare/src/query_parser/feasibility/feasibility-mapping.json
     depends_on:
     - dic-1-store-fhir-server
 
