@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>feasibility-dsf-process</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
 
     <parent>
         <groupId>de.medizininformatik-initiative</groupId>
         <artifactId>feasibility-dsf-process-parent</artifactId>
-        <version>0.4.0</version>
+        <version>0.5.0</version>
     </parent>
 
     <name>MII Feasibility DSF Process</name>
@@ -54,6 +54,22 @@
             <artifactId>okhttp-tls</artifactId>
             <version>4.9.3</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>2.7.5</version>
+            <scope>test</scope>
+            <exclusions>
+                <!--
+                    Needs to be excluded. Otherwise, an error regarding incompatible log4j dependencies is thrown.
+                    This avoid them being loaded both.
+                -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -230,6 +246,41 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>copy-process-plugin-to-dic-4</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-4/bpe/process
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-hapi-fhir-client-to-dic-4</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>ca.uhn.hapi.fhir</groupId>
+                                    <artifactId>hapi-fhir-client</artifactId>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>../feasibility-dsf-process-docker-test-setup/dic-4/bpe/plugin
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>copy-process-plugin-to-zars</id>
                         <phase>package</phase>
                         <goals>
@@ -322,6 +373,20 @@
                         </fileset>
                         <fileset>
                             <directory>../feasibility-dsf-process-docker-test-setup/dic-3/bpe/process</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>../feasibility-dsf-process-docker-test-setup/dic-4/bpe/plugin</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>../feasibility-dsf-process-docker-test-setup/dic-4/bpe/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>

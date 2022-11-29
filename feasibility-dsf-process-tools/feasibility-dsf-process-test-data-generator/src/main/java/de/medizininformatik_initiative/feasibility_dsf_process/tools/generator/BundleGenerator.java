@@ -32,6 +32,7 @@ public class BundleGenerator {
     private Bundle dic1Bundle;
     private Bundle dic2Bundle;
     private Bundle dic3Bundle;
+    private Bundle dic4Bundle;
     private Bundle zarsBundle;
 
     private Bundle readAndCleanBundle(Path bundleTemplateFile) {
@@ -68,6 +69,7 @@ public class BundleGenerator {
         createDockerTestDic1Bundle(clientCertificateFilesByCommonName);
         createDockerTestDic2Bundle(clientCertificateFilesByCommonName);
         createDockerTestDic3Bundle(clientCertificateFilesByCommonName);
+        createDockerTestDic4Bundle(clientCertificateFilesByCommonName);
         createDockerTestZarsBundle(clientCertificateFilesByCommonName);
     }
 
@@ -113,10 +115,24 @@ public class BundleGenerator {
         Organization organizationZars = (Organization) dic3Bundle.getEntry().get(0).getResource();
         setThumbprint(organizationZars, clientCertificateFilesByCommonName.get("zars-client"));
 
-        Organization organizationDic2 = (Organization) dic3Bundle.getEntry().get(1).getResource();
-        setThumbprint(organizationDic2, clientCertificateFilesByCommonName.get("dic-3-client"));
+        Organization organizationDic3 = (Organization) dic3Bundle.getEntry().get(1).getResource();
+        setThumbprint(organizationDic3, clientCertificateFilesByCommonName.get("dic-3-client"));
 
         writeBundle(Paths.get("bundle/dic-3-bundle.xml"), dic3Bundle);
+    }
+
+    private void createDockerTestDic4Bundle(Map<String, CertificateGenerator.CertificateFiles> clientCertificateFilesByCommonName) {
+        Path bundleTemplateFile = Paths.get("src/main/resources/bundle-templates/dic-4-bundle.xml");
+
+        dic4Bundle = readAndCleanBundle(bundleTemplateFile);
+
+        Organization organizationZars = (Organization) dic4Bundle.getEntry().get(0).getResource();
+        setThumbprint(organizationZars, clientCertificateFilesByCommonName.get("zars-client"));
+
+        Organization organizationDic4 = (Organization) dic4Bundle.getEntry().get(1).getResource();
+        setThumbprint(organizationDic4, clientCertificateFilesByCommonName.get("dic-4-client"));
+
+        writeBundle(Paths.get("bundle/dic-4-bundle.xml"), dic4Bundle);
     }
 
     private void createDockerTestZarsBundle(Map<String, CertificateGenerator.CertificateFiles> clientCertificateFilesByCommonName) {
@@ -136,6 +152,9 @@ public class BundleGenerator {
         Organization organizationDic3 = (Organization) zarsBundle.getEntry().get(3).getResource();
         setThumbprint(organizationDic3, clientCertificateFilesByCommonName.get("dic-3-client"));
 
+        Organization organizationDic4 = (Organization) zarsBundle.getEntry().get(4).getResource();
+        setThumbprint(organizationDic4, clientCertificateFilesByCommonName.get("dic-4-client"));
+
         writeBundle(Paths.get("bundle/zars-bundle.xml"), zarsBundle);
     }
 
@@ -151,6 +170,10 @@ public class BundleGenerator {
         Path dic3BundleFile = Paths.get("../../feasibility-dsf-process-docker-test-setup/dic-3/fhir/conf/bundle.xml");
         logger.info("Copying fhir bundle to {}", dic3BundleFile);
         writeBundle(dic3BundleFile, dic3Bundle);
+
+        Path dic4BundleFile = Paths.get("../../feasibility-dsf-process-docker-test-setup/dic-4/fhir/conf/bundle.xml");
+        logger.info("Copying fhir bundle to {}", dic4BundleFile);
+        writeBundle(dic4BundleFile, dic4Bundle);
 
         Path zarsBundleFile = Paths.get("../../feasibility-dsf-process-docker-test-setup/zars/fhir/conf/bundle.xml");
         logger.info("Copying fhir bundle to {}", zarsBundleFile);

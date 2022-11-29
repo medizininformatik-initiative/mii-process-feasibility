@@ -4,21 +4,23 @@ on:
   push:
     branches:
     - main
+    - develop
     tags:
     - v[0-9]+.[0-9]+.[0-9]+**
   pull_request:
     branches:
     - main
+    - develop
 
 jobs:
 
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up JDK 11
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
         java-version: 11
@@ -28,14 +30,14 @@ jobs:
         server-password: GITHUB_TOKEN
 
     - name: Cache Local Maven Repo
-      uses: actions/cache@v2.1.2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.m2/repository
         key: maven-repo
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v2
 
     - name: Build with Maven
       run: mvn -B verify --file pom.xml
@@ -44,7 +46,7 @@ jobs:
         USERNAME: ${{ github.actor }}
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v2
 
 
   build:
@@ -52,15 +54,14 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Prepare Version
       id: prep
-      run: |
-        echo ::set-output name=version::${GITHUB_REF#refs/tags/v}
+      run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
     - name: Set up JDK 11
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
         java-version: 11
@@ -70,7 +71,7 @@ jobs:
         server-password: GITHUB_TOKEN
 
     - name: Cache Local Maven Repo
-      uses: actions/cache@v2.1.2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.m2/repository

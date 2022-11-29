@@ -1,11 +1,8 @@
 # Docker Test Setup
 
-This directory contains a Docker Compose file containing a complete setup which consists of three sites communicating
-over the DFS middleware. Of the three sites, one is the ZARS which represents the central application and register
-entity and the other two are DIC's which are data integration centers.
-
-The goal of this setup is to test feasibility query requests which are initiated at the ZARS and answered from the two
-DIC's.
+This directory contains a `docker-compose.yml` describing a ZARS part and multiple different example setups regarding a
+DIC. These example setups shall illustrate different supported functionalities of this plugin and their corresponding
+configuration settings.
 
 ### Custom FHIR Server Image
 
@@ -33,6 +30,8 @@ Add the following entries to `/etc/hosts`:
 127.0.0.1       zars
 127.0.0.1       dic-1
 127.0.0.1       dic-2
+127.0.0.1       dic-3
+127.0.0.1       dic-4
 ```
 
 After that, you can start the ZARS FHIR Inbox using:
@@ -88,7 +87,7 @@ After that, you can stop the DIC-1 FHIR Inbox log output and start the DIC-1 Bus
 docker-compose up -d dic-1-bpe-app && docker-compose logs -f dic-1-fhir-app dic-1-bpe-app
 ```
 
-Continue with DIC-2.
+Continue with other DIC as you see fit.
 
 After that we can POST the first Task to the ZARS:
 
