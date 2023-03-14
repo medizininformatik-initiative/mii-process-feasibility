@@ -10,12 +10,12 @@ import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,24 +38,16 @@ public class DownloadMeasureReportTest {
 
     private static final String MEASURE_REPORT_ID = "id-144911";
 
-    @Mock
-    private EnhancedFhirWebserviceClientProvider clientProvider;
+    @Mock private EnhancedFhirWebserviceClientProvider clientProvider;
+    @Mock private FhirWebserviceClient webserviceClient;
+    @Mock private TaskHelper taskHelper;
+    @Mock private DelegateExecution execution;
 
-    @Mock
-    private FhirWebserviceClient webserviceClient;
-
-    @Mock
-    private TaskHelper taskHelper;
-
-    @Mock
-    private DelegateExecution execution;
-
-    @InjectMocks
-    private DownloadMeasureReport service;
+    @InjectMocks private DownloadMeasureReport service;
 
     private Task task;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         task = new Task();
     }

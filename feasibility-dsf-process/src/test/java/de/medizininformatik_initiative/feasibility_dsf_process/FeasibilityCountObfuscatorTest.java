@@ -1,10 +1,10 @@
 package de.medizininformatik_initiative.feasibility_dsf_process;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FeasibilityCountObfuscatorTest {
 
-    @Mock
-    private RandomNumberGenerator randomNumberGenerator;
+    @Mock private RandomNumberGenerator randomNumberGenerator;
 
-    @InjectMocks
-    private FeasibilityCountObfuscator feasibilityCountObfuscator;
+    @InjectMocks private FeasibilityCountObfuscator feasibilityCountObfuscator;
 
     @Test
     public void testObfuscateFeasibility_ObfuscatedResultsLowerThanFiveGetReturnedAsZero() {

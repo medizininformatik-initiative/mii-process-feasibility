@@ -1,6 +1,5 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.service.PrepareForFurtherEvaluation;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.IdType;
@@ -8,14 +7,14 @@ import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.TaskOutputComponent;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -31,24 +30,19 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class PrepareForFurtherEvaluationTest {
 
-    @Captor
-    private ArgumentCaptor<Reference> refCaptor;
+    @Captor private ArgumentCaptor<Reference> refCaptor;
 
-    @Mock
-    private DelegateExecution execution;
+    @Mock private DelegateExecution execution;
+    @Mock private TaskHelper taskHelper;
 
-    @Mock
-    private TaskHelper taskHelper;
-
-    @InjectMocks
-    private PrepareForFurtherEvaluation service;
+    @InjectMocks private PrepareForFurtherEvaluation service;
 
     private Task task;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         task = new Task();
     }

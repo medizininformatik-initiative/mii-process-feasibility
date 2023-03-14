@@ -1,6 +1,5 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectResponseTarget;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.variable.value.PrimitiveValue;
 import org.highmed.dsf.fhir.organization.EndpointProvider;
@@ -9,13 +8,13 @@ import org.highmed.dsf.fhir.variables.Target;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
@@ -28,23 +27,16 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class SelectResponseTargetTest {
 
-    @Captor
-    ArgumentCaptor<PrimitiveValue<Target>> targetsValuesCaptor;
+    @Captor ArgumentCaptor<PrimitiveValue<Target>> targetsValuesCaptor;
 
-    @Mock
-    private TaskHelper taskHelper;
+    @Mock private TaskHelper taskHelper;
+    @Mock private EndpointProvider endpointProvider;
+    @Mock private DelegateExecution execution;
 
-    @Mock
-    private EndpointProvider endpointProvider;
-
-    @Mock
-    private DelegateExecution execution;
-
-    @InjectMocks
-    private SelectResponseTarget service;
+    @InjectMocks private SelectResponseTarget service;
 
     @Test
     public void testDoExecute() throws Exception {

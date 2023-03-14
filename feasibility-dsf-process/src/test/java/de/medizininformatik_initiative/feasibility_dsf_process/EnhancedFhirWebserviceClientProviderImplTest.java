@@ -1,30 +1,25 @@
 package de.medizininformatik_initiative.feasibility_dsf_process;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProviderImpl;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.fhir.client.FhirWebserviceClient;
 import org.hl7.fhir.r4.model.IdType;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class EnhancedFhirWebserviceClientProviderImplTest {
 
-    @Mock
-    private FhirWebserviceClient client;
+    @Mock private FhirWebserviceClient client;
+    @Mock private FhirWebserviceClientProvider clientProvider;
 
-    @Mock
-    private FhirWebserviceClientProvider clientProvider;
-
-    @InjectMocks
-    private EnhancedFhirWebserviceClientProviderImpl enhancedFhirWebserviceClientProvider;
+    @InjectMocks private EnhancedFhirWebserviceClientProviderImpl enhancedFhirWebserviceClientProvider;
 
     private static final String BASE_URL = "http://localhost";
     private static final String PATH = "Something/id-123456";

@@ -4,40 +4,50 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.fhir.authorization.read.ReadAccessHelperImpl;
-import org.hl7.fhir.r4.model.*;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.*;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.hl7.fhir.r4.model.Attachment;
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Library;
+import org.hl7.fhir.r4.model.Measure;
+import org.hl7.fhir.r4.model.Resource;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.UUID;
 
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
-import static org.junit.Assert.*;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_ID;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class StoreFeasibilityResourcesTest {
 
     public static final String ID = "foo";
 
-    @Spy
-    private ReadAccessHelperImpl readAccessHelper;
+    @Spy private ReadAccessHelperImpl readAccessHelper;
 
-    @Captor
-    ArgumentCaptor<Resource> resourceCaptor;
+    @Captor ArgumentCaptor<Resource> resourceCaptor;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private IGenericClient storeClient;
 
-    @Mock
-    private DelegateExecution execution;
+    @Mock private DelegateExecution execution;
 
-    @InjectMocks
-    private StoreFeasibilityResources service;
+    @InjectMocks private StoreFeasibilityResources service;
 
     @Test
     public void testDoExecute() {
