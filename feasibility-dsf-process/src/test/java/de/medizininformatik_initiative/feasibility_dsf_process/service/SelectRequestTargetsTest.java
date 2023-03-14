@@ -72,8 +72,8 @@ public class SelectRequestTargetsTest {
 
         var targets = targetsValuesCaptor.getValue().getValue();
         assertEquals(1, targets.getEntries().size());
-        assertEquals("http://localhost/foo", targets.getEntries().get(0).getTargetOrganizationIdentifierValue());
-        assertEquals("https://dic/fhir", targets.getEntries().get(0).getTargetEndpointUrl());
+        assertEquals("http://localhost/foo", targets.getEntries().get(0).getOrganizationIdentifierValue());
+        assertEquals("https://dic/fhir", targets.getEntries().get(0).getEndpointUrl());
     }
 
     @Test
@@ -112,14 +112,14 @@ public class SelectRequestTargetsTest {
         var targets = targetsValuesCaptor.getValue().getValue();
         assertEquals(2, targets.getEntries().size());
         assertEquals("http://localhost/foo", targets.getEntries().get(0)
-                .getTargetOrganizationIdentifierValue());
+                .getOrganizationIdentifierValue());
         assertEquals("http://localhost/bar", targets.getEntries().get(1)
-                .getTargetOrganizationIdentifierValue());
+                .getOrganizationIdentifierValue());
         assertNotEquals(targetsValuesCaptor.getValue().getValue().getEntries().get(0).getCorrelationKey(),
                 targetsValuesCaptor.getValue().getValue().getEntries().get(1).getCorrelationKey());
         assertEquals("https://dic-1/fhir", targets.getEntries().get(0)
-                .getTargetEndpointUrl());
+                .getEndpointUrl());
         assertEquals("https://dic-2/fhir", targets.getEntries().get(1)
-                .getTargetEndpointUrl());
+                .getEndpointUrl());
     }
 }

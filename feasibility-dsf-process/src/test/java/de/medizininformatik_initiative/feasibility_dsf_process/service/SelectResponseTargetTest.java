@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TARGET;
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
 import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY;
 import static org.junit.Assert.assertEquals;
@@ -48,7 +47,7 @@ public class SelectResponseTargetTest {
         task.setRequester(requesterReference);
         when(endpointProvider.getFirstDefaultEndpointAddress(requesterReference.getIdentifier().getValue()))
                 .thenReturn(Optional.of("endpoint-url"));
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterStringValue(task, CODESYSTEM_HIGHMED_BPMN,
                 CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY))
@@ -60,7 +59,7 @@ public class SelectResponseTargetTest {
 
         var target = targetsValuesCaptor.getValue().getValue();
         assertEquals("correlation-key", target.getCorrelationKey());
-        assertEquals("requester-id", target.getTargetOrganizationIdentifierValue());
-        assertEquals("endpoint-url", target.getTargetEndpointUrl());
+        assertEquals("requester-id", target.getOrganizationIdentifierValue());
+        assertEquals("endpoint-url", target.getEndpointUrl());
     }
 }

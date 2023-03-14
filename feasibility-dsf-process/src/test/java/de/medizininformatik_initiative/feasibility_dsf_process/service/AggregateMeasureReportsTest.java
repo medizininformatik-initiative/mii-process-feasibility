@@ -1,6 +1,7 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
@@ -16,7 +17,6 @@ import java.util.Map;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT_MAP;
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 public class AggregateMeasureReportsTest {
 
     @Mock private DelegateExecution execution;
+    @Mock private TaskHelper taskHelper;
 
     @InjectMocks private AggregateMeasureReports service;
 
@@ -33,7 +34,7 @@ public class AggregateMeasureReportsTest {
         Reference requester = new Reference("DIZ 1");
         Task task = new Task().setRequester(requester);
 
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution))
                 .thenReturn(task);
 
         Map<Reference, MeasureReport> measureReports = new HashMap<>();
@@ -55,7 +56,8 @@ public class AggregateMeasureReportsTest {
     public void testDoExecute_AdditionalMeasureReport() throws Exception {
         Reference additionalRequester = new Reference("DIZ 2");
         Task additionalTask = new Task().setRequester(additionalRequester);
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
+
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution))
                 .thenReturn(additionalTask);
 
         Reference initialRequester = new Reference("DIZ 1");

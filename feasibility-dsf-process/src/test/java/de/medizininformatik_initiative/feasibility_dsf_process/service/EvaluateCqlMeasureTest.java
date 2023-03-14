@@ -2,9 +2,14 @@ package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.IOperation;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateCqlMeasure;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
+import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.task.TaskHelper;
+import org.highmed.fhir.client.FhirWebserviceClient;
+import org.highmed.fhir.client.PreferReturnMinimalWithRetry;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateType;
@@ -31,14 +36,13 @@ import java.util.stream.Stream;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_ID;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
 import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR;
 import static org.hl7.fhir.r4.model.Task.TaskStatus.FAILED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,9 +59,16 @@ public class EvaluateCqlMeasureTest {
     @Mock private IGenericClient storeClient;
     @Mock private TaskHelper taskHelper;
     @Mock private DelegateExecution execution;
+    @Mock private FhirWebserviceClientProvider clientProvider;
+    @Mock private FhirWebserviceClient webserviceClient;
+    @Mock private ReadAccessHelper readAccessHelper;
+    @Mock private PreferReturnMinimalWithRetry retry;
+    @Mock private ProcessEngine processEngine;
+    @Mock private RuntimeService runtimeService;
 
     @InjectMocks private EvaluateCqlMeasure service;
 
+    private final String instanceId = "instanceId-020112";;
     private Task task;
     private Task.TaskOutputComponent taskOutputComponent;
 
@@ -155,12 +166,22 @@ public class EvaluateCqlMeasureTest {
             when(taskHelper.createOutput(CODESYSTEM_HIGHMED_BPMN, CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR,
                     "Process null has fatal error in step null, reason: " + expectedErrMsg.get()))
                     .thenReturn(taskOutputComponent);
+            when(taskHelper.getTask(execution)).thenReturn(task);
+            when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
+            when(webserviceClient.withMinimalReturn()).thenReturn(retry);
+            when(execution.getProcessEngine()).thenReturn(processEngine);
+            when(processEngine.getRuntimeService()).thenReturn(runtimeService);
+            when(execution.getProcessInstanceId()).thenReturn(instanceId);
 
-            assertThrows(RuntimeException.class, () -> service.execute(execution));
+            service.execute(execution);
+
             assertSame(FAILED, task.getStatus());
             assertEquals(taskOutputComponent, task.getOutputFirstRep());
+            verify(retry).update(task);
+            verify(runtimeService).deleteProcessInstance(eq(instanceId), contains(expectedErrMsg.get()));
         } else {
             service.execute(execution);
+
             verify(execution).setVariable(VARIABLE_MEASURE_REPORT, measureReport);
         }
     }

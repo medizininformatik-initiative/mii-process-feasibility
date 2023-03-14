@@ -2,6 +2,7 @@ package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.fhir.task.TaskHelper;
+import org.highmed.fhir.client.FhirWebserviceClient;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
@@ -25,7 +26,6 @@ import static de.medizininformatik_initiative.feasibility_dsf_process.variables.
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.EXTENSION_DIC_URI;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT_MAP;
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_LEADING_TASK;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -37,6 +37,7 @@ public class PrepareForFurtherEvaluationTest {
 
     @Mock private DelegateExecution execution;
     @Mock private TaskHelper taskHelper;
+    @Mock FhirWebserviceClient client;
 
     @InjectMocks private PrepareForFurtherEvaluation service;
 
@@ -67,18 +68,15 @@ public class PrepareForFurtherEvaluationTest {
         String orga2ReportId = "89620db8-6a1b-4223-8d35-2a52bbbfa461";
         MeasureReport orga2Report = new MeasureReport();
         orga2Report.setIdElement(new IdType(orga2ReportId));
-
         Map<Reference, MeasureReport> measureReportMapping = new LinkedHashMap<>();
         measureReportMapping.put(orga1Ref, orga1Report);
         measureReportMapping.put(orga2Ref, orga2Report);
+        TaskOutputComponent orga1Output = new TaskOutputComponent();
+        TaskOutputComponent orga2Output = new TaskOutputComponent();
 
         when(execution.getVariable(VARIABLE_MEASURE_REPORT_MAP))
                 .thenReturn(measureReportMapping);
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_LEADING_TASK))
-                .thenReturn(task);
-
-        TaskOutputComponent orga1Output = new TaskOutputComponent();
-        TaskOutputComponent orga2Output = new TaskOutputComponent();
+        when(taskHelper.getLeadingTaskFromExecutionVariables(execution)).thenReturn(task);
         when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
                 refCaptor.capture()))
                 .thenReturn(orga1Output, orga2Output);

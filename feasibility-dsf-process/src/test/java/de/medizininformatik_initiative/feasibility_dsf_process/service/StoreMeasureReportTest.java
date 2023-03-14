@@ -4,6 +4,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.authorization.read.ReadAccessHelperImpl;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
+import org.highmed.dsf.fhir.task.TaskHelper;
 import org.highmed.fhir.client.FhirWebserviceClient;
 import org.highmed.fhir.client.PreferReturnMinimalWithRetry;
 import org.hl7.fhir.r4.model.IdType;
@@ -29,7 +30,6 @@ import static de.medizininformatik_initiative.feasibility_dsf_process.variables.
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT_ID;
 import static java.util.stream.Collectors.toList;
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_LEADING_TASK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
@@ -41,6 +41,7 @@ public class StoreMeasureReportTest
     @Mock private FhirWebserviceClientProvider clientProvider;
     @Mock private FhirWebserviceClient localWebserviceClient;
     @Mock private PreferReturnMinimalWithRetry returnMinimal;
+    @Mock private TaskHelper taskHelper;
     @Mock private DelegateExecution execution;
 
     @Spy private ReadAccessHelper readAccessHelper = new ReadAccessHelperImpl();
@@ -70,7 +71,7 @@ public class StoreMeasureReportTest
 
         when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(initialMeasureFromZars);
         when(execution.getVariable(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_LEADING_TASK)).thenReturn(task);
+        when(taskHelper.getLeadingTaskFromExecutionVariables(execution)).thenReturn(task);
         when(clientProvider.getLocalWebserviceClient()).thenReturn(localWebserviceClient);
         when(localWebserviceClient.withMinimalReturn()).thenReturn(returnMinimal);
         when(returnMinimal.create(measureReportCaptor.capture())).thenReturn(new IdType("id-094601"));

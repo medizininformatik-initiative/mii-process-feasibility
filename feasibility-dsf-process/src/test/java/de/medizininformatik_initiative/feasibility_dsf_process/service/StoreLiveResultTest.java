@@ -25,7 +25,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -65,9 +64,7 @@ public class StoreLiveResultTest {
     public void testDoExecute_MeasureReportReferenceIsAddedToTask() throws Exception {
         when(execution.getVariable(VARIABLE_MEASURE_REPORT))
                 .thenReturn(measureReport);
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
-                .thenReturn(task);
-
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution)).thenReturn(task);
         TaskOutputComponent taskOutputComponent = new TaskOutputComponent();
         when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
                 refCaptor.capture()))
@@ -90,8 +87,7 @@ public class StoreLiveResultTest {
     public void testDoExecute_MeasureReportIsStored() throws Exception {
         when(execution.getVariable(VARIABLE_MEASURE_REPORT))
                 .thenReturn(measureReport);
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
-                .thenReturn(task);
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution)).thenReturn(task);
 
         when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
                 refCaptor.capture()))
