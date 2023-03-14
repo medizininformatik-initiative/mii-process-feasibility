@@ -11,6 +11,8 @@ import org.springframework.beans.factory.InitializingBean;
 import java.util.Objects;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_EVALUATION_OBFUSCATION;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_EPSILON;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_SENSITIVITY;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_EVALUATION_STRATEGY;
 
 public class SetupEvaluationSettings extends AbstractServiceDelegate implements InitializingBean {
@@ -36,5 +38,9 @@ public class SetupEvaluationSettings extends AbstractServiceDelegate implements 
                 evaluationSettingsProvider.evaluationStrategyRepresentation());
         execution.setVariable(VARIABLE_EVALUATION_OBFUSCATION,
                 evaluationSettingsProvider.evaluationResultObfuscationEnabled());
+        execution.setVariable(VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_SENSITIVITY,
+                evaluationSettingsProvider.resultObfuscationLaplaceSensitivity());
+        execution.setVariable(VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_EPSILON,
+                evaluationSettingsProvider.resultObfuscationLaplaceEpsilon());
     }
 }

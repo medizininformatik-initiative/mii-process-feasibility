@@ -23,7 +23,7 @@ Messages, queries and results are represented by FHIR resources. The following t
 3. To each DIZ, an `execute` message is sent via a Task resource.
 
 4. After arriving at the DIZ FHIR communication server, the `execute` Task resource is transferred to the DIZ BPE via websocket subscription, starting the `execute` process.
-   
+
 ### Execute Query (CQL)
 
 This describes the execute process in case `CQL` is specified as an evaluation strategy.
@@ -32,8 +32,8 @@ This describes the execute process in case `CQL` is specified as an evaluation s
 
 5. In each DIZ, the `execute` process starts by fetching the Measure and Library resource created at the ZARS FHIR communication server. The resources have to be fetched by the BPE because only Task resources are sent actively between organizations and message payload is only fetched in case a process really needs it. FHIR search is used in order to fetch both resources in one HTTP request by searching for the Measure resource and including the referenced Library resource.
 
-6. In the next step, the `execute` process stores the Measure and Library resources to the Blaze FHIR server in order to be able to execute the [$evaluate-measure][5] operation. 
-   
+6. In the next step, the `execute` process stores the Measure and Library resources to the Blaze FHIR server in order to be able to execute the [$evaluate-measure][5] operation.
+
 7. The resulting [MeasureReport][6] resource is transferred back to the DIZ BPE.
 
 8. After receiving the MeasureReport, the DIZ BPE obfuscates the population count within it unless disabled. Subsequently, it stores the MeasureReport on the DIZ FHIR communication server in order to make it available for the ZARS.
@@ -64,8 +64,8 @@ This describes the execute process in case `Structured Query` is specified as an
 
 ![fig-1](docs/feasibility-process-05.png)
 
-10. After arrival, the ZARS FHIR communication server will send the `result` Task resource to the ZARS BPE via websocket subscription. The incoming `result` message will use its correlation ID to match the original `request` process to continue. 
-    
+10. After arrival, the ZARS FHIR communication server will send the `result` Task resource to the ZARS BPE via websocket subscription. The incoming `result` message will use its correlation ID to match the original `request` process to continue.
+
 11. As part of this process, the MeasureReport resource is fetched from the DIZ.
 
 12. The fetched MeasureReport resource is stored immediately on the ZARS FHIR communication server together with the updated Task resource. The Task resource references the MeasureReport resource in its output parameter, in order to make it available to the initial requester.
@@ -84,7 +84,7 @@ This process supports the following query types within the transferred Library r
 
 ## Result Obfuscation
 
-The process ensures obfuscation of a DIZ's real evaluation numbers by rounding them to the nearest ten. Real numbers are solely present in an intermediary step for obfuscation purposes. None of these non obfuscated numbers get persisted unless obfuscation gets explicitly disabled. 
+The process ensures obfuscation of a DIZ's real evaluation numbers by rounding them to the nearest ten. Real numbers are solely present in an intermediary step for obfuscation purposes. None of these non obfuscated numbers get persisted unless obfuscation gets explicitly disabled.
 
 ## Request Process as BPMN Model
 
@@ -125,6 +125,8 @@ Besides the [common DSF settings controlled by different environment variables][
 | CLIENT_FLARE_TIMEOUT_CONNECT         | Timeout for establishing a connection to a FLARE client target in `ms`.                                                                                                        | `2000`  |
 | EVALUATION_STRATEGY                  | Defines whether the feasibility shall be evaluated using `cql` or `structured-query`. Using the latter requires a FLARE instance.                                              | `cql`   |
 | EVALUATION_OBFUSCATE                 | Defines whether the feasibility evaluation result shall be obfuscated.                                                                                                         | `true`  |
+| EVALUATION_OBFUSCATION_SENSITIVITY   | Sets the sensitivity of the Laplace distribution function used for obfuscating the result.                                                                                     | 1.0     |
+| EVALUATION_OBFUSCATION_EPSILON       | Sets the epsilon value of the Laplace distribution function used for obfuscating the result.                                                                                   | 0.5     |
 
 ## Compatibility
 

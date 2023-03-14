@@ -16,11 +16,19 @@ public class EvaluationConfig {
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.evaluation.obfuscate:true}")
     private boolean obfuscateEvaluationResult;
 
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.evaluation.obfuscation.sensitivity:1.0}")
+    private double obfuscationLaplaceSensitivity;
+
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.evaluation.obfuscation.epsilon:0.5}")
+    private double obfuscationLaplaceEpsilon;
+
     @Bean
     public EvaluationSettingsProvider executionSettingsProvider() {
         return new EvaluationSettingsProviderImpl(
                 EvaluationStrategy.fromStrategyRepresentation(evaluationStrategy),
-                obfuscateEvaluationResult
+                obfuscateEvaluationResult,
+                obfuscationLaplaceSensitivity,
+                obfuscationLaplaceEpsilon
         );
     }
 }

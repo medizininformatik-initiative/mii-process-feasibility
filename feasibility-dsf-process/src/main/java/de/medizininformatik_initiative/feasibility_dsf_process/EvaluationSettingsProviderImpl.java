@@ -9,9 +9,17 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
 
     private final EvaluationStrategy evaluationStrategy;
     private final boolean evaluationResultObfuscationEnabled;
+    private final double evaluationResultObfuscationLaplaceSensitivity;
+    private final double evaluationResultObfuscationLaplaceEpsilon;
 
     public EvaluationSettingsProviderImpl(EvaluationStrategy evaluationStrategy,
-                                          Boolean evaluationResultObfuscationEnabled) {
+                                          Boolean evaluationResultObfuscationEnabled,
+                                          Double evaluationResultObfuscationLaplaceSensitivity,
+                                          Double evaluationResultObfuscationLaplaceEpsilon) {
+        this.evaluationResultObfuscationLaplaceSensitivity = Objects
+                .requireNonNull(evaluationResultObfuscationLaplaceSensitivity);
+        this.evaluationResultObfuscationLaplaceEpsilon = Objects
+                .requireNonNull(evaluationResultObfuscationLaplaceEpsilon);
         this.evaluationStrategy = Objects.requireNonNull(evaluationStrategy);
         this.evaluationResultObfuscationEnabled = Objects.requireNonNull(evaluationResultObfuscationEnabled);
     }
@@ -24,5 +32,15 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
     @Override
     public boolean evaluationResultObfuscationEnabled() {
         return evaluationResultObfuscationEnabled;
+    }
+
+    @Override
+    public double resultObfuscationLaplaceSensitivity() {
+        return evaluationResultObfuscationLaplaceSensitivity;
+    }
+
+    @Override
+    public double resultObfuscationLaplaceEpsilon() {
+        return evaluationResultObfuscationLaplaceEpsilon;
     }
 }

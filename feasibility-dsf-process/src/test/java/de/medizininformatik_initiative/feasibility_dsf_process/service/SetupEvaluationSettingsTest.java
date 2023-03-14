@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_EVALUATION_OBFUSCATION;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_EPSILON;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_SENSITIVITY;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_EVALUATION_STRATEGY;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,13 +25,20 @@ public class SetupEvaluationSettingsTest {
 
     @Test
     public void testDoExecute() throws Exception {
-        var expectedEvaluationStrategy = "cql";
+        String expectedEvaluationStrategy = "cql";
+        double sensitivity = 113045d;
+        double epsilon = 113810d;
+
         when(settingsProvider.evaluationStrategyRepresentation()).thenReturn(expectedEvaluationStrategy);
         when(settingsProvider.evaluationResultObfuscationEnabled()).thenReturn(true);
+        when(settingsProvider.resultObfuscationLaplaceSensitivity()).thenReturn(sensitivity);
+        when(settingsProvider.resultObfuscationLaplaceEpsilon()).thenReturn(epsilon);
 
         service.execute(execution);
         verify(execution).setVariable(VARIABLE_EVALUATION_STRATEGY, expectedEvaluationStrategy);
         verify(execution).setVariable(VARIABLE_EVALUATION_OBFUSCATION, true);
+        verify(execution).setVariable(VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_SENSITIVITY, sensitivity);
+        verify(execution).setVariable(VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_EPSILON, epsilon);
     }
 
 }

@@ -5,7 +5,8 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProvider;
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProviderImpl;
 import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationSettingsProvider;
-import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCountObfuscator;
+import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCachingLaplaceCountObfuscator;
+import de.medizininformatik_initiative.feasibility_dsf_process.Obfuscator;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicRequest;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicResponse;
@@ -70,9 +71,10 @@ public class FeasibilityConfig {
     }
 
     @Bean
-    public FeasibilityCountObfuscator feasibilityCountObfuscator() {
-        var randomNumberGenerator = new FeasibilityCountObfuscator.ObfuscationRandomNumberGenerator();
-        return new FeasibilityCountObfuscator(randomNumberGenerator);
+    public Obfuscator<Integer> feasibilityCountObfuscator() {
+        return new FeasibilityCachingLaplaceCountObfuscator(
+                evaluationSettingsProvider.resultObfuscationLaplaceSensitivity(),
+                evaluationSettingsProvider.resultObfuscationLaplaceEpsilon());
     }
 
     //
@@ -141,7 +143,7 @@ public class FeasibilityConfig {
     }
 
     @Bean
-    public ObfuscateEvaluationResult obfuscateEvaluationResult(FeasibilityCountObfuscator feasibilityCountObfuscator) {
+    public ObfuscateEvaluationResult obfuscateEvaluationResult(Obfuscator<Integer> feasibilityCountObfuscator) {
         return new ObfuscateEvaluationResult(fhirClientProvider, taskHelper, readAccessHelper,
                 feasibilityCountObfuscator);
     }
