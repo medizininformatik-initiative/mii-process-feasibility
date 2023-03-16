@@ -1,6 +1,5 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
-import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectRequestTargets;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.variable.value.PrimitiveValue;
 import org.highmed.dsf.fhir.organization.EndpointProvider;
@@ -10,13 +9,13 @@ import org.hl7.fhir.r4.model.Endpoint;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Reference;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,23 +28,16 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class SelectRequestTargetsTest {
 
-    @Captor
-    ArgumentCaptor<PrimitiveValue<Targets>> targetsValuesCaptor;
+    @Captor ArgumentCaptor<PrimitiveValue<Targets>> targetsValuesCaptor;
 
-    @Mock
-    private OrganizationProvider orgProvider;
+    @Mock private OrganizationProvider orgProvider;
+    @Mock private EndpointProvider endpointProvider;
+    @Mock private DelegateExecution execution;
 
-    @Mock
-    private EndpointProvider endpointProvider;
-
-    @Mock
-    private DelegateExecution execution;
-
-    @InjectMocks
-    private SelectRequestTargets service;
+    @InjectMocks private SelectRequestTargets service;
 
     @Test
     public void testDoExecute_NoTargets() {
@@ -80,8 +72,8 @@ public class SelectRequestTargetsTest {
 
         var targets = targetsValuesCaptor.getValue().getValue();
         assertEquals(1, targets.getEntries().size());
-        assertEquals("http://localhost/foo", targets.getEntries().get(0).getTargetOrganizationIdentifierValue());
-        assertEquals("https://dic/fhir", targets.getEntries().get(0).getTargetEndpointUrl());
+        assertEquals("http://localhost/foo", targets.getEntries().get(0).getOrganizationIdentifierValue());
+        assertEquals("https://dic/fhir", targets.getEntries().get(0).getEndpointUrl());
     }
 
     @Test
@@ -120,14 +112,14 @@ public class SelectRequestTargetsTest {
         var targets = targetsValuesCaptor.getValue().getValue();
         assertEquals(2, targets.getEntries().size());
         assertEquals("http://localhost/foo", targets.getEntries().get(0)
-                .getTargetOrganizationIdentifierValue());
+                .getOrganizationIdentifierValue());
         assertEquals("http://localhost/bar", targets.getEntries().get(1)
-                .getTargetOrganizationIdentifierValue());
+                .getOrganizationIdentifierValue());
         assertNotEquals(targetsValuesCaptor.getValue().getValue().getEntries().get(0).getCorrelationKey(),
                 targetsValuesCaptor.getValue().getValue().getEntries().get(1).getCorrelationKey());
         assertEquals("https://dic-1/fhir", targets.getEntries().get(0)
-                .getTargetEndpointUrl());
+                .getEndpointUrl());
         assertEquals("https://dic-2/fhir", targets.getEntries().get(1)
-                .getTargetEndpointUrl());
+                .getEndpointUrl());
     }
 }

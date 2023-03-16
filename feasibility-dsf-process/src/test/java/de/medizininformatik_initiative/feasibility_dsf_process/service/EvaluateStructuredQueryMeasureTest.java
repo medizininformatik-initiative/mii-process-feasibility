@@ -6,13 +6,13 @@ import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.Library;
 import org.hl7.fhir.r4.model.Measure;
 import org.hl7.fhir.r4.model.MeasureReport;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,20 +28,15 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EvaluateStructuredQueryMeasureTest {
 
-    @Captor
-    ArgumentCaptor<MeasureReport> measureReportCaptor;
+    @Captor ArgumentCaptor<MeasureReport> measureReportCaptor;
 
-    @Mock
-    private FlareWebserviceClient flareWebserviceClient;
+    @Mock private FlareWebserviceClient flareWebserviceClient;
+    @Mock private DelegateExecution execution;
 
-    @Mock
-    private DelegateExecution execution;
-
-    @InjectMocks
-    private EvaluateStructuredQueryMeasure service;
+    @InjectMocks private EvaluateStructuredQueryMeasure service;
 
     @Test
     public void testDoExecute_FailsIfStructuredQueryContentIsMissing() {

@@ -1,10 +1,10 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProvider;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadFeasibilityResources;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.highmed.dsf.fhir.task.TaskHelper;
 import org.highmed.fhir.client.FhirWebserviceClient;
+import org.highmed.fhir.client.PreferReturnMinimalWithRetry;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Library;
@@ -13,12 +13,12 @@ import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Task;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +29,6 @@ import static de.medizininformatik_initiative.feasibility_dsf_process.variables.
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE;
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
 import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR;
 import static org.hl7.fhir.r4.model.Task.TaskStatus.FAILED;
@@ -39,30 +38,23 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class DownloadFeasibilityResourcesTest {
 
     private static final String MEASURE_ID = "id-142416";
 
-    @Mock
-    private EnhancedFhirWebserviceClientProvider clientProvider;
+    @Mock private EnhancedFhirWebserviceClientProvider clientProvider;
+    @Mock private FhirWebserviceClient webserviceClient;
+    @Mock private PreferReturnMinimalWithRetry retry;
+    @Mock private TaskHelper taskHelper;
+    @Mock private DelegateExecution execution;
 
-    @Mock
-    private FhirWebserviceClient webserviceClient;
-
-    @Mock
-    private TaskHelper taskHelper;
-
-    @Mock
-    private DelegateExecution execution;
-
-    @InjectMocks
-    private DownloadFeasibilityResources service;
+    @InjectMocks private DownloadFeasibilityResources service;
 
     private Task task;
     private Task.TaskOutputComponent taskOutputComponent;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         task = new Task();
         taskOutputComponent = new Task.TaskOutputComponent();
@@ -75,10 +67,12 @@ public class DownloadFeasibilityResourcesTest {
 
     @Test
     public void testDoExecute_NoMeasureReference() {
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK)).thenReturn(task);
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution))
+                .thenReturn(task);
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
                 .thenReturn(Optional.empty());
+        when(taskHelper.getTask(execution)).thenReturn(task);
         when(taskHelper.createOutput(CODESYSTEM_HIGHMED_BPMN, CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR,
                 "Process null has fatal error in step null, reason: Missing measure reference."))
                 .thenReturn(taskOutputComponent);
@@ -93,7 +87,7 @@ public class DownloadFeasibilityResourcesTest {
         IdType measureRefId = new IdType("Measure/" + MEASURE_ID);
         Reference measureRef = new Reference(measureRefId);
 
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
@@ -102,9 +96,12 @@ public class DownloadFeasibilityResourcesTest {
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(new Bundle());
+        when(taskHelper.getTask(execution)).thenReturn(task);
         when(taskHelper.createOutput(CODESYSTEM_HIGHMED_BPMN, CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR,
                 "Process null has fatal error in step null, reason: Returned search-set contained less then two entries"))
                 .thenReturn(taskOutputComponent);
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
+        when(webserviceClient.withMinimalReturn()).thenReturn(retry);
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
         assertSame(FAILED, task.getStatus());
@@ -120,7 +117,7 @@ public class DownloadFeasibilityResourcesTest {
         bundle.addEntry().setResource(new Patient().setId("foo"));
         bundle.addEntry().setResource(new Patient().setId("foo"));
 
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
@@ -129,13 +126,17 @@ public class DownloadFeasibilityResourcesTest {
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);
+        when(taskHelper.getTask(execution)).thenReturn(task);
         when(taskHelper.createOutput(CODESYSTEM_HIGHMED_BPMN, CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR,
                 "Process null has fatal error in step null, reason: Returned search-set did not contain Measure at index 0"))
                 .thenReturn(taskOutputComponent);
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
+        when(webserviceClient.withMinimalReturn()).thenReturn(retry);
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
         assertSame(FAILED, task.getStatus());
         assertEquals(taskOutputComponent, task.getOutputFirstRep());
+        verify(retry).update(task);
     }
 
     @Test
@@ -147,7 +148,7 @@ public class DownloadFeasibilityResourcesTest {
         bundle.addEntry().setResource(new Measure().setId("foo"));
         bundle.addEntry().setResource(new Measure().setId("foo"));
 
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
@@ -156,13 +157,17 @@ public class DownloadFeasibilityResourcesTest {
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);
+        when(taskHelper.getTask(execution)).thenReturn(task);
         when(taskHelper.createOutput(CODESYSTEM_HIGHMED_BPMN, CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR,
                 "Process null has fatal error in step null, reason: Returned search-set did not contain Library at index 1"))
                 .thenReturn(taskOutputComponent);
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
+        when(webserviceClient.withMinimalReturn()).thenReturn(retry);
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
         assertSame(FAILED, task.getStatus());
         assertEquals(taskOutputComponent, task.getOutputFirstRep());
+        verify(retry).update(task);
     }
 
     @Test
@@ -176,7 +181,7 @@ public class DownloadFeasibilityResourcesTest {
         bundle.addEntry().setResource(measure);
         bundle.addEntry().setResource(library);
 
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution))
                 .thenReturn(task);
         when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))

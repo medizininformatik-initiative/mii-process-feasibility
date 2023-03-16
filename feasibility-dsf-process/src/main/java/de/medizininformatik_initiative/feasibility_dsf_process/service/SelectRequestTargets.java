@@ -54,7 +54,7 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
                                 UUID.randomUUID().toString()))
                 .collect(Collectors.toList());
 
-        targets.forEach(t -> logger.debug(t.getTargetOrganizationIdentifierValue()));
+        targets.forEach(t -> logger.debug(t.getOrganizationIdentifierValue()));
 
         execution.setVariable(BPMN_EXECUTION_VARIABLE_TARGETS, TargetsValues.create(new Targets(targets)));
     }

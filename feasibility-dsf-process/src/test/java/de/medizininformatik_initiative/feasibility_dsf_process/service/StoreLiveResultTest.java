@@ -11,59 +11,48 @@ import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.TaskOutputComponent;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TASK;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class StoreLiveResultTest {
 
     private static final String MEASURE_REPORT_ID = "4adfdef6-fc5b-4650-bdf5-80258a61e732";
 
-    @Captor
-    private ArgumentCaptor<Reference> refCaptor;
-
-    @Captor
-    private ArgumentCaptor<MeasureReport> measureReportCaptor;
+    @Captor private ArgumentCaptor<Reference> refCaptor;
+    @Captor private ArgumentCaptor<MeasureReport> measureReportCaptor;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private FhirWebserviceClientProvider clientProvider;
 
-    @Mock
-    private FhirWebserviceClient client;
+    @Mock private FhirWebserviceClient client;
+    @Mock private DelegateExecution execution;
+    @Mock private TaskHelper taskHelper;
 
-    @Mock
-    private DelegateExecution execution;
+    @Spy private ReadAccessHelper readAccessHelper = new ReadAccessHelperImpl();
 
-    @Mock
-    private TaskHelper taskHelper;
-
-    @Spy
-    private ReadAccessHelper readAccessHelper = new ReadAccessHelperImpl();
-
-    @InjectMocks
-    private StoreLiveResult service;
+    @InjectMocks private StoreLiveResult service;
 
     private Task task;
     private MeasureReport measureReport;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         task = new Task();
 
@@ -75,9 +64,7 @@ public class StoreLiveResultTest {
     public void testDoExecute_MeasureReportReferenceIsAddedToTask() throws Exception {
         when(execution.getVariable(VARIABLE_MEASURE_REPORT))
                 .thenReturn(measureReport);
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
-                .thenReturn(task);
-
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution)).thenReturn(task);
         TaskOutputComponent taskOutputComponent = new TaskOutputComponent();
         when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
                 refCaptor.capture()))
@@ -100,8 +87,7 @@ public class StoreLiveResultTest {
     public void testDoExecute_MeasureReportIsStored() throws Exception {
         when(execution.getVariable(VARIABLE_MEASURE_REPORT))
                 .thenReturn(measureReport);
-        when(execution.getVariable(BPMN_EXECUTION_VARIABLE_TASK))
-                .thenReturn(task);
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution)).thenReturn(task);
 
         when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
                 refCaptor.capture()))
