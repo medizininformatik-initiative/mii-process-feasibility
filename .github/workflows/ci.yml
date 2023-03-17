@@ -90,3 +90,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         USERNAME: ${{ github.actor }}
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: feasibility-dsf-process/target/feasibility-dsf-process-*.jar
+        name: "Feasibility DSF Process - v${{ steps.prep.outputs.version }}"
+
