@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
+
 @Configuration
 public class EvaluationConfig {
 
@@ -22,13 +24,21 @@ public class EvaluationConfig {
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.evaluation.obfuscation.epsilon:0.5}")
     private double obfuscationLaplaceEpsilon;
 
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.rate.limit.count:999}")
+    private Integer rateLimitCount;
+
+    @Value("#{T(java.time.Duration).parse('${de.medizininformatik_initiative.feasibility_dsf_process.rate.limit.interval.duration:PT1H}')}")
+    private Duration rateLimitTimeIntervalDuration;
+
     @Bean
     public EvaluationSettingsProvider executionSettingsProvider() {
         return new EvaluationSettingsProviderImpl(
                 EvaluationStrategy.fromStrategyRepresentation(evaluationStrategy),
                 obfuscateEvaluationResult,
                 obfuscationLaplaceSensitivity,
-                obfuscationLaplaceEpsilon
+                obfuscationLaplaceEpsilon,
+                rateLimitCount,
+                rateLimitTimeIntervalDuration
         );
     }
 }

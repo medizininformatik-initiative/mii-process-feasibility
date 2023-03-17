@@ -46,7 +46,7 @@ This describes the execute process in case `Structured Query` is specified as an
 
 ![fig-1](./docs/feasibility-process-04.png)
 
-5. In each DIZ, the `execute` process starts by fetching the Measure and Library resource created at the ZARS FHIR communication server. The resources have to be fetched by the BPE because only Task resources are sent actively between organizations and message payload is only fetched in case a process really needs it. FHIR search is used in order to fetch both resources in one HTTP request by searching for the Measure resource and including the referenced Library resource.
+5. In each DIZ, the `execute` process starts by checking the current request rate against the configured rate limit and rejects the current and all future requests when the rate limit is exceeded until the BPE is restarted. If the rate limit has not been exceeded the process continues by fetching the Measure and Library resource created at the ZARS FHIR communication server. The resources have to be fetched by the BPE because only Task resources are sent actively between organizations and message payload is only fetched in case a process really needs it. FHIR search is used in order to fetch both resources in one HTTP request by searching for the Measure resource and including the referenced Library resource.
 
 6. The DIZ BPE extracts the structured query from the Library resource and sends it to the Flare server.
 

@@ -7,6 +7,8 @@ import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebse
 import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationSettingsProvider;
 import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCachingLaplaceCountObfuscator;
 import de.medizininformatik_initiative.feasibility_dsf_process.Obfuscator;
+import de.medizininformatik_initiative.feasibility_dsf_process.RateLimit;
+import de.medizininformatik_initiative.feasibility_dsf_process.RateLimit;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicRequest;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicResponse;
@@ -14,9 +16,11 @@ import de.medizininformatik_initiative.feasibility_dsf_process.service.Aggregate
 import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadFeasibilityResources;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadMeasureReport;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateCqlMeasure;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateRequestRate;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateStructuredQueryMeasure;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.ObfuscateEvaluationResult;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.PrepareForFurtherEvaluation;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.RateLimitExceededTaskRejecter;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectRequestTargets;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectResponseTarget;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.SetupEvaluationSettings;
@@ -114,6 +118,18 @@ public class FeasibilityConfig {
     //
     // process executeFeasibility implementations
     //
+
+    @Bean
+    public EvaluateRequestRate requestRateLimiter() {
+        return new EvaluateRequestRate(fhirClientProvider, taskHelper, readAccessHelper,
+                new RateLimit(evaluationSettingsProvider.getRateLimitCount(),
+                        evaluationSettingsProvider.getRateLimitTimeIntervalDuration()));
+    }
+
+    @Bean
+    public RateLimitExceededTaskRejecter rateLimitExceededTaskRejecter() {
+        return new RateLimitExceededTaskRejecter(fhirClientProvider, taskHelper, readAccessHelper);
+    }
 
     @Bean
     public SetupEvaluationSettings setupEvaluationSettings() {
