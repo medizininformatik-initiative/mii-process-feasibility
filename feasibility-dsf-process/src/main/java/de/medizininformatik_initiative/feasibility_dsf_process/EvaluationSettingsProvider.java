@@ -19,4 +19,17 @@ public interface EvaluationSettingsProvider {
      */
     boolean evaluationResultObfuscationEnabled();
 
+    /**
+     * Returns the sensitivity value of the Laplace algorithm to be used for obfuscating the feasibility result.
+     *
+     * @return value of sensitivity used for the result obfuscation Laplace algorithm
+     */
+    double resultObfuscationLaplaceSensitivity();
+
+    /**
+     * Returns the epsilon value of the Laplace algorithm to be used for obfuscating the feasibility result.
+     *
+     * @return value of epsilon used for the result obfuscation Laplace algorithm
+     */
+    double resultObfuscationLaplaceEpsilon();
 }
