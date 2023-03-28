@@ -5,11 +5,28 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProvider;
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProviderImpl;
 import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationSettingsProvider;
-import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCountObfuscator;
+import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCachingLaplaceCountObfuscator;
+import de.medizininformatik_initiative.feasibility_dsf_process.Obfuscator;
+import de.medizininformatik_initiative.feasibility_dsf_process.RateLimit;
+import de.medizininformatik_initiative.feasibility_dsf_process.RateLimit;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicRequest;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicResponse;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.*;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.AggregateMeasureReports;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadFeasibilityResources;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadMeasureReport;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateCqlMeasure;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateRequestRate;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateStructuredQueryMeasure;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.ObfuscateEvaluationResult;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.PrepareForFurtherEvaluation;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.RateLimitExceededTaskRejecter;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectRequestTargets;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectResponseTarget;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.SetupEvaluationSettings;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreFeasibilityResources;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreLiveResult;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreMeasureReport;
 import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.organization.EndpointProvider;
@@ -58,9 +75,10 @@ public class FeasibilityConfig {
     }
 
     @Bean
-    public FeasibilityCountObfuscator feasibilityCountObfuscator() {
-        var randomNumberGenerator = new FeasibilityCountObfuscator.ObfuscationRandomNumberGenerator();
-        return new FeasibilityCountObfuscator(randomNumberGenerator);
+    public Obfuscator<Integer> feasibilityCountObfuscator() {
+        return new FeasibilityCachingLaplaceCountObfuscator(
+                evaluationSettingsProvider.resultObfuscationLaplaceSensitivity(),
+                evaluationSettingsProvider.resultObfuscationLaplaceEpsilon());
     }
 
     //
@@ -102,6 +120,18 @@ public class FeasibilityConfig {
     //
 
     @Bean
+    public EvaluateRequestRate requestRateLimiter() {
+        return new EvaluateRequestRate(fhirClientProvider, taskHelper, readAccessHelper,
+                new RateLimit(evaluationSettingsProvider.getRateLimitCount(),
+                        evaluationSettingsProvider.getRateLimitTimeIntervalDuration()));
+    }
+
+    @Bean
+    public RateLimitExceededTaskRejecter rateLimitExceededTaskRejecter() {
+        return new RateLimitExceededTaskRejecter(fhirClientProvider, taskHelper, readAccessHelper);
+    }
+
+    @Bean
     public SetupEvaluationSettings setupEvaluationSettings() {
         return new SetupEvaluationSettings(fhirClientProvider, taskHelper, readAccessHelper, evaluationSettingsProvider);
     }
@@ -129,7 +159,7 @@ public class FeasibilityConfig {
     }
 
     @Bean
-    public ObfuscateEvaluationResult obfuscateEvaluationResult(FeasibilityCountObfuscator feasibilityCountObfuscator) {
+    public ObfuscateEvaluationResult obfuscateEvaluationResult(Obfuscator<Integer> feasibilityCountObfuscator) {
         return new ObfuscateEvaluationResult(fhirClientProvider, taskHelper, readAccessHelper,
                 feasibilityCountObfuscator);
     }

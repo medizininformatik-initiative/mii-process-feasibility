@@ -12,18 +12,20 @@ import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
 import org.hl7.fhir.r4.model.Period;
 import org.joda.time.LocalDate;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 import java.util.List;
 
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_MEASURE_POPULATION;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_MEASURE_POPULATION_VALUE_INITIAL_POPULATION;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 import static org.junit.Assert.assertEquals;
@@ -32,27 +34,19 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ObfuscateEvaluationResultTest {
 
-    @Captor
-    private ArgumentCaptor<MeasureReport> measureReportCaptor;
+    @Captor private ArgumentCaptor<MeasureReport> measureReportCaptor;
 
-    @Mock
-    private FhirWebserviceClientProvider clientProvider;
-
-    @Mock
-    private TaskHelper taskHelper;
-
-    @Mock
-    private ReadAccessHelper readAccessHelper;
-
-    @Mock
-    private DelegateExecution execution;
+    @Mock private FhirWebserviceClientProvider clientProvider;
+    @Mock private TaskHelper taskHelper;
+    @Mock private ReadAccessHelper readAccessHelper;
+    @Mock private DelegateExecution execution;
 
     private ObfuscateEvaluationResult service;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         var incrementFeasibilityCountObfuscator = new FeasibilityCountIncrementObfuscator();
         service = new ObfuscateEvaluationResult(clientProvider, taskHelper, readAccessHelper,

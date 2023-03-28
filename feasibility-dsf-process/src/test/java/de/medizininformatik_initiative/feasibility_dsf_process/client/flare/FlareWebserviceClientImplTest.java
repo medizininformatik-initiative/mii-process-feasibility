@@ -1,11 +1,10 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.client.flare;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,6 +14,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 
+import javax.net.ssl.SSLSession;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,13 +23,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FlareWebserviceClientImplTest {
 
     private HttpClient httpClient;
     private FlareWebserviceClient flareWebserviceClient;
 
-    @Before
+    @BeforeEach
     public void setUp() throws URISyntaxException {
         httpClient = mock(HttpClient.class);
         flareWebserviceClient = new FlareWebserviceClientImpl(httpClient, new URI("http://localhost:5000/"));
