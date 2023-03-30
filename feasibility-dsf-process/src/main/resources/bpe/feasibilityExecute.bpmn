@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0drkcb5" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.5.0">
-  <bpmn:process id="medizininformatik-initiativede_feasibilityExecute" isExecutable="true" camunda:versionTag="0.6.1">
+  <bpmn:process id="medizininformatik-initiativede_feasibilityExecute" isExecutable="true" camunda:versionTag="0.6.2">
     <bpmn:startEvent id="StartEvent" name="start">
       <bpmn:outgoing>Flow_1f6bge9</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_0sjtzj6" messageRef="Message_1yz2a31" />
@@ -13,8 +13,8 @@
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="messageName">feasibilitySingleDicResultMessage</camunda:inputParameter>
-          <camunda:inputParameter name="instantiatesUri">http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest/0.5.0</camunda:inputParameter>
-          <camunda:inputParameter name="profile">http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-single-dic-result|0.5.0</camunda:inputParameter>
+          <camunda:inputParameter name="instantiatesUri">http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest/0.6.2</camunda:inputParameter>
+          <camunda:inputParameter name="profile">http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-single-dic-result|0.6.2</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0ascyjc</bpmn:incoming>
