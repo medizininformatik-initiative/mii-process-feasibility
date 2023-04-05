@@ -125,8 +125,10 @@ Besides the [common DSF settings controlled by different environment variables][
 | CLIENT_FLARE_TIMEOUT_CONNECT         | Timeout for establishing a connection to a FLARE client target in `ms`.                                                                                                        | `2000`  |
 | EVALUATION_STRATEGY                  | Defines whether the feasibility shall be evaluated using `cql` or `structured-query`. Using the latter requires a FLARE instance.                                              | `cql`   |
 | EVALUATION_OBFUSCATE                 | Defines whether the feasibility evaluation result shall be obfuscated.                                                                                                         | `true`  |
-| EVALUATION_OBFUSCATION_SENSITIVITY   | Sets the sensitivity of the Laplace distribution function used for obfuscating the result.                                                                                     | 1.0     |
-| EVALUATION_OBFUSCATION_EPSILON       | Sets the epsilon value of the Laplace distribution function used for obfuscating the result.                                                                                   | 0.5     |
+| EVALUATION_OBFUSCATION_SENSITIVITY   | Sets the sensitivity of the Laplace distribution function used for obfuscating the result.                                                                                     | `1.0`   |
+| EVALUATION_OBFUSCATION_EPSILON       | Sets the epsilon value of the Laplace distribution function used for obfuscating the result.                                                                                   | `0.5`   |
+| RATE_LIMIT_COUNT                     | Sets the hard limit for the maximum allowed number of requests during the configured rate limit interval after no further requests will be processed                           | `999`   |
+| RATE_LIMIT_INTERVAL_DURATION         | Sets the size of the time window used for calculating the request rate. The value is required to be given in the [ISO 8601 format][10] (e.g. "PT1H30M10S").                    | `PT1H`  |
 
 ## Compatibility
 
@@ -151,3 +153,4 @@ This version of the process is compatible with the following components:
 [7]: <https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation>
 [8]: <https://github.com/highmed/highmed-dsf/wiki/DSF-0.5.5-Configuration-Parameters#dsf-bpe>
 [9]: <https://github.com/rwth-imi/flare-query>
+[10]: <https://en.wikipedia.org/wiki/ISO_8601#Durations>
