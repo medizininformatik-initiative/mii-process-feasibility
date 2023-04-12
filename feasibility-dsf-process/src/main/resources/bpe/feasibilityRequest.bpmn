@@ -25,7 +25,7 @@
     <bpmn:sequenceFlow id="SequenceFlow_0b5s4ef" sourceRef="selectRequestTargets" targetRef="sendRequestToDics" />
     <bpmn:endEvent id="EndEvent" name="success">
       <bpmn:incoming>Flow_1479yc4</bpmn:incoming>
-      <bpmn:incoming>Flow_1f790pw</bpmn:incoming>
+      <bpmn:incoming>Flow_0wm2en5</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:subProcess id="Activity_1h2vwsh">
       <bpmn:incoming>Flow_0qqdr67</bpmn:incoming>
@@ -72,13 +72,7 @@
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="Flow_0qqdr67" sourceRef="sendRequestToDics" targetRef="Activity_1h2vwsh" />
     <bpmn:sequenceFlow id="Flow_1479yc4" sourceRef="Event_13wq5pb" targetRef="EndEvent" />
-    <bpmn:sequenceFlow id="Flow_0wm2en5" sourceRef="Activity_1h2vwsh" targetRef="Activity_1aufhzp" />
-    <bpmn:serviceTask id="Activity_1aufhzp" name="prepare task resource for further evaluation" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.PrepareForFurtherEvaluation">
-      <bpmn:documentation>Assign queries to organizations</bpmn:documentation>
-      <bpmn:incoming>Flow_0wm2en5</bpmn:incoming>
-      <bpmn:outgoing>Flow_1f790pw</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_1f790pw" sourceRef="Activity_1aufhzp" targetRef="EndEvent" />
+    <bpmn:sequenceFlow id="Flow_0wm2en5" sourceRef="Activity_1h2vwsh" targetRef="EndEvent" />
   </bpmn:process>
   <bpmn:message id="Message_1pq9qxp" name="feasibilityRequestMessage" />
   <bpmn:message id="Message_07ayhv1" name="feasibilityResultMessage" />
@@ -108,9 +102,9 @@
         <dc:Bounds x="430" y="115" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_18syky8_di" bpmnElement="EndEvent">
-        <dc:Bounds x="1612" y="137" width="36" height="36" />
+        <dc:Bounds x="1442" y="137" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1610" y="113" width="41" height="14" />
+          <dc:Bounds x="1440" y="113" width="41" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1h2vwsh_di" bpmnElement="Activity_1h2vwsh" isExpanded="true">
@@ -154,9 +148,6 @@
         <di:waypoint x="1240" y="157" />
         <di:waypoint x="1312" y="157" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_1y41cdj_di" bpmnElement="Activity_1aufhzp">
-        <dc:Bounds x="1460" y="115" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_13wq5pb_di" bpmnElement="Event_13wq5pb">
         <dc:Bounds x="1362" y="204" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -174,16 +165,12 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1479yc4_di" bpmnElement="Flow_1479yc4">
         <di:waypoint x="1398" y="222" />
-        <di:waypoint x="1630" y="222" />
-        <di:waypoint x="1630" y="173" />
+        <di:waypoint x="1460" y="222" />
+        <di:waypoint x="1460" y="173" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0wm2en5_di" bpmnElement="Flow_0wm2en5">
         <di:waypoint x="1380" y="155" />
-        <di:waypoint x="1460" y="155" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1f790pw_di" bpmnElement="Flow_1f790pw">
-        <di:waypoint x="1560" y="155" />
-        <di:waypoint x="1612" y="155" />
+        <di:waypoint x="1442" y="155" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

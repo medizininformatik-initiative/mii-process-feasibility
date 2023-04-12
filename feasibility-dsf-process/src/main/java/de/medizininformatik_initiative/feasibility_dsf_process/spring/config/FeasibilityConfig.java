@@ -8,7 +8,6 @@ import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationSetting
 import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCachingLaplaceCountObfuscator;
 import de.medizininformatik_initiative.feasibility_dsf_process.Obfuscator;
 import de.medizininformatik_initiative.feasibility_dsf_process.RateLimit;
-import de.medizininformatik_initiative.feasibility_dsf_process.RateLimit;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicRequest;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicResponse;
@@ -19,7 +18,6 @@ import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateC
 import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateRequestRate;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateStructuredQueryMeasure;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.ObfuscateEvaluationResult;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.PrepareForFurtherEvaluation;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.RateLimitExceededTaskRejecter;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectRequestTargets;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectResponseTarget;
@@ -103,11 +101,6 @@ public class FeasibilityConfig {
     @Bean
     public StoreLiveResult storeLiveResult() {
         return new StoreLiveResult(fhirClientProvider, taskHelper, readAccessHelper);
-    }
-
-    @Bean
-    public PrepareForFurtherEvaluation prepareForFurtherEvaluation() {
-        return new PrepareForFurtherEvaluation(fhirClientProvider, taskHelper, readAccessHelper);
     }
 
     @Bean
