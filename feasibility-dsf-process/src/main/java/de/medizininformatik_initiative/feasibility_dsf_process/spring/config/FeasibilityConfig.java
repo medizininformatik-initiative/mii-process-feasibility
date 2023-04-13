@@ -11,7 +11,6 @@ import de.medizininformatik_initiative.feasibility_dsf_process.RateLimit;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicRequest;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicResponse;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.AggregateMeasureReports;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadFeasibilityResources;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadMeasureReport;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateCqlMeasure;
@@ -101,11 +100,6 @@ public class FeasibilityConfig {
     @Bean
     public StoreLiveResult storeLiveResult() {
         return new StoreLiveResult(fhirClientProvider, taskHelper, readAccessHelper);
-    }
-
-    @Bean
-    public AggregateMeasureReports aggregateMeasureReports() {
-        return new AggregateMeasureReports(fhirClientProvider, taskHelper, readAccessHelper);
     }
 
     //
