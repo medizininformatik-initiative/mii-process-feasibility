@@ -36,6 +36,8 @@ public class SelectRequestTargetsTest {
     @Mock private OrganizationProvider orgProvider;
     @Mock private EndpointProvider endpointProvider;
     @Mock private DelegateExecution execution;
+    @Mock private Endpoint endpointA;
+    @Mock private Endpoint endpointB;
 
     @InjectMocks private SelectRequestTargets service;
 
@@ -60,11 +62,14 @@ public class SelectRequestTargetsTest {
         var organization = new Organization()
                 .setIdentifier(List.of(organizationId))
                 .setEndpoint(List.of(new Reference(dic_endpoint)));
+        var endpointId = "endpointId-12:24:41";
 
         when(orgProvider.getRemoteOrganizations())
                 .thenReturn(List.of(organization));
         when(endpointProvider.getFirstDefaultEndpointAddress(organizationId.getValue()))
                 .thenReturn(Optional.of("https://dic/fhir"));
+        when(endpointProvider.getFirstDefaultEndpoint(organizationId.getValue())).thenReturn(Optional.of(endpointA));
+        when(endpointA.getId()).thenReturn(endpointId);
 
         service.doExecute(execution);
 
@@ -74,6 +79,7 @@ public class SelectRequestTargetsTest {
         assertEquals(1, targets.getEntries().size());
         assertEquals("http://localhost/foo", targets.getEntries().get(0).getOrganizationIdentifierValue());
         assertEquals("https://dic/fhir", targets.getEntries().get(0).getEndpointUrl());
+        assertEquals(endpointId, targets.getEntries().get(0).getEndpointIdentifierValue());
     }
 
     @Test
@@ -96,6 +102,8 @@ public class SelectRequestTargetsTest {
         var organizationB = new Organization()
                 .setIdentifier(List.of(organizationBId))
                 .setEndpoint(List.of(new Reference(dic_2_endpoint)));
+        var endpointAId = "endpointAId-12:24:41";
+        var endpointBId = "endpointBId-12:27:09";
 
         when(orgProvider.getRemoteOrganizations())
                 .thenReturn(List.of(organizationA, organizationB));
@@ -104,6 +112,10 @@ public class SelectRequestTargetsTest {
                 .thenReturn(Optional.of("https://dic-1/fhir"));
         when(endpointProvider.getFirstDefaultEndpointAddress(organizationBId.getValue()))
                 .thenReturn(Optional.of("https://dic-2/fhir"));
+        when(endpointProvider.getFirstDefaultEndpoint(organizationAId.getValue())).thenReturn(Optional.of(endpointA));
+        when(endpointProvider.getFirstDefaultEndpoint(organizationBId.getValue())).thenReturn(Optional.of(endpointB));
+        when(endpointA.getId()).thenReturn(endpointAId);
+        when(endpointB.getId()).thenReturn(endpointBId);
 
         service.doExecute(execution);
 
@@ -121,5 +133,7 @@ public class SelectRequestTargetsTest {
                 .getEndpointUrl());
         assertEquals("https://dic-2/fhir", targets.getEntries().get(1)
                 .getEndpointUrl());
+        assertEquals(endpointAId, targets.getEntries().get(0).getEndpointIdentifierValue());
+        assertEquals(endpointBId, targets.getEntries().get(1).getEndpointIdentifierValue());
     }
 }

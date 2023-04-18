@@ -15,7 +15,9 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Objects;
 
-import static org.highmed.dsf.bpe.ConstantsBase.*;
+import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TARGET;
+import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
+import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY;
 
 public class SelectResponseTarget extends AbstractServiceDelegate implements InitializingBean {
 
@@ -45,11 +47,12 @@ public class SelectResponseTarget extends AbstractServiceDelegate implements Ini
                 .getFirstInputParameterStringValue(task, CODESYSTEM_HIGHMED_BPMN,
                         CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY).get();
         Identifier targetOrganizationIdentifier = task.getRequester().getIdentifier();
+        String endpointIdentifierValue = targetOrganizationIdentifier.getValue();
 
         execution.setVariable(BPMN_EXECUTION_VARIABLE_TARGET, TargetValues
                 .create(Target.createBiDirectionalTarget(targetOrganizationIdentifier.getValue(),
-                        null,
-                        endpointProvider.getFirstDefaultEndpointAddress(targetOrganizationIdentifier.getValue()).get(),
+                        endpointIdentifierValue,
+                        endpointProvider.getFirstDefaultEndpointAddress(endpointIdentifierValue).get(),
                         correlationKey)));
     }
 }

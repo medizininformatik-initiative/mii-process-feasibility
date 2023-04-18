@@ -48,10 +48,14 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
         var targets = organizationProvider.getRemoteOrganizations().stream()
                 .filter(Organization::hasEndpoint)
                 .filter(Organization::hasIdentifier)
-                .map(organization -> Target
-                        .createBiDirectionalTarget(organization.getIdentifierFirstRep().getValue(),
-                                endpointProvider.getFirstDefaultEndpointAddress(organization.getIdentifierFirstRep().getValue()).get(),
-                                UUID.randomUUID().toString()))
+                .map(organization -> {
+                    String organizationIdentifier = organization.getIdentifierFirstRep().getValue();
+                    return Target
+                            .createBiDirectionalTarget(organization.getIdentifierFirstRep().getValue(),
+                                    endpointProvider.getFirstDefaultEndpoint(organizationIdentifier).get().getId(),
+                                    endpointProvider.getFirstDefaultEndpointAddress(organizationIdentifier).get(),
+                                    UUID.randomUUID().toString());
+                })
                 .collect(Collectors.toList());
 
         targets.forEach(t -> logger.debug(t.getOrganizationIdentifierValue()));
