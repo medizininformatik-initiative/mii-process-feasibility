@@ -9,7 +9,6 @@ import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCachin
 import de.medizininformatik_initiative.feasibility_dsf_process.Obfuscator;
 import de.medizininformatik_initiative.feasibility_dsf_process.RateLimit;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClient;
-import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicRequest;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicResponse;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadFeasibilityResources;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadMeasureReport;
@@ -20,6 +19,7 @@ import de.medizininformatik_initiative.feasibility_dsf_process.service.Obfuscate
 import de.medizininformatik_initiative.feasibility_dsf_process.service.RateLimitExceededTaskRejecter;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectRequestTargets;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectResponseTarget;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.SendDicRequests;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.SetupEvaluationSettings;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreFeasibilityResources;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreLiveResult;
@@ -32,6 +32,8 @@ import org.highmed.dsf.fhir.task.TaskHelper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.concurrent.ForkJoinPool;
 
 @Configuration
 public class FeasibilityConfig {
@@ -88,8 +90,8 @@ public class FeasibilityConfig {
     }
 
     @Bean
-    public SendDicRequest sendDicRequest() {
-        return new SendDicRequest(fhirClientProvider, taskHelper, readAccessHelper, organizationProvider, fhirContext);
+    public SendDicRequests sendDicRequests(ForkJoinPool threadPool) {
+        return new SendDicRequests(fhirClientProvider, taskHelper, readAccessHelper, organizationProvider, threadPool);
     }
 
     @Bean
@@ -165,5 +167,10 @@ public class FeasibilityConfig {
     @Bean
     public SendDicResponse sendDicResponse() {
         return new SendDicResponse(fhirClientProvider, taskHelper, readAccessHelper, organizationProvider, fhirContext);
+    }
+
+    @Bean
+    public ForkJoinPool ioThreadPool() {
+        return new ForkJoinPool(8);
     }
 }

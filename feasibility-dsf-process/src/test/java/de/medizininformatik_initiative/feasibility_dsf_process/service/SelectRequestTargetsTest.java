@@ -1,14 +1,19 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
+import de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.variable.value.PrimitiveValue;
+import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
 import org.highmed.dsf.fhir.organization.EndpointProvider;
 import org.highmed.dsf.fhir.organization.OrganizationProvider;
+import org.highmed.dsf.fhir.task.TaskHelper;
 import org.highmed.dsf.fhir.variables.Targets;
 import org.hl7.fhir.r4.model.Endpoint;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Task;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -36,18 +41,41 @@ public class SelectRequestTargetsTest {
     @Mock private OrganizationProvider orgProvider;
     @Mock private EndpointProvider endpointProvider;
     @Mock private DelegateExecution execution;
+    @Mock private TaskHelper taskHelper;
+    @Mock private FhirWebserviceClientProvider clientProvider;
+    @Mock private Task task;
     @Mock private Endpoint endpointA;
     @Mock private Endpoint endpointB;
 
     @InjectMocks private SelectRequestTargets service;
 
+    private String baseUrl;
+
+    private String measureId;
+
+
+    @BeforeEach
+    public void setup() {
+        baseUrl = "foo";
+        measureId = "measure-id-11:57:29";
+        Reference measureReference = new Reference(measureId);
+
+        when(taskHelper.getCurrentTaskFromExecutionVariables(execution)).thenReturn(task);
+        when(taskHelper.getFirstInputParameterReferenceValue(task, ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
+                ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE))
+        .thenReturn(Optional.of(measureReference));
+        when(clientProvider.getLocalBaseUrl()).thenReturn(baseUrl);
+    }
+
     @Test
     public void testDoExecute_NoTargets() {
         when(orgProvider.getRemoteOrganizations())
                 .thenReturn(new ArrayList<>());
+
         service.doExecute(execution);
 
         verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGETS), targetsValuesCaptor.capture());
+        verify(execution).setVariable("measure-id", baseUrl + "/" + measureId);
         assertEquals(0, targetsValuesCaptor.getValue().getValue().getEntries().size());
     }
 
@@ -56,7 +84,7 @@ public class SelectRequestTargetsTest {
         var organizationId = new Identifier().setValue("http://localhost/foo");
         var dic_endpoint = new Endpoint()
                 .setIdentifier(List.of(new Identifier()
-                        .setSystem("http://highmed.org/sid/endpoint-identifier")
+                        .setSystem("http://highmed.org/sid/endpointA-identifier")
                         .setValue("DIC Endpoint")))
                 .setAddress("https://dic/fhir");
         var organization = new Organization()
