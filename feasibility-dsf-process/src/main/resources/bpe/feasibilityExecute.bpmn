@@ -98,14 +98,13 @@
     <bpmn:sequenceFlow id="Flow_0ug5qml" name="no" sourceRef="Gateway_0vqojf6" targetRef="Activity_19ax4t8">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('request-rate-below-limit') == false}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:endEvent id="NoResultEndEvent" name="end execution with no result">
-      <bpmn:incoming>Flow_1gqxni9</bpmn:incoming>
-      <bpmn:terminateEventDefinition id="TerminateEventDefinition_1kf7e8h" />
-    </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_1gqxni9" sourceRef="Activity_19ax4t8" targetRef="NoResultEndEvent" />
     <bpmn:sequenceFlow id="Flow_1f6bge9" sourceRef="StartEvent" targetRef="Activity_0zvan0q" />
     <bpmn:sequenceFlow id="Flow_0js57at" sourceRef="limitRequestRate" targetRef="Gateway_0vqojf6" />
     <bpmn:sequenceFlow id="Flow_07fkz0p" sourceRef="Activity_0zvan0q" targetRef="limitRequestRate" />
+    <bpmn:endEvent id="NoResultEndEvent" name="end execution with no result">
+      <bpmn:incoming>Flow_1gqxni9</bpmn:incoming>
+    </bpmn:endEvent>
   </bpmn:process>
   <bpmn:message id="Message_1yz2a31" name="feasibilityExecuteMessage" />
   <bpmn:message id="Message_1dr71re" name="feasibilitySingleDicResultMessage" />
@@ -171,7 +170,7 @@
       <bpmndi:BPMNShape id="Activity_19ax4t8_di" bpmnElement="Activity_19ax4t8">
         <dc:Bounds x="520" y="300" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1ekcqju_di" bpmnElement="NoResultEndEvent">
+      <bpmndi:BPMNShape id="Event_1u9eo5t_di" bpmnElement="NoResultEndEvent">
         <dc:Bounds x="552" y="442" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="538" y="485" width="69" height="27" />
