@@ -10,9 +10,13 @@ import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.TaskOutputComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static org.highmed.dsf.fhir.authorization.read.ReadAccessHelper.READ_ACCESS_TAG_VALUE_LOCAL;
 
 /**
@@ -20,6 +24,7 @@ import static org.highmed.dsf.fhir.authorization.read.ReadAccessHelper.READ_ACCE
  */
 public class StoreLiveResult extends AbstractServiceDelegate implements InitializingBean {
 
+    private static final Logger logger = LoggerFactory.getLogger(StoreLiveResult.class);
     /**
      * Instantiates a new Store live result.
      *
@@ -40,6 +45,7 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
 
         MeasureReport storedMeasureReport = storeMeasureReport(measureReport);
         addMeasureReportReferenceToTaskOutput(task, storedMeasureReport.getIdElement());
+        logger.info("Added measure report {} to {}", storedMeasureReport.getId(), task.getId());
 
         execution.setVariable(VARIABLE_MEASURE_REPORT, storedMeasureReport);
     }
