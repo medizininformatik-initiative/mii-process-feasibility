@@ -1,11 +1,10 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import de.medizininformatik_initiative.feasibility_dsf_process.Obfuscator;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
+import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -13,13 +12,13 @@ import java.util.Objects;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 
-public class ObfuscateEvaluationResult extends AbstractServiceDelegate implements InitializingBean {
+public class ObfuscateEvaluationResult extends AbstractServiceDelegate
+        implements InitializingBean {
 
     private final Obfuscator<Integer> obfuscator;
 
-    public ObfuscateEvaluationResult(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                                     ReadAccessHelper readAccessHelper, Obfuscator<Integer> obfuscator) {
-        super(clientProvider, taskHelper, readAccessHelper);
+    public ObfuscateEvaluationResult(Obfuscator<Integer> obfuscator, ProcessPluginApi api) {
+        super(api);
         this.obfuscator = obfuscator;
     }
 
@@ -30,9 +29,9 @@ public class ObfuscateEvaluationResult extends AbstractServiceDelegate implement
     }
 
     @Override
-    protected void doExecute(DelegateExecution execution) {
-        var measureReport = (MeasureReport) execution.getVariable(VARIABLE_MEASURE_REPORT);
-        execution.setVariable(VARIABLE_MEASURE_REPORT, obfuscateFeasibilityCount(measureReport));
+    protected void doExecute(DelegateExecution execution, Variables variables) {
+        var measureReport = (MeasureReport) variables.getResource(VARIABLE_MEASURE_REPORT);
+        variables.setResource(VARIABLE_MEASURE_REPORT, obfuscateFeasibilityCount(measureReport));
     }
 
     private MeasureReport obfuscateFeasibilityCount(MeasureReport measureReport) {

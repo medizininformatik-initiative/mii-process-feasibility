@@ -1,14 +1,15 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
+import dev.dsf.bpe.v1.constants.CodeSystems.BpmnMessage;
+import dev.dsf.bpe.v1.constants.NamingSystems;
+import dev.dsf.bpe.v1.variables.Target;
+import dev.dsf.bpe.v1.variables.Targets;
+import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.organization.OrganizationProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
-import org.highmed.dsf.fhir.variables.Target;
-import org.highmed.dsf.fhir.variables.Targets;
+import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
@@ -25,17 +26,9 @@ import java.util.Date;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_INSTANTIATES_URI;
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_MESSAGE_NAME;
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_PROFILE;
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TARGETS;
-import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
-import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_BUSINESS_KEY;
-import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY;
-import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_MESSAGE_NAME;
-import static org.highmed.dsf.bpe.ConstantsBase.NAMINGSYSTEM_HIGHMED_ORGANIZATION_IDENTIFIER;
 import static org.hl7.fhir.r4.model.Task.TaskIntent.ORDER;
 
 public class SendDicRequests extends AbstractServiceDelegate {
@@ -43,19 +36,33 @@ public class SendDicRequests extends AbstractServiceDelegate {
     private static final Logger logger = LoggerFactory.getLogger(SendDicRequests.class);
 
     private final ForkJoinPool forkJoinPool;
-    private final OrganizationProvider organizationProvider;
 
-    public SendDicRequests(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-            ReadAccessHelper readAccessHelper, OrganizationProvider organizationProvider, ForkJoinPool forkJoinPool) {
-        super(clientProvider, taskHelper, readAccessHelper);
-        this.organizationProvider = organizationProvider;
+    // set via field injection
+    private FixedValue instantiatesCanonical;
+    private FixedValue messageName;
+    private FixedValue profile;
+
+    public SendDicRequests(ProcessPluginApi api, ForkJoinPool forkJoinPool) {
+        super(api);
         this.forkJoinPool = forkJoinPool;
     }
 
+    public void setInstantiatesCanonical(FixedValue instantiatesCanonical) {
+        this.instantiatesCanonical = instantiatesCanonical;
+    }
+
+    public void setMessageName(FixedValue messageName) {
+        this.messageName = messageName;
+    }
+
+    public void setProfile(FixedValue profile) {
+        this.profile = profile;
+    }
+
     @Override
-    protected void doExecute(DelegateExecution execution) throws BpmnError, Exception {
-        Targets targets = (Targets) execution.getVariable(BPMN_EXECUTION_VARIABLE_TARGETS);
-        Task targetTaskTemplate = createTargetTaskTemplate(execution);
+    protected void doExecute(DelegateExecution execution, Variables variables) throws BpmnError, Exception {
+        Targets targets = variables.getTargets();
+        Task targetTaskTemplate = createTargetTaskTemplate(execution, variables);
 
         forkJoinPool.submit(
                 () -> targets.getEntries()
@@ -69,9 +76,7 @@ public class SendDicRequests extends AbstractServiceDelegate {
                             if (correlationKey != null) {
                                 ParameterComponent correlationKeyInput = new ParameterComponent(
                                         new CodeableConcept(
-                                                new Coding(CODESYSTEM_HIGHMED_BPMN,
-                                                           CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY,
-                                                           null)),
+                                                new Coding(BpmnMessage.URL, BpmnMessage.Codes.CORRELATION_KEY, null)),
                                         new StringType(correlationKey));
                                 targetTask.getInput().add(correlationKeyInput);
                             }
@@ -82,11 +87,12 @@ public class SendDicRequests extends AbstractServiceDelegate {
                 .get();
     }
 
-    private Task createTargetTaskTemplate(DelegateExecution execution) {
-        String instantiatesUri = (String) execution.getVariable(BPMN_EXECUTION_VARIABLE_INSTANTIATES_URI);
-        String messageName = (String) execution.getVariable(BPMN_EXECUTION_VARIABLE_MESSAGE_NAME);
-        String profile = (String) execution.getVariable(BPMN_EXECUTION_VARIABLE_PROFILE);
-        Reference measure = new Reference().setReference((String) execution.getVariable("measure-id"));
+    private Task createTargetTaskTemplate(DelegateExecution execution, Variables variables) {
+        String instantiatesCanonical = checkNotNull(this.instantiatesCanonical).getExpressionText();
+        String messageName = checkNotNull(this.messageName).getExpressionText();
+        String profile = checkNotNull(this.profile).getExpressionText();
+        Reference measure = new Reference()
+                .setReference(checkNotNull(variables.getString("measure-id"), "variable 'measure-id' not set"));
         String businessKey = execution.getBusinessKey();
         Task targetTask = new Task();
         targetTask.copy();
@@ -95,38 +101,31 @@ public class SendDicRequests extends AbstractServiceDelegate {
         targetTask.setIntent(ORDER);
         targetTask.setAuthoredOn(new Date());
         targetTask.setRequester(getRequester());
-        targetTask.setInstantiatesUri(instantiatesUri);
+        targetTask.setInstantiatesCanonical(instantiatesCanonical);
 
         ParameterComponent messageNameInput = new ParameterComponent(
-                new CodeableConcept(
-                        new Coding(CODESYSTEM_HIGHMED_BPMN,
-                                CODESYSTEM_HIGHMED_BPMN_VALUE_MESSAGE_NAME,
-                                null)),
+                new CodeableConcept(new Coding(BpmnMessage.URL, BpmnMessage.Codes.MESSAGE_NAME, null)),
                 new StringType(messageName));
         targetTask.addInput(messageNameInput);
 
         ParameterComponent businessKeyInput = new ParameterComponent(
-                new CodeableConcept(
-                        new Coding(CODESYSTEM_HIGHMED_BPMN,
-                                CODESYSTEM_HIGHMED_BPMN_VALUE_BUSINESS_KEY,
-                                null)),
+                new CodeableConcept(new Coding(BpmnMessage.URL, BpmnMessage.Codes.BUSINESS_KEY, null)),
                 new StringType(businessKey));
         targetTask.getInput().add(businessKeyInput);
-        targetTask.getInput().add(getTaskHelper().createInput(CODESYSTEM_FEASIBILITY,
-                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE,
-                measure));
+        targetTask.getInput().add(api.getTaskHelper().createInput(measure, CODESYSTEM_FEASIBILITY,
+                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE));
         return targetTask;
     }
 
     private Reference getRequester() {
         return new Reference().setType("Organization")
-                .setIdentifier(new Identifier().setSystem(NAMINGSYSTEM_HIGHMED_ORGANIZATION_IDENTIFIER)
-                        .setValue(organizationProvider.getLocalIdentifierValue()));
+                .setIdentifier(new Identifier().setSystem(NamingSystems.OrganizationIdentifier.SID)
+                        .setValue(api.getOrganizationProvider().getLocalOrganizationIdentifierValue().get()));
     }
 
     private Reference getRecipient(Target target) {
         return new Reference().setType("Organization")
-                .setIdentifier(new Identifier().setSystem(NAMINGSYSTEM_HIGHMED_ORGANIZATION_IDENTIFIER)
+                .setIdentifier(new Identifier().setSystem(NamingSystems.OrganizationIdentifier.SID)
                         .setValue(target.getOrganizationIdentifierValue()));
     }
 
@@ -134,7 +133,7 @@ public class SendDicRequests extends AbstractServiceDelegate {
         try {
             logger.info("Sending task to target organization {}, endpoint {}",
                     target.getOrganizationIdentifierValue(), target.getEndpointUrl());
-            getFhirWebserviceClientProvider()
+            api.getFhirWebserviceClientProvider()
                     .getWebserviceClient(target.getEndpointUrl())
                     .create(task);
             return true;

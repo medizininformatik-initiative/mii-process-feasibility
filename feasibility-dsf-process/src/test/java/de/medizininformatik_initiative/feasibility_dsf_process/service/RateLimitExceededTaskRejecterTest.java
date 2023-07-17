@@ -1,9 +1,11 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
+import dev.dsf.bpe.v1.service.TaskHelper;
+import dev.dsf.bpe.v1.variables.Variables;
+import dev.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.DisplayName;
@@ -31,19 +33,21 @@ public class RateLimitExceededTaskRejecterTest {
     @Mock private ReadAccessHelper readAccessHelper;
     @Mock private DelegateExecution execution;
     @Mock private Task task;
+    @Mock private ProcessPluginApi api;
+    @Mock private Variables variables;
 
     @InjectMocks private RateLimitExceededTaskRejecter service;
+
 
     @Test
     @DisplayName("status and status reason is set on task")
     void taskStatusIsSet() throws Exception {
-        when(taskHelper.getTask(execution)).thenReturn(task);
+        when(variables.getStartTask()).thenReturn(task);
         when(task.setStatus(FAILED)).thenReturn(task);
 
-        service.doExecute(execution);
+        service.doExecute(execution, variables);
 
         verify(task).setStatusReason(reasonCaptor.capture());
         assertThat(reasonCaptor.getValue().getText(), is("The request rate limit has been exceeded."));
     }
-
 }

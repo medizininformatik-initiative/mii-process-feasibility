@@ -3,11 +3,10 @@ package de.medizininformatik_initiative.feasibility_dsf_process.service;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
+import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Library;
 import org.hl7.fhir.r4.model.Measure;
@@ -19,7 +18,7 @@ import org.springframework.beans.factory.InitializingBean;
 import java.util.List;
 import java.util.Objects;
 
-import static org.highmed.dsf.fhir.authorization.read.ReadAccessHelper.READ_ACCESS_TAG_SYSTEM;
+import static dev.dsf.fhir.authorization.read.ReadAccessHelper.READ_ACCESS_TAG_SYSTEM;
 
 public class StoreFeasibilityResources extends AbstractServiceDelegate implements InitializingBean {
 
@@ -28,9 +27,8 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
 
     private final IGenericClient storeClient;
 
-    public StoreFeasibilityResources(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                                     ReadAccessHelper readAccessHelper, IGenericClient storeClient) {
-        super(clientProvider, taskHelper, readAccessHelper);
+    public StoreFeasibilityResources(IGenericClient storeClient, ProcessPluginApi api) {
+        super(api);
 
         this.storeClient = storeClient;
     }
@@ -43,15 +41,15 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
     }
 
     @Override
-    protected void doExecute(DelegateExecution execution) {
-        Measure measure = (Measure) execution.getVariable(ConstantsFeasibility.VARIABLE_MEASURE);
-        Library library = (Library) execution.getVariable(ConstantsFeasibility.VARIABLE_LIBRARY);
+    protected void doExecute(DelegateExecution execution, Variables variables) {
+        Measure measure = (Measure) variables.getResource(ConstantsFeasibility.VARIABLE_MEASURE);
+        Library library = (Library) variables.getResource(ConstantsFeasibility.VARIABLE_LIBRARY);
 
         var cleanedLibrary = stripReadAccessInformation(stripNonCqlAttachments(library));
         var libraryRes = storeLibraryResource(cleanedLibrary);
         var measureRes = storeMeasureResource(stripReadAccessInformation(measure), libraryRes.getId());
 
-        execution.setVariable(ConstantsFeasibility.VARIABLE_MEASURE_ID, measureRes.getId().getIdPart());
+        variables.setString(ConstantsFeasibility.VARIABLE_MEASURE_ID, measureRes.getId().getIdPart());
     }
 
     private <T extends Resource> T stripReadAccessInformation(T resource) {

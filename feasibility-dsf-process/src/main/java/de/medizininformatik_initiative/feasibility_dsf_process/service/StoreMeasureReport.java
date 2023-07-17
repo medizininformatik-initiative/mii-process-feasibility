@@ -1,10 +1,9 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
+import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Measure;
 import org.hl7.fhir.r4.model.MeasureReport;
@@ -15,53 +14,54 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.util.List;
 
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT_ID;
 
 public class StoreMeasureReport extends AbstractServiceDelegate implements InitializingBean
 {
 
-	private static final Logger logger = LoggerFactory.getLogger(StoreMeasureReport.class);
+    private static final Logger logger = LoggerFactory.getLogger(StoreMeasureReport.class);
 
-	public StoreMeasureReport(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-			ReadAccessHelper readAccessHelper)
-	{
-		super(clientProvider, taskHelper, readAccessHelper);
-	}
-
-	@Override
-	protected void doExecute(DelegateExecution execution)
-	{
-        var leadingTask = getLeadingTaskFromExecutionVariables(execution);
-
-        MeasureReport measureReport = (MeasureReport) execution.getVariable(VARIABLE_MEASURE_REPORT);
-		Measure associatedMeasure = (Measure) execution.getVariable(VARIABLE_MEASURE);
-
-		addReadAccessTag(measureReport, leadingTask);
-		referenceZarsMeasure(measureReport, associatedMeasure);
-		stripEvaluatedResources(measureReport);
-
-		IdType measureReportId = storeMeasureReport(measureReport);
-		logger.debug("Stored MeasureReport {}", measureReportId);
-
-		execution.setVariable(VARIABLE_MEASURE_REPORT_ID, measureReportId.getValue());
-	}
-
-    private void addReadAccessTag(MeasureReport measureReport, Task leadingTask)
-    {
-		String identifier = leadingTask.getRequester().getIdentifier().getValue();
-        getReadAccessHelper().addOrganization(measureReport, identifier);
+    public StoreMeasureReport(ProcessPluginApi api) {
+        super(api);
     }
 
-	private void referenceZarsMeasure(MeasureReport measureReport, Measure zarsMeasure) {
-		measureReport.setMeasure(zarsMeasure.getUrl());
-	}
+    @Override
+    protected void doExecute(DelegateExecution execution, Variables variables) {
+        var task = variables.getStartTask();
 
-	private void stripEvaluatedResources(MeasureReport measureReport) {
-		measureReport.setEvaluatedResource(List.of());
-	}
+        MeasureReport measureReport = variables.getResource(VARIABLE_MEASURE_REPORT);
+        Measure associatedMeasure = variables.getResource(VARIABLE_MEASURE);
 
-	private IdType storeMeasureReport(MeasureReport measureReport)
-	{
-		return getFhirWebserviceClientProvider().getLocalWebserviceClient().withMinimalReturn().create(measureReport);
-	}
+        addReadAccessTag(measureReport, task);
+        referenceZarsMeasure(measureReport, associatedMeasure);
+        stripEvaluatedResources(measureReport);
+
+        IdType measureReportId = storeMeasureReport(measureReport);
+        logger.debug("Stored MeasureReport {}", measureReportId);
+
+        variables.setString(VARIABLE_MEASURE_REPORT_ID, measureReportId.getValue());
+    }
+
+    private void addReadAccessTag(MeasureReport measureReport, Task task)
+    {
+        String identifier = task.getRequester().getIdentifier().getValue();
+        api.getReadAccessHelper().addOrganization(measureReport, identifier);
+    }
+
+    private void referenceZarsMeasure(MeasureReport measureReport, Measure zarsMeasure) {
+        measureReport.setMeasure(zarsMeasure.getUrl());
+    }
+
+    private void stripEvaluatedResources(MeasureReport measureReport) {
+        measureReport.setEvaluatedResource(List.of());
+    }
+
+    private IdType storeMeasureReport(MeasureReport measureReport) {
+        return api.getFhirWebserviceClientProvider()
+                .getLocalWebserviceClient()
+                .withMinimalReturn()
+                .create(measureReport);
+    }
 }

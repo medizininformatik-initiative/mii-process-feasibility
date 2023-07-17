@@ -2,9 +2,7 @@ package de.medizininformatik_initiative.feasibility_dsf_process.spring.config;
 
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProvider;
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProviderImpl;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

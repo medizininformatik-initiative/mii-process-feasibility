@@ -1,12 +1,9 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.message;
 
-import ca.uhn.fhir.context.FhirContext;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.activity.AbstractTaskMessageSend;
+import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.organization.OrganizationProvider;
-import org.highmed.dsf.fhir.task.AbstractTaskMessageSend;
-import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 
@@ -18,18 +15,16 @@ import static de.medizininformatik_initiative.feasibility_dsf_process.variables.
 
 public class SendDicResponse extends AbstractTaskMessageSend {
 
-    public SendDicResponse(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                           ReadAccessHelper readAccessHelper, OrganizationProvider organizationProvider,
-                           FhirContext fhirContext) {
-        super(clientProvider, taskHelper, readAccessHelper, organizationProvider, fhirContext);
+
+    public SendDicResponse(ProcessPluginApi api) {
+        super(api);
     }
 
     @Override
-    protected Stream<Task.ParameterComponent> getAdditionalInputParameters(DelegateExecution execution) {
-        String measureReportId = (String) execution.getVariable(VARIABLE_MEASURE_REPORT_ID);
-
-        return Stream.of(getTaskHelper().createInput(CODESYSTEM_FEASIBILITY,
-                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE,
-                new Reference().setReference(measureReportId)));
+    protected Stream<Task.ParameterComponent> getAdditionalInputParameters(DelegateExecution execution,
+                                                                           Variables variables) {
+        return Stream.of(api.getTaskHelper()
+                .createInput(new Reference().setReference(variables.getString(VARIABLE_MEASURE_REPORT_ID)),
+                        CODESYSTEM_FEASIBILITY, CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE));
     }
 }

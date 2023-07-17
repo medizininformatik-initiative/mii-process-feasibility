@@ -1,16 +1,19 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import de.medizininformatik_initiative.feasibility_dsf_process.Obfuscator;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
+import dev.dsf.bpe.v1.service.TaskHelper;
+import dev.dsf.bpe.v1.variables.Variables;
+import dev.dsf.fhir.authorization.read.ReadAccessHelper;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
 import org.hl7.fhir.r4.model.Period;
+import org.hl7.fhir.r4.model.Task;
 import org.joda.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,14 +46,18 @@ public class ObfuscateEvaluationResultTest {
     @Mock private TaskHelper taskHelper;
     @Mock private ReadAccessHelper readAccessHelper;
     @Mock private DelegateExecution execution;
+    @Mock private ProcessPluginApi api;
+    @Mock private Variables variables;
+    @Mock private Task task;
 
     private ObfuscateEvaluationResult service;
+
+
 
     @BeforeEach
     public void setUp() {
         var incrementFeasibilityCountObfuscator = new FeasibilityCountIncrementObfuscator();
-        service = new ObfuscateEvaluationResult(clientProvider, taskHelper, readAccessHelper,
-                incrementFeasibilityCountObfuscator);
+        service = new ObfuscateEvaluationResult(incrementFeasibilityCountObfuscator, api);
     }
 
     @Test
@@ -74,10 +81,11 @@ public class ObfuscateEvaluationResultTest {
                 .add(new MeasureReportGroupComponent()
                         .setPopulation(List.of(populationGroup)));
 
-        when(execution.getVariable(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
+        when(api.getVariables(execution)).thenReturn(variables);
+        when(variables.getResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
 
         service.execute(execution);
-        verify(execution).setVariable(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
+        verify(variables).setResource(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
 
         var expectedFeasibilityCount = feasibilityCount + 1;
         var expectedObfuscatedMeasureReport = measureReport.copy();

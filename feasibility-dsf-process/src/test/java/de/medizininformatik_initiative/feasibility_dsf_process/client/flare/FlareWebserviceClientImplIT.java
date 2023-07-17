@@ -31,19 +31,19 @@ public class FlareWebserviceClientImplIT {
     private static final Network DEFAULT_CONTAINER_NETWORK = Network.newNetwork();
 
     @Container
-    public static GenericContainer<?> fhirServer = new GenericContainer<>(DockerImageName.parse("ghcr.io/samply/blaze:0.16.5"))
+    public static GenericContainer<?> fhirServer = new GenericContainer<>(DockerImageName.parse("samply/blaze:0.21"))
             .withExposedPorts(8080)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("fhir-server")
             .withEnv("LOG_LEVEL", "debug");
 
     @Container
-    public static GenericContainer<?> flare = new GenericContainer<>(DockerImageName.parse("ghcr.io/rwth-imi/flare-query:1.0.0"))
+    public static GenericContainer<?> flare = new GenericContainer<>(DockerImageName.parse("ghcr.io/medizininformatik-initiative/flare:0.2.3"))
             .withExposedPorts(8080)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("flare")
             .withEnv(Map.of(
-                    "FLARE_FHIR_SERVER_URL", "http://fhir-server:8080/fhir/"
+                    "FLARE_FHIR_SERVER", "http://fhir-server:8080/fhir/"
             ))
             .withStartupTimeout(Duration.ofMinutes(5))
             .dependsOn(fhirServer);

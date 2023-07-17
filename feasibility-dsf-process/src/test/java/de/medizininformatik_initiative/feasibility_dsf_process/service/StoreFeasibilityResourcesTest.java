@@ -2,8 +2,10 @@ package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.variables.Variables;
+import dev.dsf.fhir.authorization.read.ReadAccessHelperImpl;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelperImpl;
 import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Library;
@@ -45,7 +47,9 @@ public class StoreFeasibilityResourcesTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private IGenericClient storeClient;
 
+    @Mock private ProcessPluginApi api;
     @Mock private DelegateExecution execution;
+    @Mock private Variables variables;
 
     @InjectMocks private StoreFeasibilityResources service;
 
@@ -56,8 +60,8 @@ public class StoreFeasibilityResourcesTest {
         library.setContent(List.of(new Attachment()
                 .setContentType("text/cql")
                 .setData("foo".getBytes())));
-        when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(measure);
-        when(execution.getVariable(VARIABLE_LIBRARY)).thenReturn(library);
+        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(measure);
+        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
 
         var libraryServerId = UUID.randomUUID();
         var libraryMethodOutcome = new MethodOutcome(new IdType(libraryServerId.toString()));
@@ -66,9 +70,9 @@ public class StoreFeasibilityResourcesTest {
         when(storeClient.create().resource(any(Resource.class)).execute())
                 .thenReturn(libraryMethodOutcome, measureMethodOutcome);
 
-        service.doExecute(execution);
+        service.doExecute(execution, variables);
 
-        verify(execution).setVariable(VARIABLE_MEASURE_ID, ID);
+        verify(variables).setString(VARIABLE_MEASURE_ID, ID);
     }
 
     @Test
@@ -82,8 +86,8 @@ public class StoreFeasibilityResourcesTest {
         library.setContent(List.of(new Attachment()
                 .setContentType("text/cql")
                 .setData("foo".getBytes())));
-        when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(measure);
-        when(execution.getVariable(VARIABLE_LIBRARY)).thenReturn(library);
+        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(measure);
+        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
 
         var libraryServerId = UUID.randomUUID();
         var libraryMethodOutcome = new MethodOutcome(new IdType(libraryServerId.toString()));
@@ -92,7 +96,7 @@ public class StoreFeasibilityResourcesTest {
         when(storeClient.create().resource(resourceCaptor.capture()).execute())
                 .thenReturn(libraryMethodOutcome, measureMethodOutcome);
 
-        service.doExecute(execution);
+        service.doExecute(execution, variables);
 
         var capturedResources = resourceCaptor.getAllValues();
         var capturedLibrary = (Library) capturedResources.get(0);
@@ -116,8 +120,8 @@ public class StoreFeasibilityResourcesTest {
                         .setContentType("text/cql")
                         .setData("bar".getBytes()));
         library.setContent(libraryAttachments);
-        when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(measure);
-        when(execution.getVariable(VARIABLE_LIBRARY)).thenReturn(library);
+        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(measure);
+        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
 
         var libraryServerId = UUID.randomUUID();
         var libraryMethodOutcome = new MethodOutcome(new IdType(libraryServerId.toString()));
@@ -128,7 +132,7 @@ public class StoreFeasibilityResourcesTest {
         when(storeClient.create().resource(resourceCaptor.capture()).execute())
                 .thenReturn(libraryMethodOutcome, measureMethodOutcome);
 
-        service.doExecute(execution);
+        service.doExecute(execution, variables);
 
         var capturedLibrary = (Library) resourceCaptor.getAllValues().get(0);
         assertEquals("text/cql", capturedLibrary.getContent().get(0).getContentType());
@@ -138,9 +142,9 @@ public class StoreFeasibilityResourcesTest {
     public void testDoExecute_FailsIfCqlContentIsMissing() {
         Measure measure = new Measure();
         Library library = new Library();
-        when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(measure);
-        when(execution.getVariable(VARIABLE_LIBRARY)).thenReturn(library);
+        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(measure);
+        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
 
-        assertThrows(IllegalStateException.class, () -> service.doExecute(execution));
+        assertThrows(IllegalStateException.class, () -> service.doExecute(execution, variables));
     }
 }
