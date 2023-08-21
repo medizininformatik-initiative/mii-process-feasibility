@@ -2,10 +2,10 @@ package de.medizininformatik_initiative.feasibility_dsf_process.tools.generator;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
-import org.highmed.dsf.fhir.service.ReferenceCleaner;
-import org.highmed.dsf.fhir.service.ReferenceCleanerImpl;
-import org.highmed.dsf.fhir.service.ReferenceExtractor;
-import org.highmed.dsf.fhir.service.ReferenceExtractorImpl;
+import dev.dsf.fhir.service.ReferenceCleaner;
+import dev.dsf.fhir.service.ReferenceCleanerImpl;
+import dev.dsf.fhir.service.ReferenceExtractor;
+import dev.dsf.fhir.service.ReferenceExtractorImpl;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.StringType;
@@ -89,7 +89,7 @@ public class BundleGenerator {
 
     private void setThumbprint(Organization organization, CertificateGenerator.CertificateFiles files) {
         organization
-                .getExtensionByUrl("http://highmed.org/fhir/StructureDefinition/extension-certificate-thumbprint")
+                .getExtensionByUrl("http://dsf.dev/fhir/StructureDefinition/extension-certificate-thumbprint")
                 .setValue(new StringType(files.getCertificateSha512ThumbprintHex()));
     }
 

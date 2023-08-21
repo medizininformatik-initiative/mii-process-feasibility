@@ -1,29 +1,22 @@
 package de.medizininformatik_initiative.feasibility_dsf_process;
 
-import ca.uhn.fhir.context.FhirContext;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClientSpringConfig;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.store.StoreClientSpringConfig;
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.BaseConfig;
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.EnhancedFhirWebserviceClientProviderConfig;
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.EvaluationConfig;
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.FeasibilityConfig;
-import org.highmed.dsf.bpe.ProcessPluginDefinition;
-import org.highmed.dsf.fhir.resources.AbstractResource;
-import org.highmed.dsf.fhir.resources.ActivityDefinitionResource;
-import org.highmed.dsf.fhir.resources.CodeSystemResource;
-import org.highmed.dsf.fhir.resources.ResourceProvider;
-import org.highmed.dsf.fhir.resources.StructureDefinitionResource;
-import org.highmed.dsf.fhir.resources.ValueSetResource;
-import org.springframework.core.env.PropertyResolver;
+import dev.dsf.bpe.v1.ProcessPluginDefinition;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class FeasibilityProcessPluginDefinition implements ProcessPluginDefinition {
 
-    public static final String VERSION = "0.6.2";
+    public static final String VERSION = "1.0.0.0";
+    private static final LocalDate RELEASE_DATE = LocalDate.of(2023, 7, 3);
 
     @Override
     public String getName() {
@@ -36,52 +29,45 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
     }
 
     @Override
-    public Stream<String> getBpmnFiles() {
-        return Stream.of("bpe/feasibilityRequest.bpmn", "bpe/feasibilityExecute.bpmn");
+    public LocalDate getReleaseDate() {
+        return RELEASE_DATE;
     }
 
     @Override
-    public Stream<Class<?>> getSpringConfigClasses() {
-        return Stream.of(BaseConfig.class, StoreClientSpringConfig.class, FeasibilityConfig.class,
+    public List<String> getProcessModels() {
+        return List.of("bpe/feasibilityRequest.bpmn", "bpe/feasibilityExecute.bpmn");
+    }
+
+    @Override
+    public List<Class<?>> getSpringConfigurations() {
+        return List.of(BaseConfig.class, StoreClientSpringConfig.class, FeasibilityConfig.class,
                 EnhancedFhirWebserviceClientProviderConfig.class, EvaluationConfig.class,
                 FlareWebserviceClientSpringConfig.class);
     }
 
     @Override
-    public ResourceProvider getResourceProvider(FhirContext fhirContext, ClassLoader classLoader,
-                                                PropertyResolver propertyResolver) {
-        var aExe = ActivityDefinitionResource.file("fhir/ActivityDefinition/feasibilityExecute.xml");
-        var aReq = ActivityDefinitionResource.file("fhir/ActivityDefinition/feasibilityRequest.xml");
+    public Map<String, List<String>> getFhirResourcesByProcessId() {
+        var aExe = "fhir/ActivityDefinition/feasibilityExecute.xml";
+        var aReq = "fhir/ActivityDefinition/feasibilityRequest.xml";
 
-        var cF = CodeSystemResource.file("fhir/CodeSystem/feasibility.xml");
+        var cF = "fhir/CodeSystem/feasibility.xml";
 
-        var sExtDic = StructureDefinitionResource
-                .file("fhir/StructureDefinition/feasibility-extension-dic.xml");
+        var sExtDic = "fhir/StructureDefinition/feasibility-extension-dic.xml";
 
-        var sMeasure = StructureDefinitionResource
-                .file("fhir/StructureDefinition/feasibility-measure.xml");
-        var sMeasureReport = StructureDefinitionResource
-                .file("fhir/StructureDefinition/feasibility-measure-report.xml");
-        var sLibrary = StructureDefinitionResource
-                .file("fhir/StructureDefinition/feasibility-library.xml");
+        var sMeasure = "fhir/StructureDefinition/feasibility-measure.xml";
+        var sMeasureReport = "fhir/StructureDefinition/feasibility-measure-report.xml";
+        var sLibrary = "fhir/StructureDefinition/feasibility-library.xml";
 
-        var sTExe = StructureDefinitionResource
-                .file("fhir/StructureDefinition/feasibility-task-execute.xml");
-        var sTReq = StructureDefinitionResource
-                .file("fhir/StructureDefinition/feasibility-task-request.xml");
-        var sTResS = StructureDefinitionResource
-                .file("fhir/StructureDefinition/feasibility-task-single-dic-result.xml");
+        var sTExe = "fhir/StructureDefinition/feasibility-task-execute.xml";
+        var sTReq = "fhir/StructureDefinition/feasibility-task-request.xml";
+        var sTResS = "fhir/StructureDefinition/feasibility-task-single-dic-result.xml";
 
-        var vF = ValueSetResource.file("fhir/ValueSet/feasibility.xml");
+        var vF = "fhir/ValueSet/feasibility.xml";
 
-        Map<String, List<AbstractResource>> resourcesByProcessKeyAndVersion = Map.of(
-                "medizininformatik-initiativede_feasibilityExecute/" + VERSION,
+        return Map.of(
+                "medizininformatik-initiativede_feasibilityExecute",
                 Arrays.asList(aExe, sTExe, sTResS, vF, cF, sMeasure, sMeasureReport, sLibrary),
-                "medizininformatik-initiativede_feasibilityRequest/" + VERSION,
+                "medizininformatik-initiativede_feasibilityRequest",
                 Arrays.asList(aReq, sTReq, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary));
-
-        return ResourceProvider.read(VERSION,
-                () -> fhirContext.newXmlParser().setStripVersionsFromReferences(false),
-                classLoader, propertyResolver, resourcesByProcessKeyAndVersion);
     }
 }

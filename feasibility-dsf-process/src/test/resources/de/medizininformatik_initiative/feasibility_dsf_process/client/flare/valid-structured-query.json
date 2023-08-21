@@ -1,25 +1,24 @@
 {
-  "version": "http://to_be_decided.com/draft-2/schema#",
-  "display": "",
+  "version": "http://to_be_decided.com/draft-1/schema#",
   "inclusionCriteria": [
     [
       {
         "termCodes": [
           {
-            "code": "27113001",
+            "code": "263495000",
             "system": "http://snomed.info/sct",
-            "version": "v1",
-            "display": "Body weight (observable entity)"
+            "display": "Geschlecht"
           }
         ],
         "valueFilter": {
-          "type": "quantity-comparator",
-          "unit": {
-            "code": "kg",
-            "display": "kilogram"
-          },
-          "comparator": "gt",
-          "value": 50
+          "type": "concept",
+          "selectedConcepts": [
+            {
+              "code": "female",
+              "system": "http://hl7.org/fhir/administrative-gender",
+              "display": "Female"
+            }
+          ]
         }
       }
     ]

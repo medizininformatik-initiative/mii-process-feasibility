@@ -1,7 +1,7 @@
 package de.medizininformatik_initiative.feasibility_dsf_process;
 
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.fhir.client.FhirWebserviceClient;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
+import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.hl7.fhir.r4.model.IdType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,10 +40,8 @@ public class EnhancedFhirWebserviceClientProviderImplTest {
     public void testGetWebserviceClientByReference_ReferenceUrlEqualsLocalBaseUrl() {
         IdType localIdType = new IdType(FULL_URL);
 
-        when(clientProvider.getLocalBaseUrl())
-                .thenReturn(BASE_URL);
-        when(clientProvider.getLocalWebserviceClient())
-                .thenReturn(client);
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
+        when(client.getBaseUrl()).thenReturn(BASE_URL);
 
         final FhirWebserviceClient webserviceClient = enhancedFhirWebserviceClientProvider.getWebserviceClientByReference(localIdType);
 
@@ -53,6 +51,7 @@ public class EnhancedFhirWebserviceClientProviderImplTest {
     @Test
     public void testGetWebserviceClientByReference_Remote() {
         IdType idType = new IdType("http://remote.host/Something/id-123456");
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
         when(clientProvider.getWebserviceClient("http://remote.host"))
                 .thenReturn(client);
 
@@ -64,8 +63,8 @@ public class EnhancedFhirWebserviceClientProviderImplTest {
     @Test
     public void testGetLocalBaseUrl() {
         String baseUrl = "http://localhost";
-        when(clientProvider.getLocalBaseUrl())
-                .thenReturn(baseUrl);
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
+        when(client.getBaseUrl()).thenReturn(baseUrl);
 
         String localBaseUrl = enhancedFhirWebserviceClientProvider.getLocalBaseUrl();
 

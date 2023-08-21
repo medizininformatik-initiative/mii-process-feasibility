@@ -12,7 +12,10 @@ import okhttp3.tls.HandshakeCertificates;
 import okhttp3.tls.HeldCertificate;
 import org.apache.http.ssl.SSLContexts;
 import org.hl7.fhir.r4.model.CapabilityStatement;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.NginxContainer;
@@ -20,18 +23,25 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
-import java.security.*;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Base64;
 import java.util.Objects;
 
+import javax.net.ssl.SSLContext;
+
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.testcontainers.containers.BindMode.READ_ONLY;
 
 @Tag("client")
@@ -42,7 +52,7 @@ public class StoreClientIT {
     private static final Network DEFAULT_CONTAINER_NETWORK = Network.newNetwork();
 
     @Container
-    public GenericContainer<?> fhirServer = new GenericContainer<>(DockerImageName.parse("ghcr.io/samply/blaze:0.16.5"))
+    public GenericContainer<?> fhirServer = new GenericContainer<>(DockerImageName.parse("samply/blaze:0.21"))
             .withExposedPorts(8080)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("fhir-server")
@@ -190,7 +200,7 @@ public class StoreClientIT {
         var serverCertChain = getResource("./certs/server_cert_chain.pem");
         var serverCertKey = getResource("./certs/server_cert_key.pem");
 
-        NginxContainer<?> nginx = new NginxContainer<>("nginx:1.21.6")
+        NginxContainer<?> nginx = new NginxContainer<>("nginx:1.25.1")
                 .withExposedPorts(80)
                 .withFileSystemBind(nginxConf.getPath(), "/etc/nginx/nginx.conf", READ_ONLY)
                 .withFileSystemBind(staticFhirMetadata.getPath(), "/static/fhir_metadata.json", READ_ONLY)
@@ -238,7 +248,7 @@ public class StoreClientIT {
         var indexFile = getResource("index.html");
         var passwordFile = getResource(".htpasswd");
 
-        NginxContainer<?> nginx = new NginxContainer<>("nginx:1.21.6")
+        NginxContainer<?> nginx = new NginxContainer<>("nginx:1.25.1")
                 .withExposedPorts(80)
                 .withFileSystemBind(nginxConf.getPath(), "/etc/nginx/nginx.conf", READ_ONLY)
                 .withFileSystemBind(staticFhirMetadata.getPath(), "/static/fhir_metadata.json", READ_ONLY)
@@ -271,7 +281,7 @@ public class StoreClientIT {
         var nginxConf = this.getClass().getResource("nginx.conf");
         var forwardProxyConfigTemplate = getResource("forward_proxy.conf.template");
 
-        NginxContainer<?> nginx = new NginxContainer<>("nginx:1.21.6")
+        NginxContainer<?> nginx = new NginxContainer<>("nginx:1.25.1")
                 .withExposedPorts(80)
                 .withFileSystemBind(nginxConf.getPath(), "/etc/nginx/nginx.conf", READ_ONLY)
                 .withFileSystemBind(forwardProxyConfigTemplate.getPath(), "/etc/nginx/templates/default.conf.template", READ_ONLY)

@@ -1,64 +1,64 @@
 <ActivityDefinition xmlns="http://hl7.org/fhir">
     <meta>
         <tag>
-            <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+            <system value="http://dsf.dev/fhir/CodeSystem/read-access-tag"/>
             <code value="ALL"/>
         </tag>
     </meta>
-    <extension url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization">
+    <extension url="http://dsf.dev/fhir/StructureDefinition/extension-process-authorization">
         <extension url="message-name">
             <valueString value="feasibilityExecuteMessage"/>
         </extension>
         <extension url="task-profile">
             <valueCanonical
-                    value="http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-execute|${version}"/>
+                    value="http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-execute|#{version}"/>
         </extension>
         <extension url="requester">
             <valueCoding>
                 <extension
-                        url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization-consortium-role">
-                    <extension url="consortium">
+                        url="http://dsf.dev/fhir/StructureDefinition/extension-process-authorization-parent-organization-role">
+                    <extension url="parent-organization">
                         <valueIdentifier>
-                            <system value="http://highmed.org/sid/organization-identifier"/>
+                            <system value="http://dsf.dev/sid/organization-identifier"/>
                             <value value="medizininformatik-initiative.de"/>
                         </valueIdentifier>
                     </extension>
-                    <extension url="role">
+                    <extension url="organization-role">
                         <valueCoding>
-                            <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
+                            <system value="http://dsf.dev/fhir/CodeSystem/organization-role"/>
                             <code value="HRP"/>
                         </valueCoding>
                     </extension>
                 </extension>
-                <system value="http://highmed.org/fhir/CodeSystem/process-authorization"/>
+                <system value="http://dsf.dev/fhir/CodeSystem/process-authorization"/>
                 <code value="REMOTE_ROLE"/>
             </valueCoding>
         </extension>
         <extension url="recipient">
             <valueCoding>
                 <extension
-                        url="http://highmed.org/fhir/StructureDefinition/extension-process-authorization-consortium-role">
-                    <extension url="consortium">
+                        url="http://dsf.dev/fhir/StructureDefinition/extension-process-authorization-parent-organization-role">
+                    <extension url="parent-organization">
                         <valueIdentifier>
-                            <system value="http://highmed.org/sid/organization-identifier"/>
+                            <system value="http://dsf.dev/sid/organization-identifier"/>
                             <value value="medizininformatik-initiative.de"/>
                         </valueIdentifier>
                     </extension>
-                    <extension url="role">
+                    <extension url="organization-role">
                         <valueCoding>
-                            <system value="http://highmed.org/fhir/CodeSystem/organization-type"/>
-                            <code value="MeDIC"/>
+                            <system value="http://dsf.dev/fhir/CodeSystem/organization-role"/>
+                            <code value="DIC"/>
                         </valueCoding>
                     </extension>
                 </extension>
-                <system value="http://highmed.org/fhir/CodeSystem/process-authorization"/>
+                <system value="http://dsf.dev/fhir/CodeSystem/process-authorization"/>
                 <code value="LOCAL_ROLE"/>
             </valueCoding>
         </extension>
     </extension>
     <url value="http://medizininformatik-initiative.de/bpe/Process/feasibilityExecute"/>
     <!-- version managed by bpe -->
-    <version value="${version}"/>
+    <version value="#{version}"/>
     <name value="ExecuteFeasibility"/>
     <title value="Executes a Feasibility Query"/>
     <subtitle value="Process to execute a feasibility query"/>

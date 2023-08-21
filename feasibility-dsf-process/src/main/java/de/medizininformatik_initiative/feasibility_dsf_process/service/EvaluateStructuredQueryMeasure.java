@@ -1,11 +1,10 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClient;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
+import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Library;
@@ -36,9 +35,8 @@ public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate impl
 
     private final FlareWebserviceClient flareClient;
 
-    public EvaluateStructuredQueryMeasure(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                                          ReadAccessHelper readAccessHelper, FlareWebserviceClient flareClient) {
-        super(clientProvider, taskHelper, readAccessHelper);
+    public EvaluateStructuredQueryMeasure(FlareWebserviceClient flareClient, ProcessPluginApi api) {
+        super(api);
         this.flareClient = flareClient;
     }
 
@@ -49,15 +47,16 @@ public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate impl
     }
 
     @Override
-    protected void doExecute(DelegateExecution execution) throws IOException, InterruptedException {
-        var library = (Library) execution.getVariable(VARIABLE_LIBRARY);
-        var measure = (Measure) execution.getVariable(VARIABLE_MEASURE);
+    protected void doExecute(DelegateExecution execution, Variables variables)
+            throws IOException, InterruptedException {
+        var library = (Library) variables.getResource(VARIABLE_LIBRARY);
+        var measure = (Measure) variables.getResource(VARIABLE_MEASURE);
 
         var structuredQuery = getStructuredQuery(library);
         var feasibility = getFeasibility(structuredQuery);
         var measureReport = buildMeasureReport(measure.getUrl(), feasibility);
 
-        execution.setVariable(VARIABLE_MEASURE_REPORT, measureReport);
+        variables.setResource(VARIABLE_MEASURE_REPORT, measureReport);
     }
 
     private byte[] getStructuredQuery(Library library) {

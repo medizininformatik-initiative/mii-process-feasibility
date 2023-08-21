@@ -1,11 +1,20 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.constants.CodeSystems.BpmnMessage;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
+import dev.dsf.bpe.v1.service.TaskHelper;
+import dev.dsf.bpe.v1.variables.Target;
+import dev.dsf.bpe.v1.variables.Variables;
+import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.variable.value.PrimitiveValue;
-import org.highmed.dsf.fhir.organization.EndpointProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
-import org.highmed.dsf.fhir.variables.Target;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntrySearchComponent;
+import org.hl7.fhir.r4.model.Bundle.SearchEntryMode;
+import org.hl7.fhir.r4.model.Endpoint;
 import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.Test;
@@ -14,15 +23,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TARGET;
-import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
-import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,34 +39,53 @@ public class SelectResponseTargetTest {
     @Captor ArgumentCaptor<PrimitiveValue<Target>> targetsValuesCaptor;
 
     @Mock private TaskHelper taskHelper;
-    @Mock private EndpointProvider endpointProvider;
     @Mock private DelegateExecution execution;
+    @Mock private ProcessPluginApi api;
+    @Mock private Variables variables;
+    @Mock private FhirWebserviceClientProvider clientProvider;
+    @Mock private FhirWebserviceClient client;
 
     @InjectMocks private SelectResponseTarget service;
+
 
     @Test
     public void testDoExecute() throws Exception {
         Task task = new Task();
-        Reference requesterReference = new Reference()
-                .setIdentifier(new Identifier()
-                        .setSystem("http://localhost/systems/sample-system")
-                        .setValue("requester-id"));
+        Identifier organizationId = new Identifier()
+                .setSystem("http://localhost/systems/sample-system")
+                .setValue("requester-id");
+        Reference requesterReference = new Reference().setIdentifier(organizationId);
         task.setRequester(requesterReference);
-        when(endpointProvider.getFirstDefaultEndpointAddress(requesterReference.getIdentifier().getValue()))
-                .thenReturn(Optional.of("endpoint-url"));
-        when(taskHelper.getCurrentTaskFromExecutionVariables(execution))
-                .thenReturn(task);
-        when(taskHelper.getFirstInputParameterStringValue(task, CODESYSTEM_HIGHMED_BPMN,
-                CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY))
-                .thenReturn(Optional.of("correlation-key"));
+        Identifier endpointId = new Identifier()
+                .setSystem("http://localhost/systems/endpoint-system")
+                .setValue("Test Endpoint");
+        Endpoint endpoint = new Endpoint()
+                .addIdentifier(endpointId)
+                .setAddress("https://localhost/endpoint");
+        Organization organization = new Organization()
+                .setIdentifier(List.of(organizationId))
+                .setEndpoint(List.of(new Reference(endpoint)));
+        Target target = mock(Target.class);
+        Bundle bundle = new Bundle();
+        bundle.addEntry().setSearch(new BundleEntrySearchComponent().setMode(SearchEntryMode.MATCH))
+                .setResource(organization);
+        bundle.addEntry().setSearch(new BundleEntrySearchComponent().setMode(SearchEntryMode.INCLUDE))
+                .setResource(endpoint);
+        String correlationKey = "correlation-key-123547";
+
+        when(api.getVariables(execution)).thenReturn(variables);
+        when(variables.getStartTask()).thenReturn(task);
+        when(api.getTaskHelper()).thenReturn(taskHelper);
+        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
+        when(client.searchWithStrictHandling(Mockito.eq(Organization.class), Mockito.anyMap())).thenReturn(bundle);
+        when(taskHelper.getFirstInputParameterStringValue(task, BpmnMessage.URL, BpmnMessage.Codes.CORRELATION_KEY))
+                .thenReturn(Optional.of(correlationKey));
+        when(variables.createTarget(organizationId.getValue(), endpointId.getValue(), endpoint.getAddress(),
+                correlationKey)).thenReturn(target);
 
         service.execute(execution);
 
-        verify(execution).setVariable(eq(BPMN_EXECUTION_VARIABLE_TARGET), targetsValuesCaptor.capture());
-
-        var target = targetsValuesCaptor.getValue().getValue();
-        assertEquals("correlation-key", target.getCorrelationKey());
-        assertEquals("requester-id", target.getOrganizationIdentifierValue());
-        assertEquals("endpoint-url", target.getEndpointUrl());
+        verify(variables).setTarget(target);
     }
 }

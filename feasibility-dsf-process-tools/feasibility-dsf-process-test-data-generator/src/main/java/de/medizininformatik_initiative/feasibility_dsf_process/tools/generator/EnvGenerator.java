@@ -26,8 +26,15 @@ public class EnvGenerator {
         final String userThumbprintsPermanentDeleteVariableName;
         final Stream<String> userThumbprintsPermanentDelete;
 
+        EnvEntry(String userThumbprintsVariableName, Stream<String> userThumbprints) {
+            this.userThumbprintsVariableName = userThumbprintsVariableName;
+            this.userThumbprints = userThumbprints;
+            this.userThumbprintsPermanentDeleteVariableName = null;
+            this.userThumbprintsPermanentDelete = null;
+        }
+
         EnvEntry(String userThumbprintsVariableName, Stream<String> userThumbprints,
-                 String userThumbprintsPermanentDeleteVariableName, Stream<String> userThumbprintsPermanentDelete) {
+                String userThumbprintsPermanentDeleteVariableName, Stream<String> userThumbprintsPermanentDelete) {
             this.userThumbprintsVariableName = userThumbprintsVariableName;
             this.userThumbprints = userThumbprints;
             this.userThumbprintsPermanentDeleteVariableName = userThumbprintsPermanentDeleteVariableName;
@@ -61,6 +68,9 @@ public class EnvGenerator {
         Stream<String> dic4UserThumbprintsPermanentDelete = filterAndMapToThumbprint(clientCertificateFilesByCommonName,
                 "dic-4-client", "Webbrowser Test User");
 
+        Stream<String> webBrowserTestUserThumbprint = filterAndMapToThumbprint(clientCertificateFilesByCommonName,
+                "Webbrowser Test User");
+
         List<EnvEntry> entries = List.of(
                 new EnvEntry("ZARS_" + USER_THUMBPRINTS, zarsUserThumbprints, "ZARS_" + USER_THUMBPRINTS_PERMANENTDELETE,
                         zarsUserThumbprintsPermanentDelete),
@@ -75,7 +85,9 @@ public class EnvGenerator {
                         dic3UserThumbprintsPermanentDelete),
 
                 new EnvEntry("DIC_4_" + USER_THUMBPRINTS, dic4UserThumbprints, "DIC_4_" + USER_THUMBPRINTS_PERMANENTDELETE,
-                        dic4UserThumbprintsPermanentDelete));
+                        dic4UserThumbprintsPermanentDelete),
+
+                new EnvEntry("WEBBROWSER_TEST_USER_THUMBPRINT", webBrowserTestUserThumbprint));
 
         writeEnvFile(Paths.get("../../feasibility-dsf-process-docker-test-setup/.env"), entries);
     }
@@ -97,10 +109,14 @@ public class EnvGenerator {
             builder.append(entry.userThumbprintsVariableName);
             builder.append('=');
             builder.append(entry.userThumbprints.collect(Collectors.joining(",")));
-            builder.append('\n');
-            builder.append(entry.userThumbprintsPermanentDeleteVariableName);
-            builder.append('=');
-            builder.append(entry.userThumbprintsPermanentDelete.collect(Collectors.joining(",")));
+
+            if (entry.userThumbprintsPermanentDeleteVariableName != null
+                    && entry.userThumbprintsPermanentDelete != null) {
+                builder.append('\n');
+                builder.append(entry.userThumbprintsPermanentDeleteVariableName);
+                builder.append('=');
+                builder.append(entry.userThumbprintsPermanentDelete.collect(Collectors.joining(",")));
+            }
 
             if ((i + 1) < entries.size())
                 builder.append("\n\n");

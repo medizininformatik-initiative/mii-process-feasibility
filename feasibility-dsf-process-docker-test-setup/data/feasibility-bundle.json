@@ -11,14 +11,14 @@
             "http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-request"
           ]
         },
-        "instantiatesUri": "http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest/0.6.2",
+        "instantiatesCanonical": "http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest|1.0",
         "status": "requested",
         "intent": "order",
         "authoredOn": "2022",
         "requester": {
           "type": "Organization",
           "identifier": {
-            "system": "http://highmed.org/sid/organization-identifier",
+            "system": "http://dsf.dev/sid/organization-identifier",
             "value": "Test_ZARS"
           }
         },
@@ -27,7 +27,7 @@
             {
               "type": "Organization",
               "identifier": {
-                "system": "http://highmed.org/sid/organization-identifier",
+                "system": "http://dsf.dev/sid/organization-identifier",
                 "value": "Test_ZARS"
               }
             }
@@ -38,7 +38,7 @@
             "type": {
               "coding": [
                 {
-                  "system": "http://highmed.org/fhir/CodeSystem/bpmn-message",
+                  "system": "http://dsf.dev/fhir/CodeSystem/bpmn-message",
                   "code": "message-name"
                 }
               ]
@@ -49,7 +49,7 @@
             "type": {
               "coding": [
                 {
-                  "system": "http://highmed.org/fhir/CodeSystem/bpmn-message",
+                  "system": "http://dsf.dev/fhir/CodeSystem/bpmn-message",
                   "code": "business-key"
                 }
               ]
@@ -83,7 +83,7 @@
         "meta": {
           "tag": [
             {
-              "system": "http://highmed.org/fhir/CodeSystem/read-access-tag",
+              "system": "http://dsf.dev/fhir/CodeSystem/read-access-tag",
               "code": "ALL"
             }
           ],
@@ -137,7 +137,7 @@
         "meta": {
           "tag": [
             {
-              "system": "http://highmed.org/fhir/CodeSystem/read-access-tag",
+              "system": "http://dsf.dev/fhir/CodeSystem/read-access-tag",
               "code": "ALL"
             }
           ],

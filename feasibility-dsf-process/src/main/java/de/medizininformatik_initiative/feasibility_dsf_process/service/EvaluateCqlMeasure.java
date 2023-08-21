@@ -1,11 +1,10 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
+import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Parameters;
@@ -27,9 +26,8 @@ public class EvaluateCqlMeasure extends AbstractServiceDelegate implements Initi
 
     private final IGenericClient storeClient;
 
-    public EvaluateCqlMeasure(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                              ReadAccessHelper readAccessHelper, IGenericClient storeClient) {
-        super(clientProvider, taskHelper, readAccessHelper);
+    public EvaluateCqlMeasure(IGenericClient storeClient, ProcessPluginApi api) {
+        super(api);
 
         this.storeClient = storeClient;
     }
@@ -42,13 +40,13 @@ public class EvaluateCqlMeasure extends AbstractServiceDelegate implements Initi
     }
 
     @Override
-    protected void doExecute(DelegateExecution execution) {
-        String measureId = (String) execution.getVariable(VARIABLE_MEASURE_ID);
+    protected void doExecute(DelegateExecution execution, Variables variables) {
+        String measureId = variables.getString(VARIABLE_MEASURE_ID);
 
         MeasureReport report = executeEvaluateMeasure(measureId);
         validateMeasureReport(report);
 
-        execution.setVariable(VARIABLE_MEASURE_REPORT, report);
+        variables.setResource(VARIABLE_MEASURE_REPORT, report);
     }
 
     private MeasureReport executeEvaluateMeasure(String measureId) {

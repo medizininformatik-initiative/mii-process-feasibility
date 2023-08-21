@@ -1,12 +1,11 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProvider;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
+import dev.dsf.bpe.v1.variables.Variables;
+import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.organization.OrganizationProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
-import org.highmed.fhir.client.FhirWebserviceClient;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
@@ -25,26 +24,24 @@ import static de.medizininformatik_initiative.feasibility_dsf_process.variables.
 public class DownloadMeasureReport extends AbstractServiceDelegate implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadMeasureReport.class);
+    private EnhancedFhirWebserviceClientProvider clientProvider;
 
-    private final OrganizationProvider organizationProvider;
-
-    public DownloadMeasureReport(EnhancedFhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                                 ReadAccessHelper readAccessHelper, OrganizationProvider organizationProvider) {
-        super(clientProvider, taskHelper, readAccessHelper);
-        this.organizationProvider = organizationProvider;
+    public DownloadMeasureReport(EnhancedFhirWebserviceClientProvider clientProvider, ProcessPluginApi api) {
+        super(api);
+        this.clientProvider = clientProvider;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        Objects.requireNonNull(organizationProvider, "organizationProvider");
+        Objects.requireNonNull(clientProvider, "clientProvider");
     }
 
     @Override
-    protected void doExecute(DelegateExecution execution) {
-        Task task = getCurrentTaskFromExecutionVariables(execution);
+    protected void doExecute(DelegateExecution execution, Variables variables) {
+        Task task = variables.getLatestTask();
         IdType measureReportId = getMeasureReportId(task);
-        FhirWebserviceClient client = ((EnhancedFhirWebserviceClientProvider) getFhirWebserviceClientProvider())
+        FhirWebserviceClient client = clientProvider
                 .getWebserviceClientByReference(measureReportId);
         MeasureReport measureReport = downloadMeasureReport(client, measureReportId);
         execution.setVariable(VARIABLE_MEASURE_REPORT, measureReport);
@@ -56,9 +53,9 @@ public class DownloadMeasureReport extends AbstractServiceDelegate implements In
     }
 
     private IdType getMeasureReportId(Task task) {
-        Optional<Reference> measureRef = getTaskHelper()
-                .getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
-                        CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE);
+        Optional<Reference> measureRef = api.getTaskHelper()
+                .getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
+                        CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE, Reference.class);
         if (measureRef.isPresent()) {
             return new IdType(measureRef.get().getReference());
         } else {
