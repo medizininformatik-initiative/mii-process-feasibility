@@ -146,6 +146,7 @@ services:
               - SEARCH
               - HISTORY
               - PERMANENT_DELETE
+              - WEBSOCKET
             practitioner-role:
               - http://dsf.dev/fhir/CodeSystem/practitioner-role|DSF_ADMIN
     networks:
