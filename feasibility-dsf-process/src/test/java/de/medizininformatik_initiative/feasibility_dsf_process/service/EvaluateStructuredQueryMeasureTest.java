@@ -1,6 +1,8 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClient;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.Library;
@@ -25,7 +27,7 @@ import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +37,8 @@ public class EvaluateStructuredQueryMeasureTest {
 
     @Mock private FlareWebserviceClient flareWebserviceClient;
     @Mock private DelegateExecution execution;
+    @Mock private ProcessPluginApi api;
+    @Mock private Variables variables;
 
     @InjectMocks private EvaluateStructuredQueryMeasure service;
 
@@ -42,10 +46,11 @@ public class EvaluateStructuredQueryMeasureTest {
     public void testDoExecute_FailsIfStructuredQueryContentIsMissing() {
         Measure measure = new Measure();
         Library library = new Library();
-        when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(measure);
-        when(execution.getVariable(VARIABLE_LIBRARY)).thenReturn(library);
 
-        assertThrows(IllegalStateException.class, () -> service.doExecute(execution));
+        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(measure);
+        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
+
+        assertThrows(IllegalStateException.class, () -> service.doExecute(execution, variables));
     }
 
     @Test
@@ -58,12 +63,12 @@ public class EvaluateStructuredQueryMeasureTest {
         library.setContent(List.of(new Attachment()
                 .setContentType("application/json")
                 .setData(structuredQuery)));
-        when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(measure);
-        when(execution.getVariable(VARIABLE_LIBRARY)).thenReturn(library);
 
+        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(measure);
+        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
         when(flareWebserviceClient.requestFeasibility(structuredQuery)).thenThrow(IOException.class);
 
-        assertThrows(IOException.class, () -> service.doExecute(execution));
+        assertThrows(IOException.class, () -> service.doExecute(execution, variables));
     }
 
     @Test
@@ -77,10 +82,10 @@ public class EvaluateStructuredQueryMeasureTest {
                 .setContentType("text/plain")
                 .setData(structuredQuery)));
 
-        when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(measure);
-        when(execution.getVariable(VARIABLE_LIBRARY)).thenReturn(library);
+        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(measure);
+        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
 
-        assertThrows(IllegalStateException.class, () -> service.doExecute(execution));
+        assertThrows(IllegalStateException.class, () -> service.doExecute(execution, variables));
     }
 
     @Test
@@ -94,15 +99,15 @@ public class EvaluateStructuredQueryMeasureTest {
         library.setContent(List.of(new Attachment()
                 .setContentType("application/json")
                 .setData(structuredQuery)));
-        when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(measure);
-        when(execution.getVariable(VARIABLE_LIBRARY)).thenReturn(library);
-
         int feasibility = 10;
+
+        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(measure);
+        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
         when(flareWebserviceClient.requestFeasibility(structuredQuery)).thenReturn(feasibility);
-        doNothing().when(execution).setVariable(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
 
-        service.doExecute(execution);
+        service.doExecute(execution, variables);
 
+        verify(variables).setResource(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
         var measureReport = measureReportCaptor.getValue();
         assertEquals(COMPLETE, measureReport.getStatus());
         assertEquals(SUMMARY, measureReport.getType());

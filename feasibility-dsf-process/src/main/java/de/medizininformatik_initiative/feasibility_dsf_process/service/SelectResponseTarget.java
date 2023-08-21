@@ -1,58 +1,66 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.constants.CodeSystems.BpmnMessage;
+import dev.dsf.bpe.v1.variables.Target;
+import dev.dsf.bpe.v1.variables.Variables;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.organization.EndpointProvider;
-import org.highmed.dsf.fhir.organization.OrganizationProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
-import org.highmed.dsf.fhir.variables.Target;
-import org.highmed.dsf.fhir.variables.TargetValues;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Bundle.SearchEntryMode;
+import org.hl7.fhir.r4.model.Endpoint;
 import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Task;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.Objects;
+import java.util.Collections;
+import java.util.Map;
 
-import static org.highmed.dsf.bpe.ConstantsBase.BPMN_EXECUTION_VARIABLE_TARGET;
-import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
-import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY;
+import static java.lang.String.format;
 
-public class SelectResponseTarget extends AbstractServiceDelegate implements InitializingBean {
+public class SelectResponseTarget extends dev.dsf.bpe.v1.activity.AbstractServiceDelegate implements InitializingBean {
 
-    private final OrganizationProvider organizationProvider;
-    private final EndpointProvider endpointProvider;
-
-    public SelectResponseTarget(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                                ReadAccessHelper readAccessHelper, OrganizationProvider organizationProvider,
-                                EndpointProvider endpointProvider) {
-        super(clientProvider, taskHelper, readAccessHelper);
-        this.organizationProvider = organizationProvider;
-        this.endpointProvider = endpointProvider;
+    public SelectResponseTarget(ProcessPluginApi api) {
+        super(api);
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
-        Objects.requireNonNull(organizationProvider, "organizationProvider");
-        Objects.requireNonNull(endpointProvider, "endpointProvider");
-    }
+    protected void doExecute(DelegateExecution execution, Variables variables) throws BpmnError, Exception {
+        Task task = variables.getStartTask();
+        String correlationKey = api.getTaskHelper()
+                .getFirstInputParameterStringValue(task, BpmnMessage.URL, BpmnMessage.Codes.CORRELATION_KEY).get();
+        Identifier organizationIdentifier = task.getRequester().getIdentifier();
 
-    @Override
-    protected void doExecute(DelegateExecution execution) {
-        Task task = getCurrentTaskFromExecutionVariables(execution);
+        // Workaround till https://github.com/datasharingframework/dsf/pull/62 is released
+        Bundle resultBundle = api.getFhirWebserviceClientProvider().getLocalWebserviceClient().searchWithStrictHandling(
+                Organization.class,
+                Map.of("active", Collections.singletonList("true"),
+                        "identifier", Collections.singletonList(organizationIdentifier.getValue()),
+                        "_include", Collections.singletonList("Organization:endpoint")));
+        if (resultBundle == null || resultBundle.getEntry() == null || resultBundle.getEntry().size() != 2
+                || resultBundle.getEntryFirstRep().getResource() == null
+                || !(resultBundle.getEntryFirstRep().getResource() instanceof Organization)
+                || resultBundle.getEntry().get(1).getResource() == null
+                || !(resultBundle.getEntry().get(1).getResource() instanceof Endpoint)) {
+            throw new BpmnError("orgNotFound",
+                    format("No active (or more than one) Organization or no Endpoint found for identifier '%s'",
+                            organizationIdentifier.getValue()));
+        }
 
-        String correlationKey = getTaskHelper()
-                .getFirstInputParameterStringValue(task, CODESYSTEM_HIGHMED_BPMN,
-                        CODESYSTEM_HIGHMED_BPMN_VALUE_CORRELATION_KEY).get();
-        Identifier targetOrganizationIdentifier = task.getRequester().getIdentifier();
-        String endpointIdentifierValue = targetOrganizationIdentifier.getValue();
+        Target target = resultBundle.getEntry().stream()
+                .filter(BundleEntryComponent::hasSearch)
+                .filter(e -> SearchEntryMode.INCLUDE.equals(e.getSearch().getMode()))
+                .filter(BundleEntryComponent::hasResource)
+                .map(BundleEntryComponent::getResource)
+                .filter(r -> r instanceof Endpoint)
+                .map(r -> (Endpoint) r)
+                .findFirst()
+                .map(e -> variables.createTarget(organizationIdentifier.getValue(),
+                        e.getIdentifierFirstRep().getValue(), e.getAddress(), correlationKey))
+                .get();
 
-        execution.setVariable(BPMN_EXECUTION_VARIABLE_TARGET, TargetValues
-                .create(Target.createBiDirectionalTarget(targetOrganizationIdentifier.getValue(),
-                        endpointIdentifierValue,
-                        endpointProvider.getFirstDefaultEndpointAddress(endpointIdentifierValue).get(),
-                        correlationKey)));
+        variables.setTarget(target);
     }
 }

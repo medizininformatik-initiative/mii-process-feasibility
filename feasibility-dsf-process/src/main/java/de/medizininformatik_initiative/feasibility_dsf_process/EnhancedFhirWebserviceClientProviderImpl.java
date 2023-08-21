@@ -1,7 +1,7 @@
 package de.medizininformatik_initiative.feasibility_dsf_process;
 
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.fhir.client.FhirWebserviceClient;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
+import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.hl7.fhir.r4.model.IdType;
 
 public class EnhancedFhirWebserviceClientProviderImpl implements EnhancedFhirWebserviceClientProvider {
@@ -21,9 +21,8 @@ public class EnhancedFhirWebserviceClientProviderImpl implements EnhancedFhirWeb
         }
     }
 
-    @Override
     public String getLocalBaseUrl() {
-        return this.fhirClientProvider.getLocalBaseUrl();
+        return this.fhirClientProvider.getLocalWebserviceClient().getBaseUrl();
     }
 
     @Override

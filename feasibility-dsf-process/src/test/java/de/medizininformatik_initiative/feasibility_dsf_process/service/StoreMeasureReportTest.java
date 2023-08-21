@@ -1,12 +1,14 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
+import dev.dsf.bpe.v1.service.TaskHelper;
+import dev.dsf.bpe.v1.variables.Variables;
+import dev.dsf.fhir.authorization.read.ReadAccessHelper;
+import dev.dsf.fhir.authorization.read.ReadAccessHelperImpl;
+import dev.dsf.fhir.client.FhirWebserviceClient;
+import dev.dsf.fhir.client.PreferReturnMinimalWithRetry;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelperImpl;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
-import org.highmed.fhir.client.FhirWebserviceClient;
-import org.highmed.fhir.client.PreferReturnMinimalWithRetry;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Measure;
@@ -43,6 +45,8 @@ public class StoreMeasureReportTest
     @Mock private PreferReturnMinimalWithRetry returnMinimal;
     @Mock private TaskHelper taskHelper;
     @Mock private DelegateExecution execution;
+    @Mock private ProcessPluginApi api;
+    @Mock private Variables variables;
 
     @Spy private ReadAccessHelper readAccessHelper = new ReadAccessHelperImpl();
 
@@ -65,27 +69,32 @@ public class StoreMeasureReportTest
         measureReport = measureReport.setEvaluatedResource(List.of(patientRef));
 
         var task = new Task();
-        var requesterReference = new Reference().setIdentifier(
-                new Identifier().setSystem("http://localhost/systems/sample-system").setValue("requester-id"));
+        Identifier requesterId = new Identifier().setSystem("http://localhost/systems/sample-system").setValue("requester-id");
+        var requesterReference = new Reference().setIdentifier(                requesterId);
         task.setRequester(requesterReference);
 
-        when(execution.getVariable(VARIABLE_MEASURE)).thenReturn(initialMeasureFromZars);
-        when(execution.getVariable(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
-        when(taskHelper.getLeadingTaskFromExecutionVariables(execution)).thenReturn(task);
+        when(api.getVariables(execution)).thenReturn(variables);
+        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(initialMeasureFromZars);
+        when(variables.getResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
+        when(variables.getStartTask()).thenReturn(task);
+        when(api.getReadAccessHelper()).thenReturn(readAccessHelper);
+        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
         when(clientProvider.getLocalWebserviceClient()).thenReturn(localWebserviceClient);
         when(localWebserviceClient.withMinimalReturn()).thenReturn(returnMinimal);
         when(returnMinimal.create(measureReportCaptor.capture())).thenReturn(new IdType("id-094601"));
 
         service.execute(execution);
 
-        verify(execution).setVariable(VARIABLE_MEASURE_REPORT_ID, "id-094601");
+        verify(variables).setString(VARIABLE_MEASURE_REPORT_ID, "id-094601");
+        verify(readAccessHelper).addOrganization(measureReport, requesterId.getValue());
 
 
         var capturedMeasureReport = measureReportCaptor.getValue();
         assertEquals("http://some.domain/fhir/Measure/" + measureId, capturedMeasureReport.getMeasure());
         assertTrue(capturedMeasureReport.getEvaluatedResource().isEmpty());
 
-        var tags =  capturedMeasureReport.getMeta().getTag().stream().filter(c -> "http://highmed.org/fhir/CodeSystem/read-access-tag".equals(c.getSystem())).collect(toList());
+        var tags = capturedMeasureReport.getMeta().getTag().stream()
+                .filter(c -> "http://dsf.dev/fhir/CodeSystem/read-access-tag".equals(c.getSystem())).collect(toList());
         assertEquals(2, tags.size());
         assertEquals(1 , tags.stream().filter(c -> "LOCAL".equals(c.getCode())).count());
 
@@ -93,7 +102,7 @@ public class StoreMeasureReportTest
         assertEquals(1 , organizationTags.size());
 
         var organizationExtensions = organizationTags.stream().flatMap(c -> c.getExtension().stream())
-                .filter(e -> "http://highmed.org/fhir/StructureDefinition/extension-read-access-organization".equals(
+                .filter(e -> "http://dsf.dev/fhir/StructureDefinition/extension-read-access-organization".equals(
                         e.getUrl())).collect(toList());
         assertEquals(1, organizationExtensions.size());
         assertEquals("requester-id", ((Identifier)organizationExtensions.get(0).getValue()).getValue());

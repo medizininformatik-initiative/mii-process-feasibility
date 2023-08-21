@@ -1,13 +1,13 @@
 <StructureDefinition xmlns="http://hl7.org/fhir">
     <meta>
         <tag>
-            <system value="http://highmed.org/fhir/CodeSystem/read-access-tag"/>
+            <system value="http://dsf.dev/fhir/CodeSystem/read-access-tag"/>
             <code value="ALL"/>
         </tag>
     </meta>
     <url value="http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-library"/>
     <!-- version managed by bpe -->
-    <version value="${version}"/>
+    <version value="#{version}"/>
     <name value="Library"/>
     <!-- status managed by bpe -->
     <status value="unknown"/>

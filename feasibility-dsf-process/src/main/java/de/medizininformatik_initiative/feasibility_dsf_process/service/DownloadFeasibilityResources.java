@@ -2,12 +2,11 @@ package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProvider;
 import de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
+import dev.dsf.bpe.v1.variables.Variables;
+import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.organization.OrganizationProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
-import org.highmed.fhir.client.FhirWebserviceClient;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Library;
@@ -23,41 +22,42 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-public class DownloadFeasibilityResources extends AbstractServiceDelegate implements InitializingBean {
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
+
+public class DownloadFeasibilityResources extends AbstractServiceDelegate
+        implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadFeasibilityResources.class);
+    private EnhancedFhirWebserviceClientProvider clientProvider;
 
-    private final OrganizationProvider organizationProvider;
-
-    public DownloadFeasibilityResources(EnhancedFhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                                        ReadAccessHelper readAccessHelper, OrganizationProvider organizationProvider) {
-        super(clientProvider, taskHelper, readAccessHelper);
-        this.organizationProvider = organizationProvider;
+    public DownloadFeasibilityResources(EnhancedFhirWebserviceClientProvider clientProvider, ProcessPluginApi api) {
+        super(api);
+        this.clientProvider = clientProvider;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        Objects.requireNonNull(organizationProvider, "organizationProvider");
+        Objects.requireNonNull(clientProvider, "clientProvider");
     }
 
     @Override
-    protected void doExecute(DelegateExecution execution) {
-        Task task = getCurrentTaskFromExecutionVariables(execution);
+    protected void doExecute(DelegateExecution execution, Variables variables) {
+        Task task = variables.getStartTask();
 
         IdType measureId = getMeasureId(task);
-        FhirWebserviceClient client = ((EnhancedFhirWebserviceClientProvider) getFhirWebserviceClientProvider())
-                .getWebserviceClientByReference(measureId);
+        FhirWebserviceClient client = clientProvider.getWebserviceClientByReference(measureId);
         Bundle bundle = getMeasureAndLibrary(measureId, client);
 
-        execution.setVariable(ConstantsFeasibility.VARIABLE_MEASURE, bundle.getEntry().get(0).getResource());
-        execution.setVariable(ConstantsFeasibility.VARIABLE_LIBRARY, bundle.getEntry().get(1).getResource());
+        variables.setResource(ConstantsFeasibility.VARIABLE_MEASURE, bundle.getEntry().get(0).getResource());
+        variables.setResource(ConstantsFeasibility.VARIABLE_LIBRARY, bundle.getEntry().get(1).getResource());
     }
 
     private IdType getMeasureId(Task task) {
-        Optional<Reference> measureRef = getTaskHelper()
-                .getFirstInputParameterReferenceValue(task, ConstantsFeasibility.CODESYSTEM_FEASIBILITY,
-                        ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE);
+        Optional<Reference> measureRef = api.getTaskHelper()
+                .getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
+                        CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class);
         if (measureRef.isPresent()) {
             return new IdType(measureRef.get().getReference());
         } else {

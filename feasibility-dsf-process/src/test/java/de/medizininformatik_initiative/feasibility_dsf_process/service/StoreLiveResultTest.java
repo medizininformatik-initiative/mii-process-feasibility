@@ -1,11 +1,13 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
+import dev.dsf.bpe.v1.service.TaskHelper;
+import dev.dsf.bpe.v1.variables.Variables;
+import dev.dsf.fhir.authorization.read.ReadAccessHelper;
+import dev.dsf.fhir.authorization.read.ReadAccessHelperImpl;
+import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelperImpl;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
-import org.highmed.fhir.client.FhirWebserviceClient;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
@@ -43,7 +45,9 @@ public class StoreLiveResultTest {
 
     @Mock private FhirWebserviceClient client;
     @Mock private DelegateExecution execution;
+    @Mock private Variables variables;
     @Mock private TaskHelper taskHelper;
+    @Mock private ProcessPluginApi api;
 
     @Spy private ReadAccessHelper readAccessHelper = new ReadAccessHelperImpl();
 
@@ -58,24 +62,26 @@ public class StoreLiveResultTest {
 
         measureReport = new MeasureReport();
         measureReport.setIdElement(new IdType(MEASURE_REPORT_ID));
+
+        when(api.getVariables(execution)).thenReturn(variables);
+        when(variables.getStartTask()).thenReturn(task);
+        when(api.getTaskHelper()).thenReturn(taskHelper);
+        when(api.getReadAccessHelper()).thenReturn(readAccessHelper);
+        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
     }
 
     @Test
     public void testDoExecute_MeasureReportReferenceIsAddedToTask() throws Exception {
-        when(execution.getVariable(VARIABLE_MEASURE_REPORT))
-                .thenReturn(measureReport);
-        when(taskHelper.getCurrentTaskFromExecutionVariables(execution)).thenReturn(task);
-        TaskOutputComponent taskOutputComponent = new TaskOutputComponent();
-        when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
-                refCaptor.capture()))
-                .thenReturn(taskOutputComponent);
-
-        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
-
         MeasureReport report = new MeasureReport();
         IdType measureReportId = new IdType("e26daf2d-2d55-4f23-a7c8-4b994e3a319e");
         report.setIdElement(measureReportId);
+        TaskOutputComponent taskOutputComponent = new TaskOutputComponent();
+        when(variables.getResource(VARIABLE_MEASURE_REPORT))
+                .thenReturn(measureReport);
         when(client.create(any(MeasureReport.class))).thenReturn(report);
+        when(taskHelper.createOutput(refCaptor.capture(), eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE)))
+                .thenReturn(taskOutputComponent);
 
         service.execute(execution);
 
@@ -85,22 +91,17 @@ public class StoreLiveResultTest {
 
     @Test
     public void testDoExecute_MeasureReportIsStored() throws Exception {
-        when(execution.getVariable(VARIABLE_MEASURE_REPORT))
+        when(variables.getResource(VARIABLE_MEASURE_REPORT))
                 .thenReturn(measureReport);
-        when(taskHelper.getCurrentTaskFromExecutionVariables(execution)).thenReturn(task);
-
-        when(taskHelper.createOutput(eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE),
-                refCaptor.capture()))
+        when(taskHelper.createOutput(refCaptor.capture(), eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE)))
                 .thenReturn(new TaskOutputComponent());
-
-        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
         when(client.create(measureReportCaptor.capture())).thenReturn(measureReport);
 
         service.execute(execution);
 
         assertEquals(MEASURE_REPORT_ID, measureReportCaptor.getValue().getIdElement().getIdPart());
         assertEquals(1, measureReportCaptor.getValue().getMeta().getTag().size());
-        assertEquals("http://highmed.org/fhir/CodeSystem/read-access-tag", measureReportCaptor.getValue().getMeta().getTagFirstRep().getSystem());
+        assertEquals("http://dsf.dev/fhir/CodeSystem/read-access-tag", measureReportCaptor.getValue().getMeta().getTagFirstRep().getSystem());
         assertEquals("LOCAL", measureReportCaptor.getValue().getMeta().getTagFirstRep().getCode());
     }
 }

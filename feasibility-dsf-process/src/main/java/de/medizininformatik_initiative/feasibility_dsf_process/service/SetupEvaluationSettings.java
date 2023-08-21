@@ -1,11 +1,10 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationSettingsProvider;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
+import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.bpe.delegate.AbstractServiceDelegate;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Objects;
@@ -15,32 +14,31 @@ import static de.medizininformatik_initiative.feasibility_dsf_process.variables.
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_SENSITIVITY;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_EVALUATION_STRATEGY;
 
-public class SetupEvaluationSettings extends AbstractServiceDelegate implements InitializingBean {
+public class SetupEvaluationSettings extends AbstractServiceDelegate
+        implements InitializingBean {
 
     private final EvaluationSettingsProvider evaluationSettingsProvider;
 
-    public SetupEvaluationSettings(FhirWebserviceClientProvider clientProvider, TaskHelper taskHelper,
-                                   ReadAccessHelper readAccessHelper,
-                                   EvaluationSettingsProvider evaluationSettingsProvider) {
-        super(clientProvider, taskHelper, readAccessHelper);
+    public SetupEvaluationSettings(EvaluationSettingsProvider evaluationSettingsProvider, ProcessPluginApi api) {
+        super(api);
         this.evaluationSettingsProvider = evaluationSettingsProvider;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        Objects.requireNonNull(evaluationSettingsProvider, "executionSettingsProvider");
+        Objects.requireNonNull(evaluationSettingsProvider, "variablesSettingsProvider");
     }
 
     @Override
-    protected void doExecute(DelegateExecution execution) {
-        execution.setVariable(VARIABLE_EVALUATION_STRATEGY,
+    protected void doExecute(DelegateExecution execution, Variables variables) {
+        variables.setString(VARIABLE_EVALUATION_STRATEGY,
                 evaluationSettingsProvider.evaluationStrategyRepresentation());
-        execution.setVariable(VARIABLE_EVALUATION_OBFUSCATION,
+        variables.setBoolean(VARIABLE_EVALUATION_OBFUSCATION,
                 evaluationSettingsProvider.evaluationResultObfuscationEnabled());
-        execution.setVariable(VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_SENSITIVITY,
+        variables.setDouble(VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_SENSITIVITY,
                 evaluationSettingsProvider.resultObfuscationLaplaceSensitivity());
-        execution.setVariable(VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_EPSILON,
+        variables.setDouble(VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_EPSILON,
                 evaluationSettingsProvider.resultObfuscationLaplaceEpsilon());
     }
 }

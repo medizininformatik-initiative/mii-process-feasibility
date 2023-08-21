@@ -1,17 +1,20 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProvider;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.service.TaskHelper;
+import dev.dsf.bpe.v1.variables.Variables;
+import dev.dsf.fhir.client.FhirWebserviceClient;
+import dev.dsf.fhir.client.PreferReturnMinimalWithRetry;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.fhir.task.TaskHelper;
-import org.highmed.fhir.client.FhirWebserviceClient;
-import org.highmed.fhir.client.PreferReturnMinimalWithRetry;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
+import org.hl7.fhir.r4.model.Task.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,13 +28,10 @@ import java.util.Optional;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
-import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
-import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hl7.fhir.r4.model.Task.TaskStatus.FAILED;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,6 +45,8 @@ public class DownloadMeasureReportTest {
     @Mock private TaskHelper taskHelper;
     @Mock private DelegateExecution execution;
     @Mock private PreferReturnMinimalWithRetry retry;
+    @Mock private Variables variables;
+    @Mock private ProcessPluginApi api;
     @Mock private ProcessEngine processEngine;
     @Mock private RuntimeService runtimeService;
 
@@ -52,37 +54,39 @@ public class DownloadMeasureReportTest {
 
     private Task task;
 
+
     @BeforeEach
     public void setUp() {
         task = new Task();
+        task.setStatus(TaskStatus.INPROGRESS);
+        when(api.getVariables(execution)).thenReturn(variables);
+        when(api.getTaskHelper()).thenReturn(taskHelper);
     }
 
     @Test
     public void testDoExecute_MissingMeasureReportReference() throws Exception {
         Task.TaskOutputComponent taskOutputComponent = new Task.TaskOutputComponent();
         String instanceId = "instanceId-241153";
+        String errorMessage = "Missing measure report reference.";
 
-        when(taskHelper.getCurrentTaskFromExecutionVariables(execution))
-                .thenReturn(task);
-        when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
-                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE))
+        when(variables.getLatestTask()).thenReturn(task);
+        when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
+                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE, Reference.class))
                 .thenReturn(Optional.empty());
-        when(taskHelper.createOutput(CODESYSTEM_HIGHMED_BPMN, CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR,
-                "Process null has fatal error in step null, reason: Missing measure report reference."))
-                .thenReturn(taskOutputComponent);
-        when(taskHelper.getTask(execution)).thenReturn(task);
+        when(variables.getTasks()).thenReturn(List.of(task));
+        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
         when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
         when(webserviceClient.withMinimalReturn()).thenReturn(retry);
+        when(execution.getProcessInstanceId()).thenReturn(instanceId);
         when(execution.getProcessEngine()).thenReturn(processEngine);
         when(processEngine.getRuntimeService()).thenReturn(runtimeService);
-        when(execution.getProcessInstanceId()).thenReturn(instanceId);
 
         service.execute(execution);
 
-        verify(runtimeService).deleteProcessInstance(eq(instanceId), contains("Missing measure report reference"));
         verify(retry).update(task);
+        verify(runtimeService).deleteProcessInstance(instanceId, errorMessage);
         assertSame(FAILED, task.getStatus());
-        assertEquals(taskOutputComponent, task.getOutputFirstRep());
+        assertThat(task.getOutputFirstRep().getValue().toString(), containsString(errorMessage));
     }
 
     @Test
@@ -96,10 +100,9 @@ public class DownloadMeasureReportTest {
         MeasureReport measureReport = new MeasureReport()
                 .setGroup(List.of(measureReportGroup));
 
-        when(taskHelper.getCurrentTaskFromExecutionVariables(execution))
-                .thenReturn(task);
-        when(taskHelper.getFirstInputParameterReferenceValue(task, CODESYSTEM_FEASIBILITY,
-                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE))
+        when(variables.getLatestTask()).thenReturn(task);
+        when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
+                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE, Reference.class))
                 .thenReturn(Optional.of(measureReportRef));
         when(clientProvider.getWebserviceClientByReference(new IdType(measureReportRef.getReference())))
                 .thenReturn(webserviceClient);

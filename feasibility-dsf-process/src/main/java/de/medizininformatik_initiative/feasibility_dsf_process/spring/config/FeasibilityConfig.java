@@ -24,52 +24,40 @@ import de.medizininformatik_initiative.feasibility_dsf_process.service.SetupEval
 import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreFeasibilityResources;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreLiveResult;
 import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreMeasureReport;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.organization.EndpointProvider;
-import org.highmed.dsf.fhir.organization.OrganizationProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
 import java.util.concurrent.ForkJoinPool;
 
 @Configuration
 public class FeasibilityConfig {
 
-    private final FhirWebserviceClientProvider fhirClientProvider;
     private final IGenericClient storeClient;
-    private final OrganizationProvider organizationProvider;
-    private final EndpointProvider endpointProvider;
-    private final TaskHelper taskHelper;
-    private final ReadAccessHelper readAccessHelper;
-    private final FhirContext fhirContext;
+
+    @Autowired private final FhirContext fhirContext;
+    @Autowired private ProcessPluginApi api;
+
     private final EvaluationSettingsProvider evaluationSettingsProvider;
     private final FlareWebserviceClient flareWebserviceClient;
 
-    public FeasibilityConfig(@Qualifier("clientProvider") FhirWebserviceClientProvider fhirClientProvider,
-                             @Qualifier("store-client") IGenericClient storeClient,
-                             OrganizationProvider organizationProvider,
-                             EndpointProvider endpointProvider,
-                             TaskHelper taskHelper,
-                             ReadAccessHelper readAccessHelper,
+    public FeasibilityConfig(@Qualifier("store-client") IGenericClient storeClient,
                              FhirContext fhirContext,
                              EvaluationSettingsProvider evaluationSettingsProvider,
                              FlareWebserviceClient flareWebserviceClient) {
-        this.fhirClientProvider = fhirClientProvider;
         this.storeClient = storeClient;
-        this.organizationProvider = organizationProvider;
-        this.endpointProvider = endpointProvider;
-        this.taskHelper = taskHelper;
-        this.readAccessHelper = readAccessHelper;
         this.fhirContext = fhirContext;
         this.evaluationSettingsProvider = evaluationSettingsProvider;
         this.flareWebserviceClient = flareWebserviceClient;
     }
 
     @Bean
-    public EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider() {
+    public EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider(@Qualifier("clientProvider") FhirWebserviceClientProvider fhirClientProvider) {
         return new EnhancedFhirWebserviceClientProviderImpl(fhirClientProvider);
     }
 
@@ -85,23 +73,27 @@ public class FeasibilityConfig {
     //
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SelectRequestTargets selectRequestTargets() {
-        return new SelectRequestTargets(fhirClientProvider, taskHelper, readAccessHelper, organizationProvider, endpointProvider);
+        return new SelectRequestTargets(api);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SendDicRequests sendDicRequests(ForkJoinPool threadPool) {
-        return new SendDicRequests(fhirClientProvider, taskHelper, readAccessHelper, organizationProvider, threadPool);
+        return new SendDicRequests(api, threadPool);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public DownloadMeasureReport downloadMeasureReport(EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
-        return new DownloadMeasureReport(enhancedFhirClientProvider, taskHelper, readAccessHelper, organizationProvider);
+        return new DownloadMeasureReport(enhancedFhirClientProvider, api);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public StoreLiveResult storeLiveResult() {
-        return new StoreLiveResult(fhirClientProvider, taskHelper, readAccessHelper);
+        return new StoreLiveResult(api);
     }
 
     //
@@ -109,64 +101,71 @@ public class FeasibilityConfig {
     //
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public EvaluateRequestRate requestRateLimiter() {
-        return new EvaluateRequestRate(fhirClientProvider, taskHelper, readAccessHelper,
-                new RateLimit(evaluationSettingsProvider.getRateLimitCount(),
-                        evaluationSettingsProvider.getRateLimitTimeIntervalDuration()));
+        return new EvaluateRequestRate(new RateLimit(evaluationSettingsProvider.getRateLimitCount(),
+                evaluationSettingsProvider.getRateLimitTimeIntervalDuration()), api);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public RateLimitExceededTaskRejecter rateLimitExceededTaskRejecter() {
-        return new RateLimitExceededTaskRejecter(fhirClientProvider, taskHelper, readAccessHelper);
+        return new RateLimitExceededTaskRejecter(api);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SetupEvaluationSettings setupEvaluationSettings() {
-        return new SetupEvaluationSettings(fhirClientProvider, taskHelper, readAccessHelper, evaluationSettingsProvider);
+        return new SetupEvaluationSettings(evaluationSettingsProvider, api);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public DownloadFeasibilityResources downloadFeasibilityResources(
             EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
-        return new DownloadFeasibilityResources(enhancedFhirClientProvider, taskHelper, readAccessHelper,
-                organizationProvider);
+        return new DownloadFeasibilityResources(enhancedFhirClientProvider, api);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public StoreFeasibilityResources storeFeasibilityResources() {
-        return new StoreFeasibilityResources(fhirClientProvider, taskHelper, readAccessHelper, storeClient);
+        return new StoreFeasibilityResources(storeClient, api);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public EvaluateCqlMeasure evaluateCqlMeasure() {
-        return new EvaluateCqlMeasure(fhirClientProvider, taskHelper, readAccessHelper, storeClient);
+        return new EvaluateCqlMeasure(storeClient, api);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public EvaluateStructuredQueryMeasure evaluateStructureQueryMeasure() {
-        return new EvaluateStructuredQueryMeasure(fhirClientProvider, taskHelper, readAccessHelper, flareWebserviceClient);
+        return new EvaluateStructuredQueryMeasure(flareWebserviceClient, api);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public ObfuscateEvaluationResult obfuscateEvaluationResult(Obfuscator<Integer> feasibilityCountObfuscator) {
-        return new ObfuscateEvaluationResult(fhirClientProvider, taskHelper, readAccessHelper,
-                feasibilityCountObfuscator);
+        return new ObfuscateEvaluationResult(feasibilityCountObfuscator, api);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public StoreMeasureReport storeMeasureReport() {
-        return new StoreMeasureReport(fhirClientProvider, taskHelper, readAccessHelper);
+        return new StoreMeasureReport(api);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SelectResponseTarget selectResponseTarget() {
-        return new SelectResponseTarget(fhirClientProvider, taskHelper, readAccessHelper, organizationProvider,
-                endpointProvider);
+        return new SelectResponseTarget(api);
     }
 
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SendDicResponse sendDicResponse() {
-        return new SendDicResponse(fhirClientProvider, taskHelper, readAccessHelper, organizationProvider, fhirContext);
+        return new SendDicResponse(api);
     }
 
     @Bean

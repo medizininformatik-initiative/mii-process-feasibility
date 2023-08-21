@@ -1,10 +1,26 @@
 version: '3.8'
 services:
 
+  # ---- Static cURL binary for health check in HAPI container
+  hapi-curl-download:
+    image: alpine:3.18
+    command: >
+      sh -c "wget https://github.com/moparisthebest/static-curl/releases/download/v8.1.2/curl-amd64 -O /opt/bin/curl &&
+             chmod +x /opt/bin/curl"
+    volumes:
+    - type: volume
+      source: hapi-curl-binary
+      target: /opt/bin
+
   # ---- Proxy ----------------------------------------------------------------
   proxy:
-    image: nginx:1.23
+    image: nginx:1.25.1
     restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "curl -ks https://localhost || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
     - "127.0.0.1:443:443"
     secrets:
@@ -42,7 +58,7 @@ services:
       TZ: Europe/Berlin
 
   db:
-    image: postgres:13
+    image: postgres:15-alpine
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
@@ -78,10 +94,10 @@ services:
 
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
-    image: ghcr.io/highmed/fhir:0.9.0
+    image: ghcr.io/datasharingframework/fhir:1.0.0
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
+      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -102,37 +118,54 @@ services:
       target: /opt/fhir/log
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_zars_user.password
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_zars_user_permanent_delete.password
-      ORG_HIGHMED_DSF_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_zars_client_certificate.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_zars_client_certificate_private_key.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://db/zars_fhir
-      ORG_HIGHMED_DSF_FHIR_DB_USER_GROUP: zars_fhir_users
-      ORG_HIGHMED_DSF_FHIR_DB_USER_USERNAME: zars_fhir_server_user
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: zars_fhir_permanent_delete_users
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: zars_fhir_server_permanent_delete_user
-      ORG_HIGHMED_DSF_FHIR_SERVER_BASE_URL: https://zars/fhir
-      ORG_HIGHMED_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_ZARS
-      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS: ${ZARS_USER_THUMBPRINTS}
-      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS_PERMANENT_DELETE: ${ZARS_USER_THUMBPRINTS_PERMANENT_DELETE}
+      DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      DEV_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_zars_user.password
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_zars_user_permanent_delete.password
+      DEV_DSF_FHIR_CLIENT_TRUST_SERVER_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_zars_client_certificate.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_zars_client_certificate_private_key.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      DEV_DSF_FHIR_DB_URL: jdbc:postgresql://db/zars_fhir
+      DEV_DSF_FHIR_DB_USER_GROUP: zars_fhir_users
+      DEV_DSF_FHIR_DB_USER_USERNAME: zars_fhir_server_user
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: zars_fhir_permanent_delete_users
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: zars_fhir_server_permanent_delete_user
+      DEV_DSF_FHIR_SERVER_BASE_URL: https://zars/fhir
+      DEV_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_ZARS
+      DEV_DSF_FHIR_SERVER_ORGANIZATION_THUMBPRINT: ${ZARS_USER_THUMBPRINTS}
+      DEV_DSF_FHIR_SERVER_ROLECONFIG: |
+        - webbrowser_test_user:
+            thumbprint: ${WEBBROWSER_TEST_USER_THUMBPRINT}
+            token-role: admin
+            dsf-role:
+              - CREATE
+              - READ
+              - UPDATE
+              - DELETE
+              - SEARCH
+              - HISTORY
+              - PERMANENT_DELETE
+            practitioner-role:
+              - http://dsf.dev/fhir/CodeSystem/practitioner-role|DSF_ADMIN
     networks:
       zars-fhir-frontend:
         ipv4_address: 172.10.0.69
       zars-fhir-backend:
       internet:
     depends_on:
-    - db
-    - proxy
+      db:
+        condition: service_healthy
+        restart: true
+      proxy:
+        condition: service_healthy
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: ghcr.io/highmed/bpe:0.9.0
+    image: ghcr.io/datasharingframework/bpe:1.0.0
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
+      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -161,34 +194,39 @@ services:
       target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
-      ORG_HIGHMED_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_zars_bpe_user.password
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_zars_bpe_user_camunda.password
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_zars_client_certificate.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_zars_client_certificate_private_key.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://db/zars_bpe
-      ORG_HIGHMED_DSF_BPE_DB_USER_GROUP: zars_bpe_users
-      ORG_HIGHMED_DSF_BPE_DB_USER_USERNAME: zars_bpe_server_user
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_GROUP: zars_camunda_users
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_USERNAME: zars_camunda_server_user
-      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_ZARS
-      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://zars/fhir
+      DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_zars_bpe_user.password
+      DEV_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_zars_bpe_user_camunda.password
+      DEV_DSF_BPE_FHIR_CLIENT_TRUST_SERVER_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_zars_client_certificate.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_zars_client_certificate_private_key.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      DEV_DSF_BPE_DB_URL: jdbc:postgresql://db/zars_bpe
+      DEV_DSF_BPE_DB_USER_GROUP: zars_bpe_users
+      DEV_DSF_BPE_DB_USER_USERNAME: zars_bpe_server_user
+      DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: zars_camunda_users
+      DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: zars_camunda_server_user
+      DEV_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_ZARS
+      DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://zars/fhir
     networks:
       zars-bpe-frontend:
       zars-bpe-backend:
       internet:
     depends_on:
-    - db
-    - zars-fhir-app
+      db:
+        condition: service_healthy
+        restart: true
+      zars-fhir-app:
+        condition:  service_healthy
+        restart: true
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
-    image: ghcr.io/highmed/fhir:0.9.0
+    image: ghcr.io/datasharingframework/fhir:1.0.0
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
+      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -209,37 +247,52 @@ services:
       target: /opt/fhir/log
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_1_user.password
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_1_user_permanent_delete.password
-      ORG_HIGHMED_DSF_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_1_client_certificate.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_1_client_certificate_private_key.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://db/dic_1_fhir
-      ORG_HIGHMED_DSF_FHIR_DB_USER_GROUP: dic_1_fhir_users
-      ORG_HIGHMED_DSF_FHIR_DB_USER_USERNAME: dic_1_fhir_server_user
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: dic_1_fhir_permanent_delete_users
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: dic_1_fhir_server_permanent_delete_user
-      ORG_HIGHMED_DSF_FHIR_SERVER_BASE_URL: https://dic-1/fhir
-      ORG_HIGHMED_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_1
-      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS: ${DIC_1_USER_THUMBPRINTS}
-      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS_PERMANENT_DELETE: ${DIC_1_USER_THUMBPRINTS_PERMANENT_DELETE}
+      DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      DEV_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_1_user.password
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_1_user_permanent_delete.password
+      DEV_DSF_FHIR_CLIENT_TRUST_SERVER_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_1_client_certificate.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_1_client_certificate_private_key.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      DEV_DSF_FHIR_DB_URL: jdbc:postgresql://db/dic_1_fhir
+      DEV_DSF_FHIR_DB_USER_GROUP: dic_1_fhir_users
+      DEV_DSF_FHIR_DB_USER_USERNAME: dic_1_fhir_server_user
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: dic_1_fhir_permanent_delete_users
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: dic_1_fhir_server_permanent_delete_user
+      DEV_DSF_FHIR_SERVER_BASE_URL: https://dic-1/fhir
+      DEV_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_1
+      DEV_DSF_FHIR_SERVER_ORGANIZATION_THUMBPRINT: ${DIC_1_USER_THUMBPRINTS}
+      DEV_DSF_FHIR_SERVER_ROLECONFIG: |
+        - webbrowser_test_user:
+            thumbprint: ${WEBBROWSER_TEST_USER_THUMBPRINT}
+            token-role: admin
+            dsf-role:
+              - CREATE
+              - READ
+              - UPDATE
+              - DELETE
+              - SEARCH
+              - HISTORY
+              - PERMANENT_DELETE
     networks:
       dic-1-fhir-frontend:
         ipv4_address: 172.10.0.83
       dic-1-fhir-backend:
       internet:
     depends_on:
-    - db
-    - proxy
+      db:
+        condition: service_healthy
+        restart: true
+      proxy:
+        condition: service_healthy
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: ghcr.io/highmed/bpe:0.9.0
+    image: ghcr.io/datasharingframework/bpe:1.0.0
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
+      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -268,20 +321,21 @@ services:
       target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
-      ORG_HIGHMED_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_1_bpe_user.password
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_dic_1_bpe_user_camunda.password
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_1_client_certificate.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_1_client_certificate_private_key.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://db/dic_1_bpe
-      ORG_HIGHMED_DSF_BPE_DB_USER_GROUP: dic_1_bpe_users
-      ORG_HIGHMED_DSF_BPE_DB_USER_USERNAME: dic_1_bpe_server_user
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_1_camunda_users
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_1_camunda_server_user
-      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_1
-      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-1/fhir
+      DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_1_bpe_user.password
+      DEV_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_dic_1_bpe_user_camunda.password
+      DEV_DSF_BPE_FHIR_CLIENT_TRUST_SERVER_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_1_client_certificate.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_1_client_certificate_private_key.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      DEV_DSF_BPE_DB_URL: jdbc:postgresql://db/dic_1_bpe
+      DEV_DSF_BPE_DB_USER_GROUP: dic_1_bpe_users
+      DEV_DSF_BPE_DB_USER_USERNAME: dic_1_bpe_server_user
+      DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_1_camunda_users
+      DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_1_camunda_server_user
+      DEV_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_1
+      DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-1/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_BASE_URL: http://dic-1-store:8080/
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_TIMEOUT_CONNECT: 2000
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: structured-query
@@ -291,9 +345,15 @@ services:
       dic-1-bpe-backend:
       internet:
     depends_on:
-    - db
-    - dic-1-fhir-app
-    - dic-1-store
+      db:
+        condition: service_healthy
+        restart: true
+      dic-1-fhir-app:
+        condition: service_healthy
+        restart: true
+      dic-1-store:
+        condition: service_healthy
+        restart: true
 
   # ---- DIC-1 - FHIR Data Store ----------------------------------------------
   dic-1-store:
@@ -301,33 +361,55 @@ services:
     restart: always
     ports:
     - "5000:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8080/cache/stats" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
     environment:
       FLARE_FHIR_SERVER_URL: http://dic-1-store-fhir-server:8080/fhir/
     networks:
       dic-1-bpe-backend:
     depends_on:
-    - dic-1-store-fhir-server
+      dic-1-store-fhir-server:
+        condition: service_healthy
 
   dic-1-store-fhir-server:
-    image: ghcr.io/chgl/hapi/hapi-fhir-jpaserver-starter:5.2.0-distroless
+    image: hapiproject/hapi:v6.4.4
+    healthcheck:
+      test: [ "CMD", "/opt/bin/curl", "http://localhost:8080"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
     networks:
       dic-1-bpe-backend:
     restart: always
     ports:
     - "8081:8080"
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://dic-1-store-db:5432/fhir?currentSchema=public"
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_DATASOURCE_DRIVERCLASSNAME: org.postgresql.Driver
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQL10Dialect
-      VALIDATION_REQUESTS_ENABLED: "false"
-      HAPI_FHIR_USE_APACHE_ADDRESS_STRATEGY: "true"
+      SPRING_CONFIG_LOCATION: 'file:///data/hapi/application.yaml'
+    volumes:
+    - type: bind
+      source: ./dic-1/fhir/conf/application.yaml
+      target: /data/hapi/application.yaml
+    - type: bind
+      source: ./data/feasibility-dsf-process-health-check.jar
+      target: /healthcheck/feasibility-dsf-process-health-check.jar
+    volumes_from:
+    - hapi-curl-download:ro
     depends_on:
-    - dic-1-store-db
+      hapi-curl-download:
+        condition: service_completed_successfully
+      dic-1-store-db:
+        condition: service_healthy
 
   dic-1-store-db:
-    image: postgres:12.6-alpine
+    image: postgres:15-alpine
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       dic-1-bpe-backend:
     restart: always
@@ -341,10 +423,10 @@ services:
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-app:
-    image: ghcr.io/highmed/fhir:0.9.0
+    image: ghcr.io/datasharingframework/fhir:1.0.0
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
+      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -365,37 +447,52 @@ services:
       target: /opt/fhir/log
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_2_user.password
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_2_user_permanent_delete.password
-      ORG_HIGHMED_DSF_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_2_client_certificate.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_2_client_certificate_private_key.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://db/dic_2_fhir
-      ORG_HIGHMED_DSF_FHIR_DB_USER_GROUP: dic_2_fhir_users
-      ORG_HIGHMED_DSF_FHIR_DB_USER_USERNAME: dic_2_fhir_server_user
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: dic_2_fhir_permanent_delete_users
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: dic_2_fhir_server_permanent_delete_user
-      ORG_HIGHMED_DSF_FHIR_SERVER_BASE_URL: https://dic-2/fhir
-      ORG_HIGHMED_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_2
-      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS: ${DIC_2_USER_THUMBPRINTS}
-      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS_PERMANENT_DELETE: ${DIC_2_USER_THUMBPRINTS_PERMANENT_DELETE}
+      DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      DEV_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_2_user.password
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_2_user_permanent_delete.password
+      DEV_DSF_FHIR_CLIENT_TRUST_SERVER_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_2_client_certificate.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_2_client_certificate_private_key.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      DEV_DSF_FHIR_DB_URL: jdbc:postgresql://db/dic_2_fhir
+      DEV_DSF_FHIR_DB_USER_GROUP: dic_2_fhir_users
+      DEV_DSF_FHIR_DB_USER_USERNAME: dic_2_fhir_server_user
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: dic_2_fhir_permanent_delete_users
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: dic_2_fhir_server_permanent_delete_user
+      DEV_DSF_FHIR_SERVER_BASE_URL: https://dic-2/fhir
+      DEV_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_2
+      DEV_DSF_FHIR_SERVER_ORGANIZATION_THUMBPRINT: ${DIC_2_USER_THUMBPRINTS}
+      DEV_DSF_FHIR_SERVER_ROLECONFIG: |
+        - webbrowser_test_user:
+            thumbprint: ${WEBBROWSER_TEST_USER_THUMBPRINT}
+            token-role: admin
+            dsf-role:
+              - CREATE
+              - READ
+              - UPDATE
+              - DELETE
+              - SEARCH
+              - HISTORY
+              - PERMANENT_DELETE
     networks:
       dic-2-fhir-frontend:
         ipv4_address: 172.10.0.99
       dic-2-fhir-backend:
       internet:
     depends_on:
-    - db
-    - proxy
+      db:
+        condition: service_healthy
+      proxy:
+        condition: service_healthy
+
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: ghcr.io/highmed/bpe:0.9.0
+    image: ghcr.io/datasharingframework/bpe:1.0.0
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
+      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -424,20 +521,21 @@ services:
       target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
-      ORG_HIGHMED_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_2_bpe_user.password
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_dic_2_bpe_user_camunda.password
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_2_client_certificate.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_2_client_certificate_private_key.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://db/dic_2_bpe
-      ORG_HIGHMED_DSF_BPE_DB_USER_GROUP: dic_2_bpe_users
-      ORG_HIGHMED_DSF_BPE_DB_USER_USERNAME: dic_2_bpe_server_user
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_2_camunda_users
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_2_camunda_server_user
-      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_2
-      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-2/fhir
+      DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_2_bpe_user.password
+      DEV_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_dic_2_bpe_user_camunda.password
+      DEV_DSF_BPE_FHIR_CLIENT_TRUST_SERVER_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_2_client_certificate.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_2_client_certificate_private_key.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      DEV_DSF_BPE_DB_URL: jdbc:postgresql://db/dic_2_bpe
+      DEV_DSF_BPE_DB_USER_GROUP: dic_2_bpe_users
+      DEV_DSF_BPE_DB_USER_USERNAME: dic_2_bpe_server_user
+      DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_2_camunda_users
+      DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_2_camunda_server_user
+      DEV_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_2
+      DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-2/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-2-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "true"
@@ -446,9 +544,15 @@ services:
       dic-2-bpe-backend:
       internet:
     depends_on:
-    - db
-    - dic-2-fhir-app
-    - dic-2-store
+      db:
+        condition: service_healthy
+        restart: true
+      dic-2-fhir-app:
+        condition:  service_healthy
+        restart: true
+      dic-2-store:
+        condition: service_healthy
+        restart: true
 
   # ---- DIC-2 - FHIR Data Store ----------------------------------------------
   dic-2-store:
@@ -470,10 +574,10 @@ services:
 
   # ---- DIC-3 - FHIR ---------------------------------------------------------
   dic-3-fhir-app:
-    image: ghcr.io/highmed/fhir:0.9.0
+    image: ghcr.io/datasharingframework/fhir:1.0.0
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
+      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -494,22 +598,33 @@ services:
         target: /opt/fhir/log
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_3_user.password
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_3_user_permanent_delete.password
-      ORG_HIGHMED_DSF_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_3_client_certificate.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_3_client_certificate_private_key.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://db/dic_3_fhir
-      ORG_HIGHMED_DSF_FHIR_DB_USER_GROUP: dic_3_fhir_users
-      ORG_HIGHMED_DSF_FHIR_DB_USER_USERNAME: dic_3_fhir_server_user
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: dic_3_fhir_permanent_delete_users
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: dic_3_fhir_server_permanent_delete_user
-      ORG_HIGHMED_DSF_FHIR_SERVER_BASE_URL: https://dic-3/fhir
-      ORG_HIGHMED_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_3
-      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS: ${DIC_3_USER_THUMBPRINTS}
-      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS_PERMANENT_DELETE: ${DIC_3_USER_THUMBPRINTS_PERMANENT_DELETE}
+      DEV_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      DEV_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_3_user.password
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_3_user_permanent_delete.password
+      DEV_DSF_FHIR_CLIENT_TRUST_SERVER_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_3_client_certificate.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_3_client_certificate_private_key.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      DEV_DSF_FHIR_DB_URL: jdbc:postgresql://db/dic_3_fhir
+      DEV_DSF_FHIR_DB_USER_GROUP: dic_3_fhir_users
+      DEV_DSF_FHIR_DB_USER_USERNAME: dic_3_fhir_server_user
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: dic_3_fhir_permanent_delete_users
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: dic_3_fhir_server_permanent_delete_user
+      DEV_DSF_FHIR_SERVER_BASE_URL: https://dic-3/fhir
+      DEV_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_3
+      DEV_DSF_FHIR_SERVER_ORGANIZATION_THUMBPRINT: ${DIC_3_USER_THUMBPRINTS}
+      DEV_DSF_FHIR_SERVER_ROLECONFIG: |
+        - webbrowser_test_user:
+            thumbprint: ${WEBBROWSER_TEST_USER_THUMBPRINT}
+            token-role: admin
+            dsf-role:
+              - CREATE
+              - READ
+              - UPDATE
+              - DELETE
+              - SEARCH
+              - HISTORY
+              - PERMANENT_DELETE
     networks:
       dic-3-fhir-frontend:
         ipv4_address: 172.10.0.115
@@ -521,10 +636,10 @@ services:
 
   # ---- DIC-3 - BPE ----------------------------------------------------------
   dic-3-bpe-app:
-    image: ghcr.io/highmed/bpe:0.9.0
+    image: ghcr.io/datasharingframework/bpe:1.0.0
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
+      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -554,20 +669,21 @@ services:
         target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
-      ORG_HIGHMED_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_3_bpe_user.password
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_dic_3_bpe_user_camunda.password
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_3_client_certificate.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_3_client_certificate_private_key.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://db/dic_3_bpe
-      ORG_HIGHMED_DSF_BPE_DB_USER_GROUP: dic_3_bpe_users
-      ORG_HIGHMED_DSF_BPE_DB_USER_USERNAME: dic_3_bpe_server_user
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_3_camunda_users
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_3_camunda_server_user
-      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_3
-      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-3/fhir
+      DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_3_bpe_user.password
+      DEV_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_dic_3_bpe_user_camunda.password
+      DEV_DSF_BPE_FHIR_CLIENT_TRUST_SERVER_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_3_client_certificate.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_3_client_certificate_private_key.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      DEV_DSF_BPE_DB_URL: jdbc:postgresql://db/dic_3_bpe
+      DEV_DSF_BPE_DB_USER_GROUP: dic_3_bpe_users
+      DEV_DSF_BPE_DB_USER_USERNAME: dic_3_bpe_server_user
+      DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_3_camunda_users
+      DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_3_camunda_server_user
+      DEV_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_3
+      DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-3/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_TRUST_STORE_PATH: /run/secrets/dic_3_store_proxy_self_signed_ca.p12
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_TRUST_STORE_PASSWORD: "testpw"
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_AUTH_BASIC_USERNAME: test
@@ -580,13 +696,18 @@ services:
       dic-3-bpe-backend:
       internet:
     depends_on:
-      - db
-      - dic-3-fhir-app
-      - dedicated-dic-3-store-proxy
+      db:
+        condition: service_healthy
+        restart: true
+      dic-3-fhir-app:
+        condition: service_healthy
+        restart: true
+      dedicated-dic-3-store-proxy:
+        condition: service_healthy
 
   # ---- DIC-3 - DEDICATED PROXY WITH SELF SIGNED CERT ------------------------
   dedicated-dic-3-store-proxy:
-    image: nginx:1.21
+    image: nginx:1.25.1
     restart: on-failure
     ports:
     - "127.0.0.1:10443:443"
@@ -613,8 +734,13 @@ services:
 
   # ---- DIC-3 - FHIR Data Store ----------------------------------------------
   dic-3-store:
-    image: samply/blaze:0.16.4
+    image: samply/blaze:0.20.2
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
     ports:
     - "8072:8080"
     environment:
@@ -631,10 +757,10 @@ services:
 
   # ---- DIC-4 - FHIR ---------------------------------------------------------
   dic-4-fhir-app:
-    image: ghcr.io/highmed/fhir:0.9.0
+    image: ghcr.io/datasharingframework/fhir:1.0.0
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_fhir.jar", "org.highmed.dsf.fhir.StatusClient" ]
+      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -655,22 +781,33 @@ services:
       target: /opt/fhir/log
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_4_user.password
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_4_user_permanent_delete.password
-      ORG_HIGHMED_DSF_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_4_client_certificate.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_4_client_certificate_private_key.pem
-      ORG_HIGHMED_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_FHIR_DB_URL: jdbc:postgresql://db/dic_4_fhir
-      ORG_HIGHMED_DSF_FHIR_DB_USER_GROUP: dic_4_fhir_users
-      ORG_HIGHMED_DSF_FHIR_DB_USER_USERNAME: dic_4_fhir_server_user
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: dic_4_fhir_permanent_delete_users
-      ORG_HIGHMED_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: dic_4_fhir_server_permanent_delete_user
-      ORG_HIGHMED_DSF_FHIR_SERVER_BASE_URL: https://dic-4/fhir
-      ORG_HIGHMED_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_4
-      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS: ${DIC_4_USER_THUMBPRINTS}
-      ORG_HIGHMED_DSF_FHIR_SERVER_USER_THUMBPRINTS_PERMANENT_DELETE: ${DIC_4_USER_THUMBPRINTS_PERMANENT_DELETE}
+      DEV_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      DEV_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_4_user.password
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_4_user_permanent_delete.password
+      DEV_DSF_FHIR_CLIENT_TRUST_SERVER_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_4_client_certificate.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_4_client_certificate_private_key.pem
+      DEV_DSF_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      DEV_DSF_FHIR_DB_URL: jdbc:postgresql://db/dic_4_fhir
+      DEV_DSF_FHIR_DB_USER_GROUP: dic_4_fhir_users
+      DEV_DSF_FHIR_DB_USER_USERNAME: dic_4_fhir_server_user
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: dic_4_fhir_permanent_delete_users
+      DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: dic_4_fhir_server_permanent_delete_user
+      DEV_DSF_FHIR_SERVER_BASE_URL: https://dic-4/fhir
+      DEV_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_4
+      DEV_DSF_FHIR_SERVER_ORGANIZATION_THUMBPRINT: ${DIC_4_USER_THUMBPRINTS}
+      DEV_DSF_FHIR_SERVER_ROLECONFIG: |
+        - webbrowser_test_user:
+            thumbprint: ${WEBBROWSER_TEST_USER_THUMBPRINT}
+            token-role: admin
+            dsf-role:
+              - CREATE
+              - READ
+              - UPDATE
+              - DELETE
+              - SEARCH
+              - HISTORY
+              - PERMANENT_DELETE
     networks:
       dic-4-fhir-frontend:
         ipv4_address: 172.10.0.131
@@ -679,13 +816,13 @@ services:
     depends_on:
     - db
     - proxy
-  
+
   # ---- DIC-4 - BPE ----------------------------------------------------------
   dic-4-bpe-app:
-    image: ghcr.io/highmed/bpe:0.9.0
+    image: ghcr.io/datasharingframework/bpe:1.0.0
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_bpe.jar", "org.highmed.dsf.bpe.StatusClient" ]
+      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -714,20 +851,21 @@ services:
         target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
-      ORG_HIGHMED_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
-      ORG_HIGHMED_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_4_bpe_user.password
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_dic_4_bpe_user_camunda.password
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_TRUST_CERTIFICATES: /run/secrets/app_client_trust_certificates.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_4_client_certificate.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_4_client_certificate_private_key.pem
-      ORG_HIGHMED_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
-      ORG_HIGHMED_DSF_BPE_DB_URL: jdbc:postgresql://db/dic_4_bpe
-      ORG_HIGHMED_DSF_BPE_DB_USER_GROUP: dic_4_bpe_users
-      ORG_HIGHMED_DSF_BPE_DB_USER_USERNAME: dic_4_bpe_server_user
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_4_camunda_users
-      ORG_HIGHMED_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_4_camunda_server_user
-      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_4
-      ORG_HIGHMED_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-4/fhir
+      DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+      DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_4_bpe_user.password
+      DEV_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_dic_4_bpe_user_camunda.password
+      DEV_DSF_BPE_FHIR_CLIENT_TRUST_SERVER_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_dic_4_client_certificate.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_dic_4_client_certificate_private_key.pem
+      DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+      DEV_DSF_BPE_DB_URL: jdbc:postgresql://db/dic_4_bpe
+      DEV_DSF_BPE_DB_USER_GROUP: dic_4_bpe_users
+      DEV_DSF_BPE_DB_USER_USERNAME: dic_4_bpe_server_user
+      DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_4_camunda_users
+      DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_4_camunda_server_user
+      DEV_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_4
+      DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-4/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-4-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
@@ -745,10 +883,15 @@ services:
 
   # ---- DIC-4 - FHIR Data Store ----------------------------------------------
   dic-4-store:
-    image: hapiproject/hapi:v5.4.1
+    image: hapiproject/hapi:v6.4.4
     restart: always
     ports:
     - "8082:8080"
+    healthcheck:
+      test: [ "CMD", "/opt/bin/curl", "http://localhost:8080"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
     environment:
       SPRING_DATASOURCE_URL: "jdbc:postgresql://dic-4-store-db:5432/fhir?currentSchema=public"
       SPRING_DATASOURCE_USERNAME: postgres
@@ -760,8 +903,13 @@ services:
       HAPI_FHIR_CQL_ENABLED: "true"
     networks:
       dic-4-bpe-backend:
+    volumes_from:
+    - hapi-curl-download:ro
     depends_on:
-    - dic-4-store-db
+      hapi-curl-download:
+        condition: service_completed_successfully
+      dic-4-store-db:
+        condition: service_healthy
 
   dic-4-store-init:
     image: curlimages/curl:7.85.0
@@ -783,11 +931,10 @@ services:
       dic-4-bpe-backend:
     depends_on:
       dic-4-store:
-#        service_healthy not possible since the HAPI image does not offer a possibility to enable health checks
-        condition: service_started
+        condition: service_healthy
 
   dic-4-store-db:
-    image: postgres:12.6-alpine
+    image: postgres:15-alpine
     networks:
       dic-4-bpe-backend:
     restart: always
@@ -943,6 +1090,9 @@ networks:
   dic-4-bpe-backend:
 
 volumes:
+  hapi-curl-binary:
+    name: "hapi-curl-binary"
+
   dic-1-store-data:
     name: "dic-1-store-data"
 

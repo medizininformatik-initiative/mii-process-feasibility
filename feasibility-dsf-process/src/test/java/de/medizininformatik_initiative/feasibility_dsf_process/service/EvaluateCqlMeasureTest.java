@@ -2,14 +2,16 @@ package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.IOperation;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
+import dev.dsf.bpe.v1.service.TaskHelper;
+import dev.dsf.bpe.v1.variables.Variables;
+import dev.dsf.fhir.authorization.read.ReadAccessHelper;
+import dev.dsf.fhir.client.FhirWebserviceClient;
+import dev.dsf.fhir.client.PreferReturnMinimalWithRetry;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.highmed.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.highmed.dsf.fhir.client.FhirWebserviceClientProvider;
-import org.highmed.dsf.fhir.task.TaskHelper;
-import org.highmed.fhir.client.FhirWebserviceClient;
-import org.highmed.fhir.client.PreferReturnMinimalWithRetry;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateType;
@@ -17,6 +19,7 @@ import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
+import org.hl7.fhir.r4.model.Task.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,10 +39,7 @@ import java.util.stream.Stream;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_ID;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
-import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN;
-import static org.highmed.dsf.bpe.ConstantsBase.CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR;
 import static org.hl7.fhir.r4.model.Task.TaskStatus.FAILED;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
@@ -65,6 +65,8 @@ public class EvaluateCqlMeasureTest {
     @Mock private PreferReturnMinimalWithRetry retry;
     @Mock private ProcessEngine processEngine;
     @Mock private RuntimeService runtimeService;
+    @Mock private ProcessPluginApi api;
+    @Mock private Variables variables;
 
     @InjectMocks private EvaluateCqlMeasure service;
 
@@ -75,14 +77,18 @@ public class EvaluateCqlMeasureTest {
     @BeforeEach
     public void setUp() {
         task = new Task();
+        task.setStatus(TaskStatus.INPROGRESS);
         taskOutputComponent = new Task.TaskOutputComponent();
+
+        when(api.getVariables(execution)).thenReturn(variables);
     }
 
     public static Stream<Arguments> measureReports() {
         return Stream.of(
                 Arguments.of("MissingMeasureReportGroup", Optional.of("Missing MeasureReport group"), new MeasureReport()
-                        .setDate(Date.from(Instant.parse("2007-12-03T10:15:30.00Z"))),
-                        Arguments.of("MissingMeasureReportPopulation", Optional.of("Missing MeasureReport population"), new MeasureReport()
+                        .setDate(Date.from(Instant.parse("2007-12-03T10:15:30.00Z")))),
+                Arguments.of("MissingMeasureReportPopulation", Optional.of("Missing MeasureReport population"),
+                        new MeasureReport()
                         .setDate(Date.from(Instant.parse("2007-12-03T10:15:30.00Z")))
                         .setGroup(List.of(
                          new MeasureReport.MeasureReportGroupComponent()
@@ -143,13 +149,13 @@ public class EvaluateCqlMeasureTest {
                                                 )))
                                                 .setCount(0)
                                                 .setSubjectResults(new Reference("http://localhost/Patient/123")))))))
-                ));
+                );
     }
 
     @ParameterizedTest
     @MethodSource("measureReports")
     public void testDoExecute(String name, Optional<String> expectedErrMsg, MeasureReport measureReport) throws Exception {
-        when(execution.getVariable(VARIABLE_MEASURE_ID))
+        when(variables.getString(VARIABLE_MEASURE_ID))
                 .thenReturn(MEASURE_ID);
         when(storeClient.operation())
                 .thenReturn(storeOperation);
@@ -163,10 +169,9 @@ public class EvaluateCqlMeasureTest {
                 .thenReturn(measureReport);
 
         if (expectedErrMsg.isPresent()) {
-            when(taskHelper.createOutput(CODESYSTEM_HIGHMED_BPMN, CODESYSTEM_HIGHMED_BPMN_VALUE_ERROR,
-                    "Process null has fatal error in step null, reason: " + expectedErrMsg.get()))
-                    .thenReturn(taskOutputComponent);
-            when(taskHelper.getTask(execution)).thenReturn(task);
+            when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
+            when(api.getTaskHelper()).thenReturn(taskHelper);
+            when(variables.getTasks()).thenReturn(List.of(task));
             when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
             when(webserviceClient.withMinimalReturn()).thenReturn(retry);
             when(execution.getProcessEngine()).thenReturn(processEngine);
@@ -176,13 +181,12 @@ public class EvaluateCqlMeasureTest {
             service.execute(execution);
 
             assertSame(FAILED, task.getStatus());
-            assertEquals(taskOutputComponent, task.getOutputFirstRep());
             verify(retry).update(task);
             verify(runtimeService).deleteProcessInstance(eq(instanceId), contains(expectedErrMsg.get()));
         } else {
             service.execute(execution);
 
-            verify(execution).setVariable(VARIABLE_MEASURE_REPORT, measureReport);
+            verify(variables).setResource(VARIABLE_MEASURE_REPORT, measureReport);
         }
     }
 }

@@ -14,8 +14,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <compileSource>11</compileSource>
-        <compileTarget>11</compileTarget>
+        <compileSource>17</compileSource>
+        <compileTarget>17</compileTarget>
 
         <hapi.fhir.version>5.1.0</hapi.fhir.version>
     </properties>
