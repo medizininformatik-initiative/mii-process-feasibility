@@ -64,7 +64,7 @@ public class StoreLiveResultTest {
         measureReport.setIdElement(new IdType(MEASURE_REPORT_ID));
 
         when(api.getVariables(execution)).thenReturn(variables);
-        when(variables.getStartTask()).thenReturn(task);
+        when(variables.getLatestTask()).thenReturn(task);
         when(api.getTaskHelper()).thenReturn(taskHelper);
         when(api.getReadAccessHelper()).thenReturn(readAccessHelper);
         when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
