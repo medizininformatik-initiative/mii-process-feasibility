@@ -4,13 +4,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>feasibility-dsf-process</artifactId>
-    <version>develop</version>
 
     <parent>
         <groupId>de.medizininformatik-initiative</groupId>
         <artifactId>feasibility-dsf-process-parent</artifactId>
-        <version>develop</version>
+        <version>0.0.0.0</version>
     </parent>
+
+    <properties>
+        <date>${maven.build.timestamp}</date>
+        <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+    </properties>
 
     <name>MII Feasibility DSF Process</name>
 
@@ -18,7 +22,7 @@
         <dependency>
             <groupId>dev.dsf</groupId>
             <artifactId>dsf-bpe-process-api-v1</artifactId>
-            <version>1.0.0</version>
+            <version>${dsf.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -99,7 +103,7 @@
         <dependency>
             <groupId>dev.dsf</groupId>
             <artifactId>dsf-fhir-validation</artifactId>
-            <version>1.0.0</version>
+            <version>${dsf.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -115,6 +119,12 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
