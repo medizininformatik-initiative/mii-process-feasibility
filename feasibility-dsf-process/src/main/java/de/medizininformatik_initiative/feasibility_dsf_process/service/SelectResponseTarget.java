@@ -25,7 +25,6 @@ public class SelectResponseTarget extends dev.dsf.bpe.v1.activity.AbstractServic
         String correlationKey = api.getTaskHelper()
                 .getFirstInputParameterStringValue(task, BpmnMessage.URL, BpmnMessage.Codes.CORRELATION_KEY).get();
         Identifier organizationIdentifier = task.getRequester().getIdentifier();
-
         // Workaround till https://github.com/datasharingframework/dsf/pull/62 is released
         Endpoint endpoint = api.getOrganizationProvider()
                 .getOrganization(organizationIdentifier)
