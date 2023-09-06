@@ -94,7 +94,7 @@ services:
 
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.0.0
+    image: ghcr.io/datasharingframework/fhir:1.1.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
@@ -163,7 +163,7 @@ services:
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.0.0
+    image: ghcr.io/datasharingframework/bpe:1.1.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
@@ -224,7 +224,7 @@ services:
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.0.0
+    image: ghcr.io/datasharingframework/fhir:1.1.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
@@ -290,7 +290,7 @@ services:
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.0.0
+    image: ghcr.io/datasharingframework/bpe:1.1.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
@@ -393,9 +393,6 @@ services:
     - type: bind
       source: ./dic-1/fhir/conf/application.yaml
       target: /data/hapi/application.yaml
-    - type: bind
-      source: ./data/feasibility-dsf-process-health-check.jar
-      target: /healthcheck/feasibility-dsf-process-health-check.jar
     volumes_from:
     - hapi-curl-download:ro
     depends_on:
@@ -424,7 +421,7 @@ services:
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.0.0
+    image: ghcr.io/datasharingframework/fhir:1.1.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
@@ -490,7 +487,7 @@ services:
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.0.0
+    image: ghcr.io/datasharingframework/bpe:1.1.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
@@ -575,7 +572,7 @@ services:
 
   # ---- DIC-3 - FHIR ---------------------------------------------------------
   dic-3-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.0.0
+    image: ghcr.io/datasharingframework/fhir:1.1.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
@@ -637,7 +634,7 @@ services:
 
   # ---- DIC-3 - BPE ----------------------------------------------------------
   dic-3-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.0.0
+    image: ghcr.io/datasharingframework/bpe:1.1.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
@@ -758,7 +755,7 @@ services:
 
   # ---- DIC-4 - FHIR ---------------------------------------------------------
   dic-4-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.0.0
+    image: ghcr.io/datasharingframework/fhir:1.1.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
@@ -820,7 +817,7 @@ services:
 
   # ---- DIC-4 - BPE ----------------------------------------------------------
   dic-4-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.0.0
+    image: ghcr.io/datasharingframework/bpe:1.1.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
