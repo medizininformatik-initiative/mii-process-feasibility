@@ -6,19 +6,12 @@ import dev.dsf.bpe.v1.variables.Target;
 import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Bundle.SearchEntryMode;
 import org.hl7.fhir.r4.model.Endpoint;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.springframework.beans.factory.InitializingBean;
-
-import java.util.Collections;
-import java.util.Map;
-
-import static java.lang.String.format;
 
 public class SelectResponseTarget extends dev.dsf.bpe.v1.activity.AbstractServiceDelegate implements InitializingBean {
 
@@ -34,32 +27,15 @@ public class SelectResponseTarget extends dev.dsf.bpe.v1.activity.AbstractServic
         Identifier organizationIdentifier = task.getRequester().getIdentifier();
 
         // Workaround till https://github.com/datasharingframework/dsf/pull/62 is released
-        Bundle resultBundle = api.getFhirWebserviceClientProvider().getLocalWebserviceClient().searchWithStrictHandling(
-                Organization.class,
-                Map.of("active", Collections.singletonList("true"),
-                        "identifier", Collections.singletonList(organizationIdentifier.getValue()),
-                        "_include", Collections.singletonList("Organization:endpoint")));
-        if (resultBundle == null || resultBundle.getEntry() == null || resultBundle.getEntry().size() != 2
-                || resultBundle.getEntryFirstRep().getResource() == null
-                || !(resultBundle.getEntryFirstRep().getResource() instanceof Organization)
-                || resultBundle.getEntry().get(1).getResource() == null
-                || !(resultBundle.getEntry().get(1).getResource() instanceof Endpoint)) {
-            throw new BpmnError("orgNotFound",
-                    format("No active (or more than one) Organization or no Endpoint found for identifier '%s'",
-                            organizationIdentifier.getValue()));
-        }
-
-        Target target = resultBundle.getEntry().stream()
-                .filter(BundleEntryComponent::hasSearch)
-                .filter(e -> SearchEntryMode.INCLUDE.equals(e.getSearch().getMode()))
-                .filter(BundleEntryComponent::hasResource)
-                .map(BundleEntryComponent::getResource)
-                .filter(r -> r instanceof Endpoint)
-                .map(r -> (Endpoint) r)
-                .findFirst()
-                .map(e -> variables.createTarget(organizationIdentifier.getValue(),
-                        e.getIdentifierFirstRep().getValue(), e.getAddress(), correlationKey))
+        Endpoint endpoint = api.getOrganizationProvider()
+                .getOrganization(organizationIdentifier)
+                .map(Organization::getEndpointFirstRep)
+                .map(Reference::getReference)
+                .map(r -> api.getEndpointProvider().getEndpoint(r).get())
                 .get();
+
+        Target target = variables.createTarget(organizationIdentifier.getValue(),
+                endpoint.getIdentifierFirstRep().getValue(), endpoint.getAddress(), correlationKey);
 
         variables.setTarget(target);
     }
