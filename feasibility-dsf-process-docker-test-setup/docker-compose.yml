@@ -551,8 +551,13 @@ services:
 
   # ---- DIC-2 - FHIR Data Store ----------------------------------------------
   dic-2-store:
-    image: samply/blaze:0.17.12
+    image: samply/blaze:0.22.2
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
     ports:
     - "127.0.0.1:8080:8080"
     environment:
@@ -728,7 +733,7 @@ services:
 
   # ---- DIC-3 - FHIR Data Store ----------------------------------------------
   dic-3-store:
-    image: samply/blaze:0.20.2
+    image: samply/blaze:0.22.2
     restart: on-failure
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/health" ]
