@@ -3,6 +3,7 @@ package de.medizininformatik_initiative.feasibility_dsf_process.service;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.constants.CodeSystems.BpmnMessage;
 import dev.dsf.bpe.v1.service.EndpointProvider;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import dev.dsf.bpe.v1.service.OrganizationProvider;
 import dev.dsf.bpe.v1.service.TaskHelper;
 import dev.dsf.bpe.v1.variables.Target;
@@ -45,8 +46,10 @@ public class SelectResponseTargetTest {
     @Mock private FhirWebserviceClient client;
     @Mock private OrganizationProvider organizationProvider;
     @Mock private EndpointProvider endpointProvider;
+    @Mock private FhirWebserviceClientProvider clientProvider;
 
     @InjectMocks private SelectResponseTarget service;
+
 
 
 
@@ -83,8 +86,9 @@ public class SelectResponseTargetTest {
                 .thenReturn(Optional.of(correlationKey));
         when(api.getOrganizationProvider()).thenReturn(organizationProvider);
         when(organizationProvider.getOrganization(organizationId)).thenReturn(Optional.of(organization));
-        when(api.getEndpointProvider()).thenReturn(endpointProvider);
-        when(endpointProvider.getEndpoint(endpointReference)).thenReturn(Optional.of(endpoint));
+        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
+        when(client.read(Endpoint.class, endpointReference)).thenReturn(endpoint);
         when(variables.createTarget(organizationId.getValue(), endpointId.getValue(), endpoint.getAddress(),
                 correlationKey)).thenReturn(target);
 
