@@ -32,7 +32,7 @@ This describes the execute process in case `CQL` is specified as an evaluation s
 
 5. In each DIZ, the `execute` process starts by fetching the Measure and Library resource created at the ZARS FHIR communication server. The resources have to be fetched by the BPE because only Task resources are sent actively between organizations and message payload is only fetched in case a process really needs it. FHIR search is used in order to fetch both resources in one HTTP request by searching for the Measure resource and including the referenced Library resource.
 
-6. In the next step, the `execute` process stores the Measure and Library resources to the Blaze FHIR server in order to be able to execute the [$evaluate-measure][5] operation.
+6. In the next step, the `execute` process stores the Measure and Library resources to the Blaze FHIR server in order to be able to execute the [$evaluate-measure][5] operation. The storage uses the [FHIR create interaction][11] on the endpoints `[base]/Measure` and `[base]/Library` using HTTP `POST` while the `$evaluate-measure` operation is executed using HTTP `GET` on the endpoint `[base]/Measure/[id]/$evaluate-measure`.
 
 7. The resulting [MeasureReport][6] resource is transferred back to the DIZ BPE.
 
@@ -50,7 +50,7 @@ This describes the execute process in case `Structured Query` is specified as an
 
 6. The DIZ BPE extracts the structured query from the Library resource and sends it to the Flare server.
 
-7. The DIZ Flare server runs the evaluation by transforming the structured query into one or more requests compatible with the FHIR standard.
+7. The DIZ Flare server runs the evaluation by transforming the structured query into one or more [FHIR search requests][13]. Flare itself uses the [FHIR search interaction][12] on the endpoints `[base]/[type]/_search` using HTTP `POST` and HTTP `GET` on the `next` links from the resulting FHIR `searchset` bundles.
 
 8. The DIZ Flare server collects all results from the FHIR server.
 
@@ -154,3 +154,6 @@ This version of the process is compatible with the following components:
 [8]: <https://github.com/highmed/highmed-dsf/wiki/DSF-0.5.5-Configuration-Parameters#dsf-bpe>
 [9]: <https://github.com/rwth-imi/flare-query>
 [10]: <https://en.wikipedia.org/wiki/ISO_8601#Durations>
+[11]: <https://hl7.org/fhir/http.html#create>
+[12]: <https://hl7.org/fhir/http.html#search>
+[13]: <https://hl7.org/fhir/search.html>
