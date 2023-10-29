@@ -87,6 +87,6 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
                 "medizininformatik-initiativede_feasibilityExecute",
                 Arrays.asList(aExe, sTExe, sTResS, vF, cF, sMeasure, sMeasureReport, sLibrary),
                 "medizininformatik-initiativede_feasibilityRequest",
-                Arrays.asList(aReq, sTReq, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary));
+                Arrays.asList(aReq, sTReq, sTResS, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary));
     }
 }
