@@ -8,15 +8,34 @@ import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.Eva
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.FeasibilityConfig;
 import dev.dsf.bpe.v1.ProcessPluginDefinition;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class FeasibilityProcessPluginDefinition implements ProcessPluginDefinition {
 
-    public static final String VERSION = "1.0.0.0";
-    private static final LocalDate RELEASE_DATE = LocalDate.of(2023, 7, 3);
+    public final String version;
+    private final LocalDate releaseDate;
+
+    public FeasibilityProcessPluginDefinition() {
+        try (InputStream input = FeasibilityProcessPluginDefinition.class.getClassLoader()
+                .getResourceAsStream("app.properties")) {
+            checkNotNull(input);
+            Properties props = new Properties();
+            props.load(input);
+
+            this.version = props.getProperty("build.version");
+            this.releaseDate = LocalDate.parse(props.getProperty("build.date"));
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not load application properties.", e);
+        }
+    }
 
     @Override
     public String getName() {
@@ -25,12 +44,12 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
 
     @Override
     public String getVersion() {
-        return VERSION;
+        return version;
     }
 
     @Override
     public LocalDate getReleaseDate() {
-        return RELEASE_DATE;
+        return releaseDate;
     }
 
     @Override
@@ -68,6 +87,6 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
                 "medizininformatik-initiativede_feasibilityExecute",
                 Arrays.asList(aExe, sTExe, sTResS, vF, cF, sMeasure, sMeasureReport, sLibrary),
                 "medizininformatik-initiativede_feasibilityRequest",
-                Arrays.asList(aReq, sTReq, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary));
+                Arrays.asList(aReq, sTReq, sTResS, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary));
     }
 }

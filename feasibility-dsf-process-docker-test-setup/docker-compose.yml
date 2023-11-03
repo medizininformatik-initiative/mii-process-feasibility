@@ -94,10 +94,10 @@ services:
 
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.0.0
+    image: ghcr.io/datasharingframework/fhir:1.3.1
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
+      test: [ "CMD-SHELL", "./healthcheck.sh" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -146,6 +146,7 @@ services:
               - SEARCH
               - HISTORY
               - PERMANENT_DELETE
+              - WEBSOCKET
             practitioner-role:
               - http://dsf.dev/fhir/CodeSystem/practitioner-role|DSF_ADMIN
     networks:
@@ -162,10 +163,10 @@ services:
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.0.0
+    image: ghcr.io/datasharingframework/bpe:1.3.1
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
+      test: [ "CMD-SHELL", "./healthcheck.sh" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -207,7 +208,6 @@ services:
       DEV_DSF_BPE_DB_USER_USERNAME: zars_bpe_server_user
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: zars_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: zars_camunda_server_user
-      DEV_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_ZARS
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://zars/fhir
     networks:
       zars-bpe-frontend:
@@ -223,10 +223,10 @@ services:
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.0.0
+    image: ghcr.io/datasharingframework/fhir:1.3.1
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
+      test: [ "CMD-SHELL", "./healthcheck.sh" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -289,10 +289,10 @@ services:
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.0.0
+    image: ghcr.io/datasharingframework/bpe:1.3.1
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
+      test: [ "CMD-SHELL", "./healthcheck.sh" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -334,7 +334,6 @@ services:
       DEV_DSF_BPE_DB_USER_USERNAME: dic_1_bpe_server_user
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_1_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_1_camunda_server_user
-      DEV_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_1
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-1/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_BASE_URL: http://dic-1-store:8080/
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_TIMEOUT_CONNECT: 2000
@@ -357,7 +356,7 @@ services:
 
   # ---- DIC-1 - FHIR Data Store ----------------------------------------------
   dic-1-store:
-    image: ghcr.io/rwth-imi/flare-query:1.0.0
+    image: ghcr.io/medizininformatik-initiative/flare:1.0.0
     restart: always
     ports:
     - "5000:8080"
@@ -367,7 +366,7 @@ services:
       timeout: 15s
       retries: 5
     environment:
-      FLARE_FHIR_SERVER_URL: http://dic-1-store-fhir-server:8080/fhir/
+      FLARE_FHIR_SERVER: http://dic-1-store-fhir-server:8080/fhir/
     networks:
       dic-1-bpe-backend:
     depends_on:
@@ -392,9 +391,6 @@ services:
     - type: bind
       source: ./dic-1/fhir/conf/application.yaml
       target: /data/hapi/application.yaml
-    - type: bind
-      source: ./data/feasibility-dsf-process-health-check.jar
-      target: /healthcheck/feasibility-dsf-process-health-check.jar
     volumes_from:
     - hapi-curl-download:ro
     depends_on:
@@ -423,10 +419,10 @@ services:
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.0.0
+    image: ghcr.io/datasharingframework/fhir:1.3.1
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
+      test: [ "CMD-SHELL", "./healthcheck.sh" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -489,10 +485,10 @@ services:
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.0.0
+    image: ghcr.io/datasharingframework/bpe:1.3.1
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
+      test: [ "CMD-SHELL", "./healthcheck.sh" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -534,7 +530,6 @@ services:
       DEV_DSF_BPE_DB_USER_USERNAME: dic_2_bpe_server_user
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_2_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_2_camunda_server_user
-      DEV_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_2
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-2/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-2-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
@@ -556,8 +551,13 @@ services:
 
   # ---- DIC-2 - FHIR Data Store ----------------------------------------------
   dic-2-store:
-    image: samply/blaze:0.17.12
+    image: samply/blaze:0.22.3
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
     ports:
     - "127.0.0.1:8080:8080"
     environment:
@@ -574,10 +574,10 @@ services:
 
   # ---- DIC-3 - FHIR ---------------------------------------------------------
   dic-3-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.0.0
+    image: ghcr.io/datasharingframework/fhir:1.3.1
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
+      test: [ "CMD-SHELL", "./healthcheck.sh" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -636,10 +636,10 @@ services:
 
   # ---- DIC-3 - BPE ----------------------------------------------------------
   dic-3-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.0.0
+    image: ghcr.io/datasharingframework/bpe:1.3.1
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
+      test: [ "CMD-SHELL", "./healthcheck.sh" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -682,7 +682,6 @@ services:
       DEV_DSF_BPE_DB_USER_USERNAME: dic_3_bpe_server_user
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_3_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_3_camunda_server_user
-      DEV_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_3
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-3/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_TRUST_STORE_PATH: /run/secrets/dic_3_store_proxy_self_signed_ca.p12
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_TRUST_STORE_PASSWORD: "testpw"
@@ -734,7 +733,7 @@ services:
 
   # ---- DIC-3 - FHIR Data Store ----------------------------------------------
   dic-3-store:
-    image: samply/blaze:0.20.2
+    image: samply/blaze:0.22.3
     restart: on-failure
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/health" ]
@@ -757,10 +756,10 @@ services:
 
   # ---- DIC-4 - FHIR ---------------------------------------------------------
   dic-4-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.0.0
+    image: ghcr.io/datasharingframework/fhir:1.3.1
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
+      test: [ "CMD-SHELL", "./healthcheck.sh" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -819,10 +818,10 @@ services:
 
   # ---- DIC-4 - BPE ----------------------------------------------------------
   dic-4-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.0.0
+    image: ghcr.io/datasharingframework/bpe:1.3.1
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "java", "-cp", "dsf_status_client.jar", "dev.dsf.common.status.client.StatusClient" ]
+      test: [ "CMD-SHELL", "./healthcheck.sh" ]
       interval: 10s
       timeout: 15s
       retries: 5
@@ -864,7 +863,6 @@ services:
       DEV_DSF_BPE_DB_USER_USERNAME: dic_4_bpe_server_user
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_4_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_4_camunda_server_user
-      DEV_DSF_BPE_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_DIC_4
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-4/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-4-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql

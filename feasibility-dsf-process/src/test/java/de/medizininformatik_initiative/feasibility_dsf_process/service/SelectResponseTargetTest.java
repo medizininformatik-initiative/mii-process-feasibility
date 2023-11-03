@@ -2,7 +2,9 @@ package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.constants.CodeSystems.BpmnMessage;
+import dev.dsf.bpe.v1.service.EndpointProvider;
 import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
+import dev.dsf.bpe.v1.service.OrganizationProvider;
 import dev.dsf.bpe.v1.service.TaskHelper;
 import dev.dsf.bpe.v1.variables.Target;
 import dev.dsf.bpe.v1.variables.Variables;
@@ -23,7 +25,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -42,10 +43,14 @@ public class SelectResponseTargetTest {
     @Mock private DelegateExecution execution;
     @Mock private ProcessPluginApi api;
     @Mock private Variables variables;
-    @Mock private FhirWebserviceClientProvider clientProvider;
     @Mock private FhirWebserviceClient client;
+    @Mock private OrganizationProvider organizationProvider;
+    @Mock private EndpointProvider endpointProvider;
+    @Mock private FhirWebserviceClientProvider clientProvider;
 
     @InjectMocks private SelectResponseTarget service;
+
+
 
 
     @Test
@@ -62,9 +67,10 @@ public class SelectResponseTargetTest {
         Endpoint endpoint = new Endpoint()
                 .addIdentifier(endpointId)
                 .setAddress("https://localhost/endpoint");
+        String endpointReference = "endpoint-184410";
         Organization organization = new Organization()
                 .setIdentifier(List.of(organizationId))
-                .setEndpoint(List.of(new Reference(endpoint)));
+                .setEndpoint(List.of(new Reference(endpoint).setReference(endpointReference)));
         Target target = mock(Target.class);
         Bundle bundle = new Bundle();
         bundle.addEntry().setSearch(new BundleEntrySearchComponent().setMode(SearchEntryMode.MATCH))
@@ -76,11 +82,13 @@ public class SelectResponseTargetTest {
         when(api.getVariables(execution)).thenReturn(variables);
         when(variables.getStartTask()).thenReturn(task);
         when(api.getTaskHelper()).thenReturn(taskHelper);
-        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
-        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
-        when(client.searchWithStrictHandling(Mockito.eq(Organization.class), Mockito.anyMap())).thenReturn(bundle);
         when(taskHelper.getFirstInputParameterStringValue(task, BpmnMessage.URL, BpmnMessage.Codes.CORRELATION_KEY))
                 .thenReturn(Optional.of(correlationKey));
+        when(api.getOrganizationProvider()).thenReturn(organizationProvider);
+        when(organizationProvider.getOrganization(organizationId)).thenReturn(Optional.of(organization));
+        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
+        when(client.read(Endpoint.class, endpointReference)).thenReturn(endpoint);
         when(variables.createTarget(organizationId.getValue(), endpointId.getValue(), endpoint.getAddress(),
                 correlationKey)).thenReturn(target);
 

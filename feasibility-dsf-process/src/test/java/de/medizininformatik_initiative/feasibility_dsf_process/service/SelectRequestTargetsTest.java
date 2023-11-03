@@ -12,6 +12,7 @@ import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Endpoint;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
@@ -33,6 +34,7 @@ import java.util.Optional;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -41,6 +43,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class SelectRequestTargetsTest {
 
+    private static final String PARENT_ORGANIZATION_ID = "medizininformatik-initiative.de";
     private static final String BASE_URL = "foo/";
     private static final String MEASURE_ID = "measure-id-11:57:29";
 
@@ -79,7 +82,8 @@ public class SelectRequestTargetsTest {
 
     @Test
     public void doExecute_NoTargets() {
-        when(organizationProvider.getRemoteOrganizations()).thenReturn(List.of());
+        when(organizationProvider.getOrganizations(any(Identifier.class), any(Coding.class)))
+                .thenReturn(List.of());
         when(variables.createTargets(eq(List.of()))).thenReturn(targets);
 
         service.doExecute(execution, variables);
@@ -105,8 +109,8 @@ public class SelectRequestTargetsTest {
                 .setEndpoint(List.of(new Reference(dic_endpoint).setReference(endpointReference)))
                 .setActiveElement((BooleanType) new BooleanType().setValue(true));
 
-        when(api.getOrganizationProvider()).thenReturn(organizationProvider);
-        when(organizationProvider.getRemoteOrganizations()).thenReturn(List.of(organization));
+        when(organizationProvider.getOrganizations(any(Identifier.class), any(Coding.class)))
+                .thenReturn(List.of(organization));
         when(client.read(Endpoint.class, endpointReference)).thenReturn(dic_endpoint);
         when(variables.createTarget(eq(organizationId.getValue()), eq(endpointId.getValue()), eq(endpointAddress),
                                     anyString()))
@@ -135,8 +139,8 @@ public class SelectRequestTargetsTest {
                 .setEndpoint(List.of(new Reference(dic_endpoint).setReference(endpointReference)))
                 .setActiveElement((BooleanType) new BooleanType().setValue(true));
 
-        when(api.getOrganizationProvider()).thenReturn(organizationProvider);
-        when(organizationProvider.getRemoteOrganizations()).thenReturn(List.of(organization));
+        when(organizationProvider.getOrganizations(any(Identifier.class), any(Coding.class)))
+                .thenReturn(List.of(organization));
         when(client.read(Endpoint.class, endpointReferenceId)).thenReturn(dic_endpoint);
         when(variables.createTarget(eq(organizationId.getValue()), eq(endpointId.getValue()), eq(endpointAddress),
                 anyString()))
@@ -179,9 +183,8 @@ public class SelectRequestTargetsTest {
         var targetA = Mockito.mock(Target.class);
         var targetB = Mockito.mock(Target.class);
 
-
-        when(api.getOrganizationProvider()).thenReturn(organizationProvider);
-        when(organizationProvider.getRemoteOrganizations()).thenReturn(List.of(organizationA, organizationB));
+        when(organizationProvider.getOrganizations(any(Identifier.class), any(Coding.class)))
+                .thenReturn(List.of(organizationA, organizationB));
         when(client.read(Endpoint.class, dic_1_endpointReference)).thenReturn(dic_1_endpoint);
         when(client.read(Endpoint.class, dic_2_endpointReference)).thenReturn(dic_2_endpoint);
         when(variables.createTarget(eq(organizationAId.getValue()), eq(endpointAId.getValue()), eq(endpointAAddress),

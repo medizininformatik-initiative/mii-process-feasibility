@@ -2,9 +2,12 @@ package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
+import dev.dsf.bpe.v1.service.OrganizationProvider;
 import dev.dsf.bpe.v1.variables.Target;
 import dev.dsf.bpe.v1.variables.Variables;
+import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Endpoint;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
+import static dev.dsf.common.auth.conf.Identity.ORGANIZATION_IDENTIFIER_SYSTEM;
 
 public class SelectRequestTargets extends AbstractServiceDelegate {
 
@@ -33,14 +37,23 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
 
-        List<Target> targets = api.getOrganizationProvider().getRemoteOrganizations().stream()
+        OrganizationProvider organizationProvider = api.getOrganizationProvider();
+        FhirWebserviceClient client = api.getFhirWebserviceClientProvider().getLocalWebserviceClient();
+        Identifier parentIdentifier = new Identifier()
+                .setSystem(ORGANIZATION_IDENTIFIER_SYSTEM)
+                .setValue("medizininformatik-initiative.de");
+        Coding memberOrganizationRole = new Coding()
+                .setSystem("http://dsf.dev/fhir/CodeSystem/organization-role")
+                .setCode("DIC");
+        List<Target> targets = organizationProvider
+                .getOrganizations(parentIdentifier, memberOrganizationRole)
+                .stream()
                 .filter(Organization::hasEndpoint)
                 .filter(Organization::hasIdentifier)
                 .map(organization -> {
                     Identifier organizationIdentifier = organization.getIdentifierFirstRep();
                     String path = URI.create(organization.getEndpointFirstRep().getReference()).getPath();
-                    Endpoint endpoint = api.getFhirWebserviceClientProvider().getLocalWebserviceClient()
-                            .read(Endpoint.class, path.substring(path.lastIndexOf("/") + 1));
+                    Endpoint endpoint = client.read(Endpoint.class, path.substring(path.lastIndexOf("/") + 1));
                     return variables.createTarget(organizationIdentifier.getValue(),
                             endpoint.getIdentifierFirstRep().getValue(),
                             endpoint.getAddress(),
