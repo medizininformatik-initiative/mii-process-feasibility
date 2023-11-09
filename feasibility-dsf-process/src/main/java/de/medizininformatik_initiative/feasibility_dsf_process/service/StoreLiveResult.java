@@ -46,8 +46,6 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
         MeasureReport storedMeasureReport = storeMeasureReport(measureReport);
         addMeasureReportReferenceToTaskOutput(task, storedMeasureReport.getIdElement());
         logger.info("Added measure report {} to {}", storedMeasureReport.getId(), task.getId());
-
-        variables.setResource(VARIABLE_MEASURE_REPORT, storedMeasureReport);
     }
 
     private void addReadAccessTag(MeasureReport measureReport) {
