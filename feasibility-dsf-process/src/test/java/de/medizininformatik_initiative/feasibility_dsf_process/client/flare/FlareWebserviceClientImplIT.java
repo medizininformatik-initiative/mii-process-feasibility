@@ -38,7 +38,7 @@ public class FlareWebserviceClientImplIT {
             .withEnv("LOG_LEVEL", "debug");
 
     @Container
-    public static GenericContainer<?> flare = new GenericContainer<>(DockerImageName.parse("ghcr.io/medizininformatik-initiative/flare:0.2.3"))
+    public static GenericContainer<?> flare = new GenericContainer<>(DockerImageName.parse("ghcr.io/medizininformatik-initiative/flare:2.1.0"))
             .withExposedPorts(8080)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("flare")
