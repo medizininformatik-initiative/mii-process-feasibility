@@ -52,7 +52,7 @@ public class StoreClientIT {
     private static final Network DEFAULT_CONTAINER_NETWORK = Network.newNetwork();
 
     @Container
-    public GenericContainer<?> fhirServer = new GenericContainer<>(DockerImageName.parse("samply/blaze:0.22.2"))
+    public GenericContainer<?> fhirServer = new GenericContainer<>(DockerImageName.parse("samply/blaze:0.23.0"))
             .withExposedPorts(8080)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("fhir-server")
