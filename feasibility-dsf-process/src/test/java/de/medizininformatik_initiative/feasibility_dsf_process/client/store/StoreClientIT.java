@@ -4,6 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.store.StoreClientConfiguration.ConnectionConfiguration;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.store.StoreClientConfiguration.ProxyConfiguration;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.store.StoreClientConfiguration.StoreAuthenticationConfiguration;
+import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.DefaultTrustStoreUtils;
 import lombok.NonNull;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -189,16 +190,16 @@ public class StoreClientIT {
     @Test
     public void testRequestToReverseProxyWithClientCert() throws KeyStoreException, CertificateException, IOException,
             NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
-        // Make sure to run `create_certs_for_store_client_tests.sh` from the `scripts` directory first. This will be
+        // Make sure to run `create_certs_for_client_tests.sh` from the `scripts` directory first. This will be
         // automatically triggered by maven when trying to run integration tests as it is coupled with a phase called
         // `pre-integration-test`.
         var nginxConf = getResource("nginx.conf");
         var nginxTestProxyConfTemplate = getResource("reverse_proxy_client_cert.conf.template");
         var staticFhirMetadata = getResource("fhir_metadata.json");
         var indexFile = getResource("index.html");
-        var trustedCerts = getResource("./certs/ca.pem");
-        var serverCertChain = getResource("./certs/server_cert_chain.pem");
-        var serverCertKey = getResource("./certs/server_cert_key.pem");
+        var trustedCerts = getResource("../certs/ca.pem");
+        var serverCertChain = getResource("../certs/server_cert_chain.pem");
+        var serverCertKey = getResource("../certs/server_cert_key.pem");
 
         NginxContainer<?> nginx = new NginxContainer<>("nginx:1.25.1")
                 .withExposedPorts(80)
@@ -212,12 +213,12 @@ public class StoreClientIT {
                 .withNetwork(DEFAULT_CONTAINER_NETWORK);
         nginx.start();
 
-        var serverTrustStoreStream = getResourceAsStream("./certs/ca.p12");
+        var serverTrustStoreStream = getResourceAsStream("../certs/ca.p12");
         var trustStore = KeyStore.getInstance("PKCS12");
         trustStore.load(serverTrustStoreStream, "changeit".toCharArray());
         serverTrustStoreStream.close();
 
-        var clientCertStream = getResourceAsStream("./certs/client_key_store.p12");
+        var clientCertStream = getResourceAsStream("../certs/client_key_store.p12");
         var keyStore = KeyStore.getInstance("PKCS12");
         keyStore.load(clientCertStream, "changeit".toCharArray());
         clientCertStream.close();

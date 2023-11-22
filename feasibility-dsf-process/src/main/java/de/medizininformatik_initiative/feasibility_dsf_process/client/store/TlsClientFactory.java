@@ -26,12 +26,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
-import javax.net.ssl.SSLContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLContext;
 
 // TODO: doc
 @Slf4j
@@ -74,39 +75,42 @@ public class TlsClientFactory extends RestfulClientFactory {
 
     public HttpClient getNativeHttpClient() {
         if (myHttpClient == null) {
-            SSLContext sslContext = getSslContext();
-
-            Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-                    .register("http", PlainConnectionSocketFactory.getSocketFactory())
-                    .register("https", new SSLConnectionSocketFactory(sslContext)).build();
-
-            PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
-                    socketFactoryRegistry, null, null, null, 5000,
-                    TimeUnit.MILLISECONDS);
-
-            connectionManager.setMaxTotal(getPoolMaxTotal());
-            connectionManager.setDefaultMaxPerRoute(getPoolMaxPerRoute());
-
-            RequestConfig defaultRequestConfig = RequestConfig.custom().setSocketTimeout(getSocketTimeout())
-                    .setConnectTimeout(getConnectTimeout()).setConnectionRequestTimeout(getConnectionRequestTimeout())
-                    .setProxy(myProxy).build();
-
-            HttpClientBuilder builder = HttpClients.custom().setConnectionManager(connectionManager)
-                    .setSSLContext(sslContext).setDefaultRequestConfig(defaultRequestConfig).disableCookieManagement();
-
-            if (myProxy != null && StringUtils.isNotBlank(getProxyUsername())
-                    && StringUtils.isNotBlank(getProxyPassword())) {
-                CredentialsProvider credsProvider = new BasicCredentialsProvider();
-                credsProvider.setCredentials(new AuthScope(myProxy.getHostName(), myProxy.getPort()),
-                        new UsernamePasswordCredentials(getProxyUsername(), getProxyPassword()));
-                builder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
-                builder.setDefaultCredentialsProvider(credsProvider);
-            }
-
-            myHttpClient = builder.build();
+            myHttpClient = getNativeHttpClientBuilder().build();
         }
 
         return myHttpClient;
+    }
+
+    public HttpClientBuilder getNativeHttpClientBuilder() {
+        SSLContext sslContext = getSslContext();
+
+        Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
+                .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                .register("https", new SSLConnectionSocketFactory(sslContext)).build();
+
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
+                socketFactoryRegistry, null, null, null, 5000,
+                TimeUnit.MILLISECONDS);
+
+        connectionManager.setMaxTotal(getPoolMaxTotal());
+        connectionManager.setDefaultMaxPerRoute(getPoolMaxPerRoute());
+
+        RequestConfig defaultRequestConfig = RequestConfig.custom().setSocketTimeout(getSocketTimeout())
+                .setConnectTimeout(getConnectTimeout()).setConnectionRequestTimeout(getConnectionRequestTimeout())
+                .setProxy(myProxy).build();
+
+        HttpClientBuilder builder = HttpClients.custom().setConnectionManager(connectionManager)
+                .setSSLContext(sslContext).setDefaultRequestConfig(defaultRequestConfig).disableCookieManagement();
+
+        if (myProxy != null && StringUtils.isNotBlank(getProxyUsername())
+                && StringUtils.isNotBlank(getProxyPassword())) {
+            CredentialsProvider credsProvider = new BasicCredentialsProvider();
+            credsProvider.setCredentials(new AuthScope(myProxy.getHostName(), myProxy.getPort()),
+                    new UsernamePasswordCredentials(getProxyUsername(), getProxyPassword()));
+            builder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
+            builder.setDefaultCredentialsProvider(credsProvider);
+        }
+        return builder;
     }
 
     protected SSLContext getSslContext() {

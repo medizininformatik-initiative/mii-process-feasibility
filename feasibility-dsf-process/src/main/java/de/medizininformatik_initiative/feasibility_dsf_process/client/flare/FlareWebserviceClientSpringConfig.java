@@ -1,14 +1,20 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.client.flare;
 
+import de.medizininformatik_initiative.feasibility_dsf_process.client.store.TlsClientFactory;
+import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.BaseConfig;
+import org.apache.http.client.HttpClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.time.Duration;
+
+import javax.net.ssl.SSLContext;
 
 @Configuration
+@Import(BaseConfig.class)
 public class FlareWebserviceClientSpringConfig {
 
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url:}")
@@ -23,9 +29,9 @@ public class FlareWebserviceClientSpringConfig {
     }
 
     @Bean
-    public HttpClient flareHttpClient() {
-        return HttpClient.newBuilder()
-                .connectTimeout(Duration.ofMillis(connectTimeout))
+    public HttpClient flareHttpClient(@Qualifier("base-client") SSLContext sslContext) {
+        return new TlsClientFactory(null, sslContext)
+                .getNativeHttpClientBuilder()
                 .build();
     }
 }

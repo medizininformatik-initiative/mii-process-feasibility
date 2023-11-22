@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 BASE_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-TARGET_DIR=$(readlink -f "${BASE_DIR}/../src/test/resources/de/medizininformatik_initiative/feasibility_dsf_process/client/store/certs")
+TARGET_DIR=$(readlink -f "${BASE_DIR}/../src/test/resources/de/medizininformatik_initiative/feasibility_dsf_process/client/certs")
 
 mkdir -p "${TARGET_DIR}"
 
@@ -19,12 +19,14 @@ openssl pkcs12 -export -out ${TARGET_DIR}/ca.p12 \
 # Issue server certificate using said self signed CA
 openssl req -nodes -sha256 -new -newkey rsa:2048 -keyout ${TARGET_DIR}/server_cert_key.pem \
   -out ${TARGET_DIR}/server_cert_csr.pem \
-  -subj "/C=DE/ST=Berlin/L=Berlin/O=Bar/CN=localhost"
+  -subj "/C=DE/ST=Berlin/L=Berlin/O=Bar/CN=localhost" \
+  -addext "subjectAltName = DNS:localhost, DNS:proxy"
 
 openssl x509 -req -days 7 -sha256 -in ${TARGET_DIR}/server_cert_csr.pem \
   -CA ${TARGET_DIR}/ca.pem \
   -CAkey ${TARGET_DIR}/ca_key.pem \
   -CAcreateserial \
+  -copy_extensions copyall \
   -out ${TARGET_DIR}/server_cert.pem
 
   # Server cert chain
