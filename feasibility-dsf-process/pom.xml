@@ -159,7 +159,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${basedir}/scripts/create_certs_for_store_client_tests.sh</executable>
+                            <executable>${basedir}/scripts/create_certs_for_client_tests.sh</executable>
                         </configuration>
                     </execution>
                 </executions>
