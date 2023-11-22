@@ -8,6 +8,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,18 @@ public class FlareWebserviceClientSpringConfig {
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.timeout.connect:2000}")
     private int connectTimeout;
 
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.host:#{null}}")
+    private String proxyHost;
+
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.port:}")
+    private Integer proxyPort;
+
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.username:#{null}}")
+    private String proxyUsername;
+
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.password:#{null}}")
+    private String proxyPassword;
+
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.username:#{null}}")
     private String basicAuthUsername;
 
@@ -47,6 +60,15 @@ public class FlareWebserviceClientSpringConfig {
 
         BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
+        if (!isNullOrEmpty(proxyHost) && proxyPort != null) {
+            HttpHost proxy = new HttpHost(proxyHost, proxyPort);
+            builder.setProxy(proxy);
+            if (!isNullOrEmpty(proxyUsername) && !isNullOrEmpty(proxyPassword)) {
+                builder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
+                credentialsProvider.setCredentials(new AuthScope(proxy),
+                        new UsernamePasswordCredentials(proxyUsername, proxyPassword));
+            }
+        }
         if (!isNullOrEmpty(basicAuthUsername) && !isNullOrEmpty(basicAuthPassword)) {
             URI flareUri = URI.create(flareBaseUrl);
             credentialsProvider.setCredentials(new AuthScope(new HttpHost(flareUri.getHost(), flareUri.getPort())),
