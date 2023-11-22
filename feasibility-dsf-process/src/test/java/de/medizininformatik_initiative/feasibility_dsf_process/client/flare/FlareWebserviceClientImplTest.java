@@ -6,6 +6,8 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
@@ -23,6 +25,7 @@ public class FlareWebserviceClientImplTest {
 
     private org.apache.http.client.HttpClient httpClient;
     private FlareWebserviceClient flareWebserviceClient;
+    @Captor ArgumentCaptor<HttpPost> postCaptor;
 
     @BeforeEach
     public void setUp() throws URISyntaxException {
@@ -59,5 +62,19 @@ public class FlareWebserviceClientImplTest {
         var feasibility = flareWebserviceClient.requestFeasibility(structuredQuery);
 
         assertEquals(15, feasibility);
+    }
+
+    @Test
+    public void testName() throws Exception {
+        String path = "/foo/bar/";
+        flareWebserviceClient = new FlareWebserviceClientImpl(httpClient, URI.create("http://foo.bar:1234" + path));
+        var structuredQuery = "foo".getBytes();
+
+        when(httpClient.execute(postCaptor.capture(), any(BasicResponseHandler.class)))
+                .thenReturn("99");
+
+        var feasibility = flareWebserviceClient.requestFeasibility(structuredQuery);
+
+        assertEquals(path + "query/execute", postCaptor.getValue().getURI().getPath());
     }
 }

@@ -26,7 +26,7 @@ public class FlareWebserviceClientImpl implements FlareWebserviceClient {
 
     @Override
     public int requestFeasibility(byte[] structuredQuery) throws IOException, InterruptedException {
-        var req = new HttpPost(flareBaseUrl.resolve("/query/execute"));
+        var req = new HttpPost(flareBaseUrl.resolve((flareBaseUrl.getPath() + "/query/execute").replaceAll("//", "/")));
         req.setEntity(new ByteArrayEntity(structuredQuery));
         req.setHeader(new BasicHeader(HEADER_CONTENT_TYPE, "application/sq+json"));
 
