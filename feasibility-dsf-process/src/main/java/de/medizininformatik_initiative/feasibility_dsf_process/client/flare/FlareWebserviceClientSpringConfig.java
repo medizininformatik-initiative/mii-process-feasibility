@@ -27,12 +27,15 @@ import org.springframework.context.annotation.Import;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.net.ssl.SSLContext;
 
 import static ca.uhn.fhir.rest.api.Constants.HEADER_AUTHORIZATION;
 import static ca.uhn.fhir.rest.api.Constants.HEADER_AUTHORIZATION_VALPREFIX_BEARER;
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.lang.String.format;
 
 @Configuration
 @Import(BaseConfig.class)
@@ -67,7 +70,13 @@ public class FlareWebserviceClientSpringConfig {
 
     @Bean
     public FlareWebserviceClient flareWebserviceClient(HttpClient httpClient) {
-        return new FlareWebserviceClientImpl(httpClient, URI.create(flareBaseUrl));
+        checkArgument(!isNullOrEmpty(flareBaseUrl), "FLARE_BASE_URL is not set.");
+        try {
+            URI parsedFlareBaseUrl = new URI(flareBaseUrl);
+            return new FlareWebserviceClientImpl(httpClient, parsedFlareBaseUrl);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(format("Could not parse FLARE_BASE_URL '%s' as URI.", flareBaseUrl), e);
+        }
     }
 
     @Bean
@@ -97,32 +106,32 @@ public class FlareWebserviceClientSpringConfig {
 
     private final class BearerHttpClient extends CloseableHttpClient {
         private CloseableHttpClient client;
-    
+
         public BearerHttpClient(CloseableHttpClient client) {
             this.client = client;
         }
-    
+
         @Override
         public HttpParams getParams() {
             return client.getParams();
         }
-    
+
         @Override
         public ClientConnectionManager getConnectionManager() {
             return client.getConnectionManager();
         }
-    
+
         @Override
         public void close() throws IOException {
             client.close();
         }
-    
+
         @Override
         protected CloseableHttpResponse doExecute(HttpHost target, HttpRequest request, HttpContext context)
                 throws IOException, ClientProtocolException {
             return client.execute(target, request, context);
         }
-    
+
         @Override
         public <T> T execute(HttpUriRequest request, ResponseHandler<? extends T> responseHandler)
                 throws IOException, ClientProtocolException {
