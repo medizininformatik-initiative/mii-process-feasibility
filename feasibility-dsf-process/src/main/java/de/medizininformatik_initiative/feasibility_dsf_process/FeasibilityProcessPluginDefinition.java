@@ -30,7 +30,7 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
             Properties props = new Properties();
             props.load(input);
 
-            this.version = props.getProperty("build.version");
+            this.version = props.getProperty("build.version").replaceFirst("-.*$", "");
             this.releaseDate = LocalDate.parse(props.getProperty("build.date"));
         } catch (IOException e) {
             throw new IllegalStateException("Could not load application properties.", e);
