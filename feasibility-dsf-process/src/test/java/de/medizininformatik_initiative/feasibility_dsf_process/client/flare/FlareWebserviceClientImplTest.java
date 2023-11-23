@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -65,7 +66,7 @@ public class FlareWebserviceClientImplTest {
     }
 
     @Test
-    public void testName() throws Exception {
+    public void testBaseUrlPathIsKept() throws Exception {
         String path = "/foo/bar/";
         flareWebserviceClient = new FlareWebserviceClientImpl(httpClient, URI.create("http://foo.bar:1234" + path));
         var structuredQuery = "foo".getBytes();
@@ -76,5 +77,27 @@ public class FlareWebserviceClientImplTest {
         var feasibility = flareWebserviceClient.requestFeasibility(structuredQuery);
 
         assertEquals(path + "query/execute", postCaptor.getValue().getURI().getPath());
+    }
+
+    @Test
+    void testNullBaseUrlFails() throws Exception {
+        FlareWebserviceClientSpringConfig config = new FlareWebserviceClientSpringConfig();
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> config.flareWebserviceClient(httpClient));
+
+        assertEquals("FLARE_BASE_URL is not set.", e.getMessage());
+    }
+
+    @Test
+    void testIllegalBaseUrlFails() throws Exception {
+        FlareWebserviceClientSpringConfig config = new FlareWebserviceClientSpringConfig();
+        String invalidUrl = "{ßöäü;";
+        ReflectionTestUtils.setField(config, "flareBaseUrl", invalidUrl);
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> config.flareWebserviceClient(httpClient));
+
+        assertEquals("Could not parse FLARE_BASE_URL '" + invalidUrl + "' as URI.", e.getMessage());
     }
 }
