@@ -44,7 +44,7 @@ public class DownloadMeasureReport extends AbstractServiceDelegate implements In
         FhirWebserviceClient client = clientProvider
                 .getWebserviceClientByReference(measureReportId);
         MeasureReport measureReport = downloadMeasureReport(client, measureReportId);
-        execution.setVariable(VARIABLE_MEASURE_REPORT, measureReport);
+        execution.setVariableLocal(VARIABLE_MEASURE_REPORT, measureReport);
     }
 
     private MeasureReport downloadMeasureReport(FhirWebserviceClient client, IdType measureReportId) {

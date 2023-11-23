@@ -111,6 +111,6 @@ public class DownloadMeasureReportTest {
 
         service.execute(execution);
 
-        verify(execution).setVariable(VARIABLE_MEASURE_REPORT, measureReport);
+        verify(execution).setVariableLocal(VARIABLE_MEASURE_REPORT, measureReport);
     }
 }
