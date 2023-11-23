@@ -77,8 +77,7 @@ public class StoreLiveResultTest {
         IdType measureReportId = new IdType("e26daf2d-2d55-4f23-a7c8-4b994e3a319e");
         report.setIdElement(measureReportId);
         TaskOutputComponent taskOutputComponent = new TaskOutputComponent();
-        when(variables.getResource(VARIABLE_MEASURE_REPORT))
-                .thenReturn(measureReport);
+        when(execution.getVariableLocal(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
         when(client.create(any(MeasureReport.class))).thenReturn(report);
         when(taskHelper.createOutput(refCaptor.capture(), eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE)))
                 .thenReturn(taskOutputComponent);
@@ -91,8 +90,7 @@ public class StoreLiveResultTest {
 
     @Test
     public void testDoExecute_MeasureReportIsStored() throws Exception {
-        when(variables.getResource(VARIABLE_MEASURE_REPORT))
-                .thenReturn(measureReport);
+        when(execution.getVariableLocal(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
         when(taskHelper.createOutput(refCaptor.capture(), eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE)))
                 .thenReturn(new TaskOutputComponent());
         when(client.create(measureReportCaptor.capture())).thenReturn(measureReport);

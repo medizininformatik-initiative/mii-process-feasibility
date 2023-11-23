@@ -40,7 +40,7 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
     protected void doExecute(DelegateExecution execution, Variables variables) {
         Task task = variables.getLatestTask();
 
-        MeasureReport measureReport = variables.getResource(VARIABLE_MEASURE_REPORT);
+        MeasureReport measureReport = (MeasureReport) execution.getVariableLocal(VARIABLE_MEASURE_REPORT);
         addReadAccessTag(measureReport);
 
         MeasureReport storedMeasureReport = storeMeasureReport(measureReport);
