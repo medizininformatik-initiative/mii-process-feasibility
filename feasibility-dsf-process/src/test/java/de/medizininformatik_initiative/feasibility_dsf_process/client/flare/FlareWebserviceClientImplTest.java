@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -74,29 +75,40 @@ public class FlareWebserviceClientImplTest {
         when(httpClient.execute(postCaptor.capture(), any(BasicResponseHandler.class)))
                 .thenReturn("99");
 
-        var feasibility = flareWebserviceClient.requestFeasibility(structuredQuery);
+        flareWebserviceClient.requestFeasibility(structuredQuery);
 
         assertEquals(path + "query/execute", postCaptor.getValue().getURI().getPath());
     }
 
     @Test
-    void testNullBaseUrlFails() throws Exception {
-        FlareWebserviceClientSpringConfig config = new FlareWebserviceClientSpringConfig();
+    void testNullBaseUrlDoesNotFailAtInit() throws Exception {
+        var config = new FlareWebserviceClientSpringConfig();
 
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> config.flareWebserviceClient(httpClient));
+        assertDoesNotThrow(() -> config.flareWebserviceClient(httpClient));
+    }
+
+    @Test
+    void testNullBaseUrlFails() throws Exception {
+        var config = new FlareWebserviceClientSpringConfig();
+        var structuredQuery = "foo".getBytes();
+        flareWebserviceClient = config.flareWebserviceClient(httpClient);
+
+        var e = assertThrows(IllegalArgumentException.class,
+                () -> flareWebserviceClient.requestFeasibility(structuredQuery));
 
         assertEquals("FLARE_BASE_URL is not set.", e.getMessage());
     }
 
     @Test
     void testIllegalBaseUrlFails() throws Exception {
-        FlareWebserviceClientSpringConfig config = new FlareWebserviceClientSpringConfig();
-        String invalidUrl = "{ßöäü;";
+        var config = new FlareWebserviceClientSpringConfig();
+        var invalidUrl = "{ßöäü;";
+        var structuredQuery = "foo".getBytes();
         ReflectionTestUtils.setField(config, "flareBaseUrl", invalidUrl);
+        flareWebserviceClient = config.flareWebserviceClient(httpClient);
 
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> config.flareWebserviceClient(httpClient));
+        var e = assertThrows(IllegalArgumentException.class,
+                () -> flareWebserviceClient.requestFeasibility(structuredQuery));
 
         assertEquals("Could not parse FLARE_BASE_URL '" + invalidUrl + "' as URI.", e.getMessage());
     }

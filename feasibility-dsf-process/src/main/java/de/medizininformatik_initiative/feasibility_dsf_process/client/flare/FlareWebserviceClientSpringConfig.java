@@ -70,13 +70,25 @@ public class FlareWebserviceClientSpringConfig {
 
     @Bean
     public FlareWebserviceClient flareWebserviceClient(HttpClient httpClient) {
-        checkArgument(!isNullOrEmpty(flareBaseUrl), "FLARE_BASE_URL is not set.");
-        try {
-            URI parsedFlareBaseUrl = new URI(flareBaseUrl);
-            return new FlareWebserviceClientImpl(httpClient, parsedFlareBaseUrl);
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(format("Could not parse FLARE_BASE_URL '%s' as URI.", flareBaseUrl), e);
-        }
+        return new FlareWebserviceClient() {
+
+            FlareWebserviceClient client;
+
+            @Override
+            public int requestFeasibility(byte[] structuredQuery) throws IOException, InterruptedException {
+                if (client == null) {
+                    checkArgument(!isNullOrEmpty(flareBaseUrl), "FLARE_BASE_URL is not set.");
+                    try {
+                        URI parsedFlareBaseUrl = new URI(flareBaseUrl);
+                        client = new FlareWebserviceClientImpl(httpClient, parsedFlareBaseUrl);
+                    } catch (URISyntaxException e) {
+                        throw new IllegalArgumentException(
+                                format("Could not parse FLARE_BASE_URL '%s' as URI.", flareBaseUrl), e);
+                    }
+                }
+                return client.requestFeasibility(structuredQuery);
+            }
+        };
     }
 
     @Bean

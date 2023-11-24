@@ -48,17 +48,13 @@ public class StoreClientSpringConfig {
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.timeout.socket:20000}")
     private Integer socketTimeout;
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.base_url}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.base_url:}")
     private String storeBaseUrl;
 
     @Bean
     @Qualifier("store-client")
     IGenericClient client(@Qualifier("store-client") FhirContext fhirContext,
                           @Qualifier("store-client") RestfulClientFactory clientFactory) {
-        if (storeBaseUrl == null || storeBaseUrl.isBlank()) {
-            throw new IllegalArgumentException("Store url is not set.");
-        }
-
         clientFactory.setServerValidationMode(ServerValidationModeEnum.NEVER);
         clientFactory.setConnectTimeout(connectTimeout);
         clientFactory.setConnectionRequestTimeout(connectRequestTimeout);

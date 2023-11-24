@@ -1,10 +1,12 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.client.store;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.api.EncodingEnum;
 import ca.uhn.fhir.rest.api.RequestTypeEnum;
 import ca.uhn.fhir.rest.client.apache.ApacheHttpClient;
 import ca.uhn.fhir.rest.client.api.Header;
 import ca.uhn.fhir.rest.client.api.IHttpClient;
+import ca.uhn.fhir.rest.client.api.IHttpRequest;
 import ca.uhn.fhir.rest.client.impl.RestfulClientFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.hl7.fhir.instance.model.api.IBaseBinary;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,17 +55,47 @@ public class TlsClientFactory extends RestfulClientFactory {
     }
 
     @Override
-    protected synchronized ApacheHttpClient getHttpClient(String serverBase) {
-        if (clientByServerBase.containsKey(serverBase)) {
-            log.debug("Reusing ApacheHttpClient for ServerBase {}", serverBase);
-            return clientByServerBase.get(serverBase);
-        } else {
-            log.debug("Returning new ApacheHttpClient for ServerBase {}", serverBase);
-            ApacheHttpClient client = new ApacheHttpClient(getNativeHttpClient(), new StringBuilder(serverBase),
-                    null, null, null, null);
-            clientByServerBase.put(serverBase, client);
-            return client;
-        }
+    protected synchronized IHttpClient getHttpClient(String serverBase) {
+        return new IHttpClient() {
+
+            @Override
+            public IHttpRequest createParamRequest(FhirContext theContext, Map<String, List<String>> theParams,
+                                                   EncodingEnum theEncoding) {
+                return getClient().createParamRequest(theContext, theParams, theEncoding);
+            }
+
+            @Override
+            public IHttpRequest createGetRequest(FhirContext theContext, EncodingEnum theEncoding) {
+                return getClient().createGetRequest(theContext, theEncoding);
+            }
+
+            @Override
+            public IHttpRequest createByteRequest(FhirContext theContext, String theContents, String theContentType,
+                                                  EncodingEnum theEncoding) {
+                return getClient().createByteRequest(theContext, theContents, theContentType, theEncoding);
+            }
+
+            @Override
+            public IHttpRequest createBinaryRequest(FhirContext theContext, IBaseBinary theBinary) {
+                return getClient().createBinaryRequest(theContext, theBinary);
+            }
+
+            private ApacheHttpClient getClient() {
+                if (serverBase == null || serverBase.isBlank()) {
+                    throw new IllegalArgumentException("Store url is not set.");
+                }
+                if (clientByServerBase.containsKey(serverBase)) {
+                    log.debug("Reusing ApacheHttpClient for ServerBase {}", serverBase);
+                    return clientByServerBase.get(serverBase);
+                } else {
+                    log.debug("Returning new ApacheHttpClient for ServerBase {}", serverBase);
+                    ApacheHttpClient client = new ApacheHttpClient(getNativeHttpClient(), new StringBuilder(serverBase),
+                            null, null, null, null);
+                    clientByServerBase.put(serverBase, client);
+                    return client;
+                }
+            }
+        };
     }
 
     @Override
