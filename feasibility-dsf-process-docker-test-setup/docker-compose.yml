@@ -598,6 +598,7 @@ services:
         target: /opt/fhir/log
     environment:
       TZ: Europe/Berlin
+      DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_3_user.password
       DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_3_user_permanent_delete.password
@@ -780,6 +781,7 @@ services:
       target: /opt/fhir/log
     environment:
       TZ: Europe/Berlin
+      DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_dic_4_user.password
       DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_PASSWORD_FILE: /run/secrets/db_fhir_dic_4_user_permanent_delete.password
@@ -891,16 +893,13 @@ services:
       timeout: 5s
       retries: 5
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://dic-4-store-db:5432/fhir?currentSchema=public"
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_DATASOURCE_DRIVERCLASSNAME: org.postgresql.Driver
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQL10Dialect
-      VALIDATION_REQUESTS_ENABLED: "false"
-      HAPI_FHIR_USE_APACHE_ADDRESS_STRATEGY: "true"
-      HAPI_FHIR_CQL_ENABLED: "true"
+      SPRING_CONFIG_LOCATION: 'file:///data/hapi/application.yaml'
     networks:
       dic-4-bpe-backend:
+    volumes:
+    - type: bind
+      source: ./dic-4/fhir/conf/application.yaml
+      target: /data/hapi/application.yaml
     volumes_from:
     - hapi-curl-download:ro
     depends_on:
