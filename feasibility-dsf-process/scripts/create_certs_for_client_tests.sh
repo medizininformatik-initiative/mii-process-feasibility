@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 BASE_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-TARGET_DIR=$(readlink -f "${BASE_DIR}/../src/test/resources/de/medizininformatik_initiative/feasibility_dsf_process/client/certs")
+TARGET_DIR="${BASE_DIR}/../src/test/resources/de/medizininformatik_initiative/feasibility_dsf_process/client/certs"
 
 mkdir -p "${TARGET_DIR}"
 
