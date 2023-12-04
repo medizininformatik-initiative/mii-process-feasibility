@@ -1,16 +1,31 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.spring.config;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProvider;
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProviderImpl;
 import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationSettingsProvider;
+import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationStrategy;
 import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCachingLaplaceCountObfuscator;
+import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityProcessPluginDeploymentStateListener;
 import de.medizininformatik_initiative.feasibility_dsf_process.Obfuscator;
 import de.medizininformatik_initiative.feasibility_dsf_process.RateLimit;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicResponse;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.*;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadFeasibilityResources;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadMeasureReport;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateCqlMeasure;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateRequestRate;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateStructuredQueryMeasure;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.FeasibilityResourceCleaner;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.ObfuscateEvaluationResult;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.RateLimitExceededTaskRejecter;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectRequestTargets;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectResponseTarget;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.SendDicRequests;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.SetupEvaluationSettings;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreFeasibilityResources;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreLiveResult;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreMeasureReport;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +42,15 @@ public class FeasibilityConfig {
 
     private final IGenericClient storeClient;
 
-    @Autowired private final FhirContext fhirContext;
     @Autowired private ProcessPluginApi api;
 
     private final EvaluationSettingsProvider evaluationSettingsProvider;
     private final FlareWebserviceClient flareWebserviceClient;
 
     public FeasibilityConfig(@Qualifier("store-client") IGenericClient storeClient,
-                             FhirContext fhirContext,
                              EvaluationSettingsProvider evaluationSettingsProvider,
                              FlareWebserviceClient flareWebserviceClient) {
         this.storeClient = storeClient;
-        this.fhirContext = fhirContext;
         this.evaluationSettingsProvider = evaluationSettingsProvider;
         this.flareWebserviceClient = flareWebserviceClient;
     }
@@ -158,5 +170,14 @@ public class FeasibilityConfig {
     @Bean
     public ForkJoinPool ioThreadPool() {
         return new ForkJoinPool(8);
+    }
+
+    @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public FeasibilityProcessPluginDeploymentStateListener deploymentStateListener () {
+        return new FeasibilityProcessPluginDeploymentStateListener(
+                EvaluationStrategy
+                        .fromStrategyRepresentation(evaluationSettingsProvider.evaluationStrategyRepresentation()),
+                storeClient, flareWebserviceClient);
     }
 }
