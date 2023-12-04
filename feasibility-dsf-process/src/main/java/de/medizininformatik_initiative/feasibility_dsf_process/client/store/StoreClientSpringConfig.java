@@ -18,6 +18,7 @@ import javax.net.ssl.SSLContext;
 @Configuration
 @Import(BaseConfig.class)
 public class StoreClientSpringConfig {
+
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.host:#{null}}")
     private String proxyHost;
 

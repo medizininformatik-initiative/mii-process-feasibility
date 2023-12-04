@@ -10,20 +10,7 @@ import de.medizininformatik_initiative.feasibility_dsf_process.Obfuscator;
 import de.medizininformatik_initiative.feasibility_dsf_process.RateLimit;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.flare.FlareWebserviceClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicResponse;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadFeasibilityResources;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.DownloadMeasureReport;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateCqlMeasure;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateRequestRate;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateStructuredQueryMeasure;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.ObfuscateEvaluationResult;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.RateLimitExceededTaskRejecter;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectRequestTargets;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.SelectResponseTarget;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.SendDicRequests;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.SetupEvaluationSettings;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreFeasibilityResources;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreLiveResult;
-import de.medizininformatik_initiative.feasibility_dsf_process.service.StoreMeasureReport;
+import de.medizininformatik_initiative.feasibility_dsf_process.service.*;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,7 +116,7 @@ public class FeasibilityConfig {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public StoreFeasibilityResources storeFeasibilityResources() {
-        return new StoreFeasibilityResources(storeClient, api);
+        return new StoreFeasibilityResources(storeClient, api, new FeasibilityResourceCleaner());
     }
 
     @Bean
