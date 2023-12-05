@@ -76,6 +76,10 @@ public class FlareWebserviceClientSpringConfig {
 
             @Override
             public int requestFeasibility(byte[] structuredQuery) throws IOException, InterruptedException {
+                return getClient().requestFeasibility(structuredQuery);
+            }
+
+            private FlareWebserviceClient getClient() {
                 if (client == null) {
                     checkArgument(!isNullOrEmpty(flareBaseUrl), "FLARE_BASE_URL is not set.");
                     try {
@@ -86,7 +90,12 @@ public class FlareWebserviceClientSpringConfig {
                                 format("Could not parse FLARE_BASE_URL '%s' as URI.", flareBaseUrl), e);
                     }
                 }
-                return client.requestFeasibility(structuredQuery);
+                return client;
+            }
+
+            @Override
+            public void testConnection() throws ClientProtocolException, IOException {
+                getClient().testConnection();
             }
         };
     }
