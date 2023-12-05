@@ -1,5 +1,7 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.client.flare;
 
+import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationSettingsProviderImpl;
+import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationStrategy;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
@@ -14,6 +16,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -83,15 +86,18 @@ public class FlareWebserviceClientImplTest {
     @Test
     void testNullBaseUrlDoesNotFailAtInit() throws Exception {
         var config = new FlareWebserviceClientSpringConfig();
-
-        assertDoesNotThrow(() -> config.flareWebserviceClient(httpClient));
+        assertDoesNotThrow(() -> {
+            return config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
+                    EvaluationStrategy.STRUCTURED_QUERY, true, 0d, 0d, 0, Duration.ofMillis(1)));
+        });
     }
 
     @Test
     void testNullBaseUrlFails() throws Exception {
         var config = new FlareWebserviceClientSpringConfig();
         var structuredQuery = "foo".getBytes();
-        flareWebserviceClient = config.flareWebserviceClient(httpClient);
+        flareWebserviceClient = config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
+                EvaluationStrategy.STRUCTURED_QUERY, true, 0d, 0d, 0, Duration.ofMillis(1)));
 
         var e = assertThrows(IllegalArgumentException.class,
                 () -> flareWebserviceClient.requestFeasibility(structuredQuery));
@@ -105,11 +111,27 @@ public class FlareWebserviceClientImplTest {
         var invalidUrl = "{ßöäü;";
         var structuredQuery = "foo".getBytes();
         ReflectionTestUtils.setField(config, "flareBaseUrl", invalidUrl);
-        flareWebserviceClient = config.flareWebserviceClient(httpClient);
+        flareWebserviceClient = config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
+                EvaluationStrategy.STRUCTURED_QUERY, true, 0d, 0d, 0, Duration.ofMillis(1)));
 
         var e = assertThrows(IllegalArgumentException.class,
                 () -> flareWebserviceClient.requestFeasibility(structuredQuery));
 
         assertEquals("Could not parse FLARE_BASE_URL '" + invalidUrl + "' as URI.", e.getMessage());
+    }
+
+    @Test
+    void testOtherEvaluationStrategyFails() throws Exception {
+        var config = new FlareWebserviceClientSpringConfig();
+        var invalidUrl = "{ßöäü;";
+        var structuredQuery = "foo".getBytes();
+        ReflectionTestUtils.setField(config, "flareBaseUrl", invalidUrl);
+        flareWebserviceClient = config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
+                EvaluationStrategy.CQL, true, 0d, 0d, 0, Duration.ofMillis(1)));
+
+        var e = assertThrows(IllegalStateException.class,
+                () -> flareWebserviceClient.requestFeasibility(structuredQuery));
+
+        assertEquals("EVALUATION_STRATEGY is not set to 'structured-query'.", e.getMessage());
     }
 }

@@ -51,6 +51,8 @@ public class FlareWebserviceClientImplRevProxyBasicAuthIT extends FlareWebservic
         var proxyHost = proxy.getHost();
         var proxyPort = proxy.getFirstMappedPort();
 
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.evaluation.strategy",
+                () -> "structured-query");
         registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url",
                 () -> String.format("http://%s:%s/", proxyHost, proxyPort));
         registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.username",

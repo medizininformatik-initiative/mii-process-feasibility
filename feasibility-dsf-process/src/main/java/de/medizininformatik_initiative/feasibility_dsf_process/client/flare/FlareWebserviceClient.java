@@ -1,7 +1,5 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.client.flare;
 
-import org.apache.http.client.ClientProtocolException;
-
 import java.io.IOException;
 
 /**
@@ -28,7 +26,6 @@ public interface FlareWebserviceClient {
      * </p>
      *
      * @throws IOException in case of a problem or the connection was aborted
-     * @throws ClientProtocolException in case of an http protocol error
      */
-    void testConnection() throws ClientProtocolException, IOException;
+    void testConnection() throws IOException;
 }
