@@ -1,13 +1,12 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
-import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
 import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.hl7.fhir.instance.model.api.IIdType;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Library;
 import org.hl7.fhir.r4.model.Measure;
 import org.slf4j.Logger;
@@ -16,8 +15,9 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Objects;
 
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
-import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.*;
+import static org.hl7.fhir.r4.model.Bundle.BundleType.TRANSACTION;
+import static org.hl7.fhir.r4.model.Bundle.HTTPVerb.POST;
 
 public class StoreFeasibilityResources extends AbstractServiceDelegate implements InitializingBean {
 
@@ -49,21 +49,21 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
         cleaner.cleanLibrary(library);
         cleaner.cleanMeasure(measure);
 
-        var libraryRes = storeLibraryResource(library);
-        var measureRes = storeMeasureResource(measure, libraryRes.getId());
+        var transactionResponse = storeResources(measure, library);
 
-        variables.setString(ConstantsFeasibility.VARIABLE_MEASURE_ID, measureRes.getId().getIdPart());
+        variables.setString(VARIABLE_MEASURE_ID, extractMeasureId(transactionResponse));
     }
 
-    private MethodOutcome storeLibraryResource(Library library) {
-        logger.info("Store Library `{}`", library.getId());
-        return storeClient.create().resource(library).execute();
+    private Bundle storeResources(Measure measure, Library library) {
+        logger.info("Store Measure `{}` and Library `{}`", measure.getId(), library.getUrl());
+
+        Bundle bundle = new Bundle().setType(TRANSACTION);
+        bundle.addEntry().setResource(measure).getRequest().setMethod(POST).setUrl("Measure");
+        bundle.addEntry().setResource(library).getRequest().setMethod(POST).setUrl("Library");
+        return storeClient.transaction().withBundle(bundle).execute();
     }
 
-    private MethodOutcome storeMeasureResource(Measure measure, IIdType libraryId) {
-        logger.info("Store Measure `{}`", measure.getId());
-        measure.getLibrary().clear();
-        measure.addLibrary("Library/" + libraryId.getIdPart());
-        return storeClient.create().resource(measure).execute();
+    private String extractMeasureId(Bundle transactionResponse) {
+        return new IdType(transactionResponse.getEntryFirstRep().getResponse().getLocation()).getIdPart();
     }
 }

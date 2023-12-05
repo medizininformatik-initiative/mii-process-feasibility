@@ -15,7 +15,7 @@ public abstract class FlareWebserviceClientImplBaseIT {
 
     @Container
     public static GenericContainer<?> fhirServer = new GenericContainer<>(
-            DockerImageName.parse("samply/blaze:0.23.0"))
+            DockerImageName.parse("samply/blaze:0.23"))
             .withExposedPorts(8080)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("fhir-server")
