@@ -1,0 +1,17 @@
+server {
+    listen 8443 ssl;
+    listen [::]:8443 ssl;
+
+    ssl_certificate /etc/nginx/certs/server_cert.pem;
+    ssl_certificate_key /etc/nginx/certs/server_cert_key.pem;
+    ssl_protocols TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    add_header Strict-Transport-Security "max-age=63072000" always;
+
+    location /query/execute {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_http_version 1.1;
+        proxy_read_timeout 43200s;
+        proxy_pass http://flare:8080;
+    }
+}

@@ -136,10 +136,10 @@ This version of the process is compatible with the following components:
 
 | Component | Compatible Version(s) |
 |-----------|-----------------------|
-| DSF FHIR  | `0.9.0`               |
-| DSF BPE   | `0.9.0`               |
+| DSF FHIR  | `>= 1.3.0`            |
+| DSF BPE   | `>= 1.3.0`            |
 | Blaze     | `>= 0.12`             |
-| Flare     | `1.0`                 |
+| Flare     | `>= 1.0`              |
 
 **Note:** Flare got rewritten. Only the [new project][9] is supported.
 
@@ -151,6 +151,6 @@ This version of the process is compatible with the following components:
 [5]: <https://www.hl7.org/fhir/operation-measure-evaluate-measure.html>
 [6]: <https://www.hl7.org/fhir/measurereport.html>
 [7]: <https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation>
-[8]: <https://github.com/highmed/highmed-dsf/wiki/DSF-0.5.5-Configuration-Parameters#dsf-bpe>
-[9]: <https://github.com/rwth-imi/flare-query>
+[8]: <https://dsf.dev/stable/maintain/bpe/configuration.html>
+[9]: <https://github.com/medizininformatik-initiative/flare>
 [10]: <https://en.wikipedia.org/wiki/ISO_8601#Durations>

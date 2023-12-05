@@ -1,0 +1,19 @@
+server {
+    listen 8080;
+    listen [::]:8080;
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+    }
+
+    location /query/execute {
+        if ($http_authorization != "Bearer 1234") {
+            add_header WWW-Authenticate Bearer always;
+            return 401;
+        }
+
+        proxy_pass http://flare:8080;
+        proxy_read_timeout 43200s;
+    }
+}

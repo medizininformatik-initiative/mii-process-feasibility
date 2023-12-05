@@ -1,33 +1,33 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.client.flare;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Optional;
-
-import javax.net.ssl.SSLSession;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class FlareWebserviceClientImplTest {
 
-    private HttpClient httpClient;
+    private org.apache.http.client.HttpClient httpClient;
     private FlareWebserviceClient flareWebserviceClient;
+    @Captor ArgumentCaptor<HttpPost> postCaptor;
 
     @BeforeEach
     public void setUp() throws URISyntaxException {
@@ -37,7 +37,7 @@ public class FlareWebserviceClientImplTest {
 
     @Test
     public void testRequestFeasibility_FailsOnCommunicationError() throws IOException, InterruptedException {
-        when(httpClient.send(any(HttpRequest.class), eq(HttpResponse.BodyHandlers.ofString())))
+        when(httpClient.execute(any(HttpPost.class), any(BasicResponseHandler.class)))
                 .thenThrow(IOException.class);
 
         var structuredQuery = "foo".getBytes();
@@ -46,8 +46,8 @@ public class FlareWebserviceClientImplTest {
 
     @Test
     public void testRequestFeasibility_FailsOnWrongBodyContent() throws IOException, InterruptedException {
-        var response = new StringHttpResponse("{\"invalid\": true}");
-        when(httpClient.send(any(HttpRequest.class), eq(HttpResponse.BodyHandlers.ofString())))
+        var response = "{\"invalid\": true}";
+        when(httpClient.execute(any(HttpPost.class), any(BasicResponseHandler.class)))
                 .thenReturn(response);
 
         var structuredQuery = "foo".getBytes();
@@ -56,8 +56,8 @@ public class FlareWebserviceClientImplTest {
 
     @Test
     public void testRequestFeasibility() throws IOException, InterruptedException {
-        var response = new StringHttpResponse("15");
-        when(httpClient.send(any(HttpRequest.class), eq(HttpResponse.BodyHandlers.ofString())))
+        var response = "15";
+        when(httpClient.execute(any(HttpPost.class), any(BasicResponseHandler.class)))
                 .thenReturn(response);
 
         var structuredQuery = "foo".getBytes();
@@ -66,53 +66,50 @@ public class FlareWebserviceClientImplTest {
         assertEquals(15, feasibility);
     }
 
+    @Test
+    public void testBaseUrlPathIsKept() throws Exception {
+        String path = "/foo/bar/";
+        flareWebserviceClient = new FlareWebserviceClientImpl(httpClient, URI.create("http://foo.bar:1234" + path));
+        var structuredQuery = "foo".getBytes();
 
-    private class StringHttpResponse implements HttpResponse<String> {
+        when(httpClient.execute(postCaptor.capture(), any(BasicResponseHandler.class)))
+                .thenReturn("99");
 
-        private final String body;
+        flareWebserviceClient.requestFeasibility(structuredQuery);
 
-        public StringHttpResponse(String body) {
-            this.body = body;
-        }
+        assertEquals(path + "query/execute", postCaptor.getValue().getURI().getPath());
+    }
 
-        @Override
-        public int statusCode() {
-            return 200;
-        }
+    @Test
+    void testNullBaseUrlDoesNotFailAtInit() throws Exception {
+        var config = new FlareWebserviceClientSpringConfig();
 
-        @Override
-        public HttpRequest request() {
-            return null;
-        }
+        assertDoesNotThrow(() -> config.flareWebserviceClient(httpClient));
+    }
 
-        @Override
-        public Optional<HttpResponse<String>> previousResponse() {
-            return Optional.empty();
-        }
+    @Test
+    void testNullBaseUrlFails() throws Exception {
+        var config = new FlareWebserviceClientSpringConfig();
+        var structuredQuery = "foo".getBytes();
+        flareWebserviceClient = config.flareWebserviceClient(httpClient);
 
-        @Override
-        public HttpHeaders headers() {
-            return null;
-        }
+        var e = assertThrows(IllegalArgumentException.class,
+                () -> flareWebserviceClient.requestFeasibility(structuredQuery));
 
-        @Override
-        public String body() {
-            return body;
-        }
+        assertEquals("FLARE_BASE_URL is not set.", e.getMessage());
+    }
 
-        @Override
-        public Optional<SSLSession> sslSession() {
-            return Optional.empty();
-        }
+    @Test
+    void testIllegalBaseUrlFails() throws Exception {
+        var config = new FlareWebserviceClientSpringConfig();
+        var invalidUrl = "{ßöäü;";
+        var structuredQuery = "foo".getBytes();
+        ReflectionTestUtils.setField(config, "flareBaseUrl", invalidUrl);
+        flareWebserviceClient = config.flareWebserviceClient(httpClient);
 
-        @Override
-        public URI uri() {
-            return null;
-        }
+        var e = assertThrows(IllegalArgumentException.class,
+                () -> flareWebserviceClient.requestFeasibility(structuredQuery));
 
-        @Override
-        public HttpClient.Version version() {
-            return null;
-        }
+        assertEquals("Could not parse FLARE_BASE_URL '" + invalidUrl + "' as URI.", e.getMessage());
     }
 }

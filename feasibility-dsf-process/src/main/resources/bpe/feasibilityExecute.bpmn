@@ -9,24 +9,6 @@
       <bpmn:incoming>Flow_0h1fgqi</bpmn:incoming>
       <bpmn:outgoing>Flow_11cnoe1</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:endEvent id="EndEvent" name="send result to requester">
-      <bpmn:extensionElements />
-      <bpmn:incoming>SequenceFlow_0ascyjc</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_13swtie" messageRef="Message_1dr71re" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicResponse">
-        <bpmn:extensionElements>
-          <camunda:field name="profile">
-            <camunda:string>http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-single-dic-result|#{version}</camunda:string>
-          </camunda:field>
-          <camunda:field name="instantiatesCanonical">
-            <camunda:string>http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest|#{version}</camunda:string>
-          </camunda:field>
-          <camunda:field name="messageName">
-            <camunda:string>feasibilitySingleDicResultMessage</camunda:string>
-          </camunda:field>
-        </bpmn:extensionElements>
-      </bpmn:messageEventDefinition>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_0ascyjc" sourceRef="selectResponseTarget" targetRef="EndEvent" />
     <bpmn:serviceTask id="selectResponseTarget" name="select response target" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.SelectResponseTarget">
       <bpmn:incoming>Flow_11lpcfm</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0ascyjc</bpmn:outgoing>
@@ -55,36 +37,36 @@
     <bpmn:sequenceFlow id="Flow_09g5hz4" name="CQL" sourceRef="Gateway_1kfqiko" targetRef="storeFeasibilityResources">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('evaluation-strategy')=='cql'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0gowl5w" name="Structured Query" sourceRef="Gateway_1kfqiko" targetRef="Activity_11pqdmi">
+    <bpmn:sequenceFlow id="Flow_0gowl5w" name="Structured Query" sourceRef="Gateway_1kfqiko" targetRef="evaluateStructuredQueryMeasure">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('evaluation-strategy')=='structured-query'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:serviceTask id="Activity_11pqdmi" name="evaluate Structured Query measure" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateStructuredQueryMeasure">
+    <bpmn:serviceTask id="evaluateStructuredQueryMeasure" name="evaluate Structured Query measure" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateStructuredQueryMeasure">
       <bpmn:incoming>Flow_0gowl5w</bpmn:incoming>
       <bpmn:outgoing>Flow_1cs9290</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_1h6wvlq" name="obfuscate evaluation result" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.ObfuscateEvaluationResult">
+    <bpmn:serviceTask id="obfuscateEvaluationResult" name="obfuscate evaluation result" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.ObfuscateEvaluationResult">
       <bpmn:incoming>Flow_0r37nze</bpmn:incoming>
       <bpmn:outgoing>Flow_10dmu4o</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_0zvan0q" name="setup evaluation settings" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.SetupEvaluationSettings">
+    <bpmn:serviceTask id="setupEvaluationSettings" name="setup evaluation settings" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.SetupEvaluationSettings">
       <bpmn:incoming>Flow_1f6bge9</bpmn:incoming>
       <bpmn:outgoing>Flow_07fkz0p</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:exclusiveGateway id="Gateway_01hxgve" name="shall be obfuscated?">
+    <bpmn:exclusiveGateway id="gatewayObfuscate" name="shall be obfuscated?">
       <bpmn:incoming>Flow_1qdam0i</bpmn:incoming>
       <bpmn:incoming>Flow_1cs9290</bpmn:incoming>
       <bpmn:outgoing>Flow_0r37nze</bpmn:outgoing>
       <bpmn:outgoing>Flow_1lvwaa9</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_1qdam0i" sourceRef="evaluateMeasure" targetRef="Gateway_01hxgve" />
-    <bpmn:sequenceFlow id="Flow_1cs9290" sourceRef="Activity_11pqdmi" targetRef="Gateway_01hxgve" />
-    <bpmn:sequenceFlow id="Flow_0r37nze" name="yes" sourceRef="Gateway_01hxgve" targetRef="Activity_1h6wvlq">
+    <bpmn:sequenceFlow id="Flow_1qdam0i" sourceRef="evaluateMeasure" targetRef="gatewayObfuscate" />
+    <bpmn:sequenceFlow id="Flow_1cs9290" sourceRef="evaluateStructuredQueryMeasure" targetRef="gatewayObfuscate" />
+    <bpmn:sequenceFlow id="Flow_0r37nze" name="yes" sourceRef="gatewayObfuscate" targetRef="obfuscateEvaluationResult">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('evaluation-obfuscation')==true}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1lvwaa9" name="no" sourceRef="Gateway_01hxgve" targetRef="storeMeasureReport">
+    <bpmn:sequenceFlow id="Flow_1lvwaa9" name="no" sourceRef="gatewayObfuscate" targetRef="storeMeasureReport">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('evaluation-obfuscation')==false}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_10dmu4o" sourceRef="Activity_1h6wvlq" targetRef="storeMeasureReport" />
+    <bpmn:sequenceFlow id="Flow_10dmu4o" sourceRef="obfuscateEvaluationResult" targetRef="storeMeasureReport" />
     <bpmn:serviceTask id="limitRequestRate" name="check current request rate" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.EvaluateRequestRate">
       <bpmn:incoming>Flow_07fkz0p</bpmn:incoming>
       <bpmn:outgoing>Flow_0js57at</bpmn:outgoing>
@@ -97,20 +79,40 @@
     <bpmn:sequenceFlow id="Flow_0h1fgqi" name="yes" sourceRef="Gateway_0vqojf6" targetRef="downloadFeasibilityResources">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('request-rate-below-limit')}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:serviceTask id="Activity_19ax4t8" name="reject task" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.RateLimitExceededTaskRejecter">
+    <bpmn:serviceTask id="rejectTask" name="reject task" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.service.RateLimitExceededTaskRejecter">
       <bpmn:incoming>Flow_0ug5qml</bpmn:incoming>
       <bpmn:outgoing>Flow_1gqxni9</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_0ug5qml" name="no" sourceRef="Gateway_0vqojf6" targetRef="Activity_19ax4t8">
+    <bpmn:sequenceFlow id="Flow_0ug5qml" name="no" sourceRef="Gateway_0vqojf6" targetRef="rejectTask">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('request-rate-below-limit') == false}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1gqxni9" sourceRef="Activity_19ax4t8" targetRef="NoResultEndEvent" />
-    <bpmn:sequenceFlow id="Flow_1f6bge9" sourceRef="StartEvent" targetRef="Activity_0zvan0q" />
+    <bpmn:sequenceFlow id="Flow_1gqxni9" sourceRef="rejectTask" targetRef="noResultEndEvent" />
+    <bpmn:sequenceFlow id="Flow_1f6bge9" sourceRef="StartEvent" targetRef="setupEvaluationSettings" />
     <bpmn:sequenceFlow id="Flow_0js57at" sourceRef="limitRequestRate" targetRef="Gateway_0vqojf6" />
-    <bpmn:sequenceFlow id="Flow_07fkz0p" sourceRef="Activity_0zvan0q" targetRef="limitRequestRate" />
-    <bpmn:endEvent id="NoResultEndEvent" name="end execution with no result">
+    <bpmn:sequenceFlow id="Flow_07fkz0p" sourceRef="setupEvaluationSettings" targetRef="limitRequestRate" />
+    <bpmn:endEvent id="noResultEndEvent" name="end execution with no result">
       <bpmn:incoming>Flow_1gqxni9</bpmn:incoming>
     </bpmn:endEvent>
+    <bpmn:endEvent id="sendDicResponse" name="send result to requester" camunda:asyncBefore="true">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R3/PT5S</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0ascyjc</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_13swtie" messageRef="Message_1dr71re" camunda:class="de.medizininformatik_initiative.feasibility_dsf_process.message.SendDicResponse">
+        <bpmn:extensionElements>
+          <camunda:field name="profile">
+            <camunda:string>http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-single-dic-result|#{version}</camunda:string>
+          </camunda:field>
+          <camunda:field name="instantiatesCanonical">
+            <camunda:string>http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest|#{version}</camunda:string>
+          </camunda:field>
+          <camunda:field name="messageName">
+            <camunda:string>feasibilitySingleDicResultMessage</camunda:string>
+          </camunda:field>
+        </bpmn:extensionElements>
+      </bpmn:messageEventDefinition>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0ascyjc" sourceRef="selectResponseTarget" targetRef="sendDicResponse" />
   </bpmn:process>
   <bpmn:message id="Message_1yz2a31" name="feasibilityExecuteMessage" />
   <bpmn:message id="Message_1dr71re" name="feasibilitySingleDicResultMessage" />
@@ -125,10 +127,10 @@
       <bpmndi:BPMNShape id="ServiceTask_0b8j3ka_di" bpmnElement="downloadFeasibilityResources">
         <dc:Bounds x="670" y="162" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_10xdh63_di" bpmnElement="EndEvent">
+      <bpmndi:BPMNShape id="EndEvent_10xdh63_di" bpmnElement="sendDicResponse">
         <dc:Bounds x="1562" y="272" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1549" y="315" width="66" height="27" />
+          <dc:Bounds x="1549" y="315" width="67" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_15aifhd_di" bpmnElement="selectResponseTarget">
@@ -149,16 +151,16 @@
           <dc:Bounds x="873" y="195" width="74" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1rmldcf_di" bpmnElement="Activity_11pqdmi">
+      <bpmndi:BPMNShape id="Activity_1rmldcf_di" bpmnElement="evaluateStructuredQueryMeasure">
         <dc:Bounds x="950" y="250" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_02bp35f_di" bpmnElement="Activity_1h6wvlq">
+      <bpmndi:BPMNShape id="Activity_02bp35f_di" bpmnElement="obfuscateEvaluationResult">
         <dc:Bounds x="1250" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0lqxwo5_di" bpmnElement="Activity_0zvan0q">
+      <bpmndi:BPMNShape id="Activity_0lqxwo5_di" bpmnElement="setupEvaluationSettings">
         <dc:Bounds x="230" y="162" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_01hxgve_di" bpmnElement="Gateway_01hxgve" isMarkerVisible="true">
+      <bpmndi:BPMNShape id="Gateway_01hxgve_di" bpmnElement="gatewayObfuscate" isMarkerVisible="true">
         <dc:Bounds x="1135" y="177" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1070" y="188" width="60" height="27" />
@@ -173,10 +175,10 @@
           <dc:Bounds x="528" y="130" width="85" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_19ax4t8_di" bpmnElement="Activity_19ax4t8">
+      <bpmndi:BPMNShape id="Activity_19ax4t8_di" bpmnElement="rejectTask">
         <dc:Bounds x="520" y="300" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1u9eo5t_di" bpmnElement="NoResultEndEvent">
+      <bpmndi:BPMNShape id="Event_1u9eo5t_di" bpmnElement="noResultEndEvent">
         <dc:Bounds x="552" y="442" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="538" y="485" width="69" height="27" />

@@ -21,8 +21,8 @@ public class EvaluateCqlMeasure extends AbstractServiceDelegate implements Initi
 
     private static final Logger logger = LoggerFactory.getLogger(EvaluateCqlMeasure.class);
 
-    private static final String CODE_SYSTEM_MEASURE_POPULATION = "http://terminology.hl7.org/CodeSystem/measure-population";
-    private static final String CODE_INITIAL_POPULATION = "initial-population";
+    private static final String MEASURE_POPULATION = "http://terminology.hl7.org/CodeSystem/measure-population";
+    private static final String INITIAL_POPULATION = "initial-population";
 
     private final IGenericClient storeClient;
 
@@ -69,8 +69,8 @@ public class EvaluateCqlMeasure extends AbstractServiceDelegate implements Initi
         if (!report.getGroupFirstRep().getPopulationFirstRep().hasCode()) {
             throw new RuntimeException("Missing MeasureReport population code");
         }
-        if (!report.getGroupFirstRep().getPopulationFirstRep().getCode().hasCoding(CODE_SYSTEM_MEASURE_POPULATION,
-                CODE_INITIAL_POPULATION)) {
+        if (!report.getGroupFirstRep().getPopulationFirstRep().getCode().hasCoding(MEASURE_POPULATION,
+                INITIAL_POPULATION)) {
             throw new RuntimeException("Missing MeasureReport initial-population code");
         }
         if (!report.getGroupFirstRep().getPopulationFirstRep().hasCount()) {

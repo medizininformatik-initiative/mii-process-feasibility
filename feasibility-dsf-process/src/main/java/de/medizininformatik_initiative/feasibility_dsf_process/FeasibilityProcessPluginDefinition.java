@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.FEASIBILITY_EXECUTE_PROCESS_ID;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.FEASIBILITY_REQUEST_PROCESS_ID;
 
 public class FeasibilityProcessPluginDefinition implements ProcessPluginDefinition {
 
@@ -30,7 +32,7 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
             Properties props = new Properties();
             props.load(input);
 
-            this.version = props.getProperty("build.version");
+            this.version = props.getProperty("build.version").replaceFirst("-.*$", "");
             this.releaseDate = LocalDate.parse(props.getProperty("build.date"));
         } catch (IOException e) {
             throw new IllegalStateException("Could not load application properties.", e);
@@ -84,9 +86,9 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
         var vF = "fhir/ValueSet/feasibility.xml";
 
         return Map.of(
-                "medizininformatik-initiativede_feasibilityExecute",
+                FEASIBILITY_EXECUTE_PROCESS_ID,
                 Arrays.asList(aExe, sTExe, sTResS, vF, cF, sMeasure, sMeasureReport, sLibrary),
-                "medizininformatik-initiativede_feasibilityRequest",
+                FEASIBILITY_REQUEST_PROCESS_ID,
                 Arrays.asList(aReq, sTReq, sTResS, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary));
     }
 }

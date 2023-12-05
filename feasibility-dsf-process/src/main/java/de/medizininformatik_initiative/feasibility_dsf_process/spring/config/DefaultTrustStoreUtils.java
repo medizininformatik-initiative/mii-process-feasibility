@@ -1,4 +1,4 @@
-package de.medizininformatik_initiative.feasibility_dsf_process.client.store;
+package de.medizininformatik_initiative.feasibility_dsf_process.spring.config;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,11 +12,11 @@ import java.security.Security;
 import java.security.cert.CertificateException;
 
 // TODO: doc
-final class DefaultTrustStoreUtils {
+public final class DefaultTrustStoreUtils {
     private DefaultTrustStoreUtils() {
     }
 
-    static KeyStore loadDefaultTrustStore() {
+    public static KeyStore loadDefaultTrustStore() {
         Path location = null;
         String type = null;
         String password = null;

@@ -6,15 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,30 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Tag("flare")
 @SpringBootTest(classes = FlareWebserviceClientSpringConfig.class)
 @Testcontainers
-public class FlareWebserviceClientImplIT {
+public class FlareWebserviceClientImplNonProxyIT extends FlareWebserviceClientImplBaseIT {
 
     @Autowired
-    private FlareWebserviceClient flareClient;
-
-    private static final Network DEFAULT_CONTAINER_NETWORK = Network.newNetwork();
-
-    @Container
-    public static GenericContainer<?> fhirServer = new GenericContainer<>(DockerImageName.parse("samply/blaze:0.22.2"))
-            .withExposedPorts(8080)
-            .withNetwork(DEFAULT_CONTAINER_NETWORK)
-            .withNetworkAliases("fhir-server")
-            .withEnv("LOG_LEVEL", "debug");
-
-    @Container
-    public static GenericContainer<?> flare = new GenericContainer<>(DockerImageName.parse("ghcr.io/medizininformatik-initiative/flare:0.2.3"))
-            .withExposedPorts(8080)
-            .withNetwork(DEFAULT_CONTAINER_NETWORK)
-            .withNetworkAliases("flare")
-            .withEnv(Map.of(
-                    "FLARE_FHIR_SERVER", "http://fhir-server:8080/fhir/"
-            ))
-            .withStartupTimeout(Duration.ofMinutes(5))
-            .dependsOn(fhirServer);
+    protected FlareWebserviceClient flareClient;
 
     @DynamicPropertySource
     static void dynamicProperties(DynamicPropertyRegistry registry) {
@@ -58,7 +32,7 @@ public class FlareWebserviceClientImplIT {
     }
 
     @Test
-    public void testRequestToFlareWithEmptyFhirServer() throws IOException {
+    public void sendQuery() throws IOException {
         var rawStructuredQuery = this.getClass().getResource("valid-structured-query.json")
                 .openStream().readAllBytes();
 
