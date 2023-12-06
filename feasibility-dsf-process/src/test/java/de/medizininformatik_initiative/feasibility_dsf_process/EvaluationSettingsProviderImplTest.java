@@ -19,7 +19,7 @@ public class EvaluationSettingsProviderImplTest {
         EvaluationSettingsProvider provider;
         for (EvaluationStrategy strategy : EvaluationStrategy.values()) {
             provider = new EvaluationSettingsProviderImpl(strategy, false, 0d, 0d, 0, Duration.ofSeconds(1));
-            assertEquals(strategy.getStrategyRepresentation(), provider.evaluationStrategyRepresentation());
+            assertEquals(strategy, provider.evaluationStrategy());
         }
     }
 

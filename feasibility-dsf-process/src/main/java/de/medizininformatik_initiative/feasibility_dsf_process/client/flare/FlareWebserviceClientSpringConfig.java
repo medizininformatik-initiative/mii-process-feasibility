@@ -73,13 +73,11 @@ public class FlareWebserviceClientSpringConfig {
     @Bean
     public FlareWebserviceClient flareWebserviceClient(HttpClient httpClient,
                                                        EvaluationSettingsProvider evaluationSettingsProvider) {
-        if (EvaluationStrategy.STRUCTURED_QUERY.getStrategyRepresentation()
-                .equals(evaluationSettingsProvider.evaluationStrategyRepresentation())) {
+        if (EvaluationStrategy.STRUCTURED_QUERY == evaluationSettingsProvider.evaluationStrategy()) {
             return createFlareClient(httpClient);
         } else {
             return new ErrorFlareWebserviceClient(new IllegalStateException(
-                    format("EVALUATION_STRATEGY is not set to '%s'.",
-                            EvaluationStrategy.STRUCTURED_QUERY.getStrategyRepresentation())));
+                    format("EVALUATION_STRATEGY is not set to '%s'.", EvaluationStrategy.STRUCTURED_QUERY)));
         }
     }
 
@@ -100,8 +98,7 @@ public class FlareWebserviceClientSpringConfig {
     @Bean
     public HttpClient flareHttpClient(@Qualifier("base-client") SSLContext sslContext,
                                       EvaluationSettingsProvider evaluationSettingsProvider) {
-        if (EvaluationStrategy.STRUCTURED_QUERY.getStrategyRepresentation()
-                .equals(evaluationSettingsProvider.evaluationStrategyRepresentation())) {
+        if (EvaluationStrategy.STRUCTURED_QUERY == evaluationSettingsProvider.evaluationStrategy()) {
             HttpClientBuilder builder = new TlsClientFactory(null, sslContext).getNativeHttpClientBuilder();
 
             BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();

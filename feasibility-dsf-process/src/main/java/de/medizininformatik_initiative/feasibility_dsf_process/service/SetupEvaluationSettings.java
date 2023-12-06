@@ -33,7 +33,7 @@ public class SetupEvaluationSettings extends AbstractServiceDelegate
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
         variables.setString(VARIABLE_EVALUATION_STRATEGY,
-                evaluationSettingsProvider.evaluationStrategyRepresentation());
+                evaluationSettingsProvider.evaluationStrategy().toString());
         variables.setBoolean(VARIABLE_EVALUATION_OBFUSCATION,
                 evaluationSettingsProvider.evaluationResultObfuscationEnabled());
         variables.setDouble(VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_SENSITIVITY,

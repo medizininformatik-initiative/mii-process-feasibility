@@ -5,7 +5,6 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProvider;
 import de.medizininformatik_initiative.feasibility_dsf_process.EnhancedFhirWebserviceClientProviderImpl;
 import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationSettingsProvider;
-import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationStrategy;
 import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityCachingLaplaceCountObfuscator;
 import de.medizininformatik_initiative.feasibility_dsf_process.FeasibilityProcessPluginDeploymentStateListener;
 import de.medizininformatik_initiative.feasibility_dsf_process.Obfuscator;
@@ -186,9 +185,7 @@ public class FeasibilityConfig {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public FeasibilityProcessPluginDeploymentStateListener deploymentStateListener() {
-        return new FeasibilityProcessPluginDeploymentStateListener(
-                EvaluationStrategy
-                        .fromStrategyRepresentation(evaluationSettingsProvider.evaluationStrategyRepresentation()),
+        return new FeasibilityProcessPluginDeploymentStateListener(evaluationSettingsProvider.evaluationStrategy(),
                 storeClient, flareWebserviceClient);
     }
 }
