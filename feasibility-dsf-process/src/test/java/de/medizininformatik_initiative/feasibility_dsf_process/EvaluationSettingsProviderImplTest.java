@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 
 import static java.time.Duration.ofSeconds;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EvaluationSettingsProviderImplTest {
@@ -19,7 +19,7 @@ public class EvaluationSettingsProviderImplTest {
         EvaluationSettingsProvider provider;
         for (EvaluationStrategy strategy : EvaluationStrategy.values()) {
             provider = new EvaluationSettingsProviderImpl(strategy, false, 0d, 0d, 0, Duration.ofSeconds(1));
-            assertEquals(strategy.getStrategyRepresentation(), provider.evaluationStrategyRepresentation());
+            assertEquals(strategy, provider.evaluationStrategy());
         }
     }
 

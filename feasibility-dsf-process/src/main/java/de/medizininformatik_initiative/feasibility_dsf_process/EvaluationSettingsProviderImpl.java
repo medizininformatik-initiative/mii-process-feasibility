@@ -39,8 +39,8 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
     }
 
     @Override
-    public String evaluationStrategyRepresentation() {
-        return evaluationStrategy.getStrategyRepresentation();
+    public EvaluationStrategy evaluationStrategy() {
+        return evaluationStrategy;
     }
 
     @Override
@@ -67,4 +67,5 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
     public Duration getRateLimitTimeIntervalDuration() {
         return rateLimitTimeIntervalDuration;
     }
+
 }

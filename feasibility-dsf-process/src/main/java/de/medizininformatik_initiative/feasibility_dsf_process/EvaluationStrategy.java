@@ -30,7 +30,8 @@ public enum EvaluationStrategy {
      *
      * @return The evaluation strategy's string representation.
      */
-    public String getStrategyRepresentation() {
+    @Override
+    public String toString() {
         return strategyRepresentation;
     }
 

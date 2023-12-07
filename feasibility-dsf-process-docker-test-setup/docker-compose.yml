@@ -709,6 +709,11 @@ services:
   dedicated-dic-3-store-proxy:
     image: nginx:1.25.1
     restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "curl -ks https://localhost || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
     - "127.0.0.1:10443:443"
     secrets:

@@ -2,8 +2,8 @@ package de.medizininformatik_initiative.feasibility_dsf_process;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EvaluationStrategyTest {
 

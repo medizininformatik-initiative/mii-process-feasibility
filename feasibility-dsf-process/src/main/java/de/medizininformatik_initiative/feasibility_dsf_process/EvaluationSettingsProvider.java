@@ -8,11 +8,11 @@ import java.time.Duration;
 public interface EvaluationSettingsProvider {
 
     /**
-     * Returns a string representation of the evaluation strategy.
+     * Returns the evaluation strategy.
      *
-     * @return Representation of the evaluation strategy.
+     * @return the evaluation strategy.
      */
-    String evaluationStrategyRepresentation();
+    EvaluationStrategy evaluationStrategy();
 
     /**
      * Returns whether evaluation result obfuscation is enabled.
