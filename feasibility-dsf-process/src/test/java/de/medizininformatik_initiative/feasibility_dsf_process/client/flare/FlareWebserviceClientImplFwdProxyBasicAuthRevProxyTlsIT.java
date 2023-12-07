@@ -64,6 +64,8 @@ public class FlareWebserviceClientImplFwdProxyBasicAuthRevProxyTlsIT extends Fla
         var proxyHost = forwardProxy.getHost();
         var proxyPort = forwardProxy.getFirstMappedPort();
 
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.evaluation.strategy",
+                () -> "structured-query");
         registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url",
                 () -> "https://proxy:8443/");
         registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_path",

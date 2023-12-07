@@ -1,7 +1,10 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.client.flare;
 
+import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationSettingsProvider;
+import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationStrategy;
 import de.medizininformatik_initiative.feasibility_dsf_process.client.store.TlsClientFactory;
 import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.BaseConfig;
+import de.medizininformatik_initiative.feasibility_dsf_process.spring.config.EvaluationConfig;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.auth.AuthScope;
@@ -33,12 +36,11 @@ import javax.net.ssl.SSLContext;
 
 import static ca.uhn.fhir.rest.api.Constants.HEADER_AUTHORIZATION;
 import static ca.uhn.fhir.rest.api.Constants.HEADER_AUTHORIZATION_VALPREFIX_BEARER;
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.String.format;
 
 @Configuration
-@Import(BaseConfig.class)
+@Import({ BaseConfig.class, EvaluationConfig.class })
 public class FlareWebserviceClientSpringConfig {
 
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url:}")
@@ -69,60 +71,76 @@ public class FlareWebserviceClientSpringConfig {
     private String bearerAuthToken;
 
     @Bean
-    public FlareWebserviceClient flareWebserviceClient(HttpClient httpClient) {
-        return new FlareWebserviceClient() {
+    public FlareWebserviceClient flareWebserviceClient(HttpClient httpClient,
+                                                       EvaluationSettingsProvider evaluationSettingsProvider) {
+        if (EvaluationStrategy.STRUCTURED_QUERY == evaluationSettingsProvider.evaluationStrategy()) {
+            return createFlareClient(httpClient);
+        } else {
+            return new ErrorFlareWebserviceClient(new IllegalStateException(
+                    format("EVALUATION_STRATEGY is not set to '%s'.", EvaluationStrategy.STRUCTURED_QUERY)));
+        }
+    }
 
-            FlareWebserviceClient client;
-
-            @Override
-            public int requestFeasibility(byte[] structuredQuery) throws IOException, InterruptedException {
-                return getClient().requestFeasibility(structuredQuery);
+    private FlareWebserviceClient createFlareClient(HttpClient httpClient) {
+        if (isNullOrEmpty(flareBaseUrl)) {
+            return new ErrorFlareWebserviceClient(new IllegalArgumentException("FLARE_BASE_URL is not set."));
+        } else {
+            try {
+                URI parsedFlareBaseUrl = new URI(flareBaseUrl);
+                return new FlareWebserviceClientImpl(httpClient, parsedFlareBaseUrl);
+            } catch (URISyntaxException e) {
+                return new ErrorFlareWebserviceClient(new IllegalArgumentException(
+                        format("Could not parse FLARE_BASE_URL '%s' as URI.", flareBaseUrl), e));
             }
-
-            private FlareWebserviceClient getClient() {
-                if (client == null) {
-                    checkArgument(!isNullOrEmpty(flareBaseUrl), "FLARE_BASE_URL is not set.");
-                    try {
-                        URI parsedFlareBaseUrl = new URI(flareBaseUrl);
-                        client = new FlareWebserviceClientImpl(httpClient, parsedFlareBaseUrl);
-                    } catch (URISyntaxException e) {
-                        throw new IllegalArgumentException(
-                                format("Could not parse FLARE_BASE_URL '%s' as URI.", flareBaseUrl), e);
-                    }
-                }
-                return client;
-            }
-
-            @Override
-            public void testConnection() throws ClientProtocolException, IOException {
-                getClient().testConnection();
-            }
-        };
+        }
     }
 
     @Bean
-    public HttpClient flareHttpClient(@Qualifier("base-client") SSLContext sslContext) {
-        HttpClientBuilder builder = new TlsClientFactory(null, sslContext).getNativeHttpClientBuilder();
+    public HttpClient flareHttpClient(@Qualifier("base-client") SSLContext sslContext,
+                                      EvaluationSettingsProvider evaluationSettingsProvider) {
+        if (EvaluationStrategy.STRUCTURED_QUERY == evaluationSettingsProvider.evaluationStrategy()) {
+            HttpClientBuilder builder = new TlsClientFactory(null, sslContext).getNativeHttpClientBuilder();
 
-        BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
-        if (!isNullOrEmpty(proxyHost) && proxyPort != null) {
-            HttpHost proxy = new HttpHost(proxyHost, proxyPort);
-            builder.setProxy(proxy);
-            if (!isNullOrEmpty(proxyUsername) && !isNullOrEmpty(proxyPassword)) {
-                builder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
-                credentialsProvider.setCredentials(new AuthScope(proxy),
-                        new UsernamePasswordCredentials(proxyUsername, proxyPassword));
+            if (!isNullOrEmpty(proxyHost) && proxyPort != null) {
+                HttpHost proxy = new HttpHost(proxyHost, proxyPort);
+                builder.setProxy(proxy);
+                if (!isNullOrEmpty(proxyUsername) && !isNullOrEmpty(proxyPassword)) {
+                    builder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
+                    credentialsProvider.setCredentials(new AuthScope(proxy),
+                            new UsernamePasswordCredentials(proxyUsername, proxyPassword));
+                }
             }
+            if (!isNullOrEmpty(basicAuthUsername) && !isNullOrEmpty(basicAuthPassword)) {
+                URI flareUri = URI.create(flareBaseUrl);
+                credentialsProvider.setCredentials(new AuthScope(new HttpHost(flareUri.getHost(), flareUri.getPort())),
+                        new UsernamePasswordCredentials(basicAuthUsername, basicAuthPassword));
+            } else if (!isNullOrEmpty(bearerAuthToken)) {
+                return new BearerHttpClient(builder.setDefaultCredentialsProvider(credentialsProvider).build());
+            }
+            return builder.setDefaultCredentialsProvider(credentialsProvider).build();
+        } else {
+            return HttpClientBuilder.create().build();
         }
-        if (!isNullOrEmpty(basicAuthUsername) && !isNullOrEmpty(basicAuthPassword)) {
-            URI flareUri = URI.create(flareBaseUrl);
-            credentialsProvider.setCredentials(new AuthScope(new HttpHost(flareUri.getHost(), flareUri.getPort())),
-                    new UsernamePasswordCredentials(basicAuthUsername, basicAuthPassword));
-        } else if (!isNullOrEmpty(bearerAuthToken)) {
-            return new BearerHttpClient(builder.setDefaultCredentialsProvider(credentialsProvider).build());
+    }
+
+    private final class ErrorFlareWebserviceClient implements FlareWebserviceClient {
+        private final RuntimeException exception;
+
+        private ErrorFlareWebserviceClient(RuntimeException exception) {
+            this.exception = exception;
         }
-        return builder.setDefaultCredentialsProvider(credentialsProvider).build();
+
+        @Override
+        public void testConnection() throws IOException {
+            throw exception;
+        }
+
+        @Override
+        public int requestFeasibility(byte[] structuredQuery) throws IOException, InterruptedException {
+            throw exception;
+        }
     }
 
     private final class BearerHttpClient extends CloseableHttpClient {

@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.io.IOException;
 import java.util.List;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.FEASIBILITY_EXECUTE_PROCESS_ID;
@@ -47,15 +46,15 @@ public class FeasibilityProcessPluginDeploymentStateListener
                             .execute();
                     logger.info("Connection test OK ({} - {})", statement.getSoftware().getName(),
                             statement.getSoftware().getVersion());
-                } catch (RuntimeException e) {
-                    logger.warn("Connection test FAILED - error: {} - {}", e.getClass().getName(), e.getMessage());
+                } catch (Exception e) {
+                    logger.error("Connection test FAILED - error: {} - {}", e.getClass().getName(), e.getMessage());
                 }
             } else {
                 try {
                     flareWebserviceClient.testConnection();
                     logger.info("Connection test OK (flare)");
-                } catch (IOException e) {
-                    logger.warn("Connection test FAILED (flare) - error: {} - {}", e.getClass().getName(),
+                } catch (Exception e) {
+                    logger.error("Connection test FAILED (flare) - error: {} - {}", e.getClass().getName(),
                             e.getMessage());
                 }
             }

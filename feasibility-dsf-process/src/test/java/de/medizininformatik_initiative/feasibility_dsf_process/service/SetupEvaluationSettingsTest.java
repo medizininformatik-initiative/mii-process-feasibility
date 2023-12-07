@@ -1,6 +1,7 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.service;
 
 import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationSettingsProvider;
+import de.medizininformatik_initiative.feasibility_dsf_process.EvaluationStrategy;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -34,7 +35,7 @@ public class SetupEvaluationSettingsTest {
         double epsilon = 113810d;
 
         when(api.getVariables(execution)).thenReturn(variables);
-        when(settingsProvider.evaluationStrategyRepresentation()).thenReturn(expectedEvaluationStrategy);
+        when(settingsProvider.evaluationStrategy()).thenReturn(EvaluationStrategy.CQL);
         when(settingsProvider.evaluationResultObfuscationEnabled()).thenReturn(true);
         when(settingsProvider.resultObfuscationLaplaceSensitivity()).thenReturn(sensitivity);
         when(settingsProvider.resultObfuscationLaplaceEpsilon()).thenReturn(epsilon);

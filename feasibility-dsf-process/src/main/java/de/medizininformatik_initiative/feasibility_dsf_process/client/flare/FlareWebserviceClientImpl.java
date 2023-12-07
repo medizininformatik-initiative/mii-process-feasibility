@@ -1,6 +1,5 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.client.flare;
 
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -42,7 +41,7 @@ public class FlareWebserviceClientImpl implements FlareWebserviceClient {
     }
 
     @Override
-    public void testConnection() throws ClientProtocolException, IOException {
+    public void testConnection() throws IOException {
         var req = new HttpGet(resolve("/cache/stats"));
 
         httpClient.execute(req, new BasicResponseHandler());
