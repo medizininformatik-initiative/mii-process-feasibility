@@ -1,5 +1,9 @@
 package de.medizininformatik_initiative.feasibility_dsf_process.variables;
 
+import org.joda.time.LocalDate;
+
+import java.util.Date;
+
 public interface ConstantsFeasibility {
     String VARIABLE_MEASURE = "measure";
     String VARIABLE_LIBRARY = "library";
@@ -23,4 +27,7 @@ public interface ConstantsFeasibility {
 
     String FEASIBILITY_REQUEST_PROCESS_ID = "medizininformatik-initiativede_feasibilityRequest";
     String FEASIBILITY_EXECUTE_PROCESS_ID = "medizininformatik-initiativede_feasibilityExecute";
+
+    Date MEASURE_REPORT_PERIOD_START = new LocalDate(1900, 1, 1).toDate();
+    Date MEASURE_REPORT_PERIOD_END = new LocalDate(2100, 1, 1).toDate();
 }

@@ -14,6 +14,8 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Objects;
 
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.MEASURE_REPORT_PERIOD_END;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.MEASURE_REPORT_PERIOD_START;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_ID;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 
@@ -52,8 +54,8 @@ public class EvaluateCqlMeasure extends AbstractServiceDelegate implements Initi
     private MeasureReport executeEvaluateMeasure(String measureId) {
         logger.debug("Evaluate measure {}", measureId);
         return storeClient.operation().onInstance("Measure/" + measureId).named("evaluate-measure")
-                .withParameter(Parameters.class, "periodStart", new DateType(1900, 1, 1))
-                .andParameter("periodEnd", new DateType(2100, 1, 1))
+                .withParameter(Parameters.class, "periodStart", new DateType(MEASURE_REPORT_PERIOD_START))
+                .andParameter("periodEnd", new DateType(MEASURE_REPORT_PERIOD_END))
                 .useHttpGet()
                 .returnResourceType(MeasureReport.class)
                 .execute();
