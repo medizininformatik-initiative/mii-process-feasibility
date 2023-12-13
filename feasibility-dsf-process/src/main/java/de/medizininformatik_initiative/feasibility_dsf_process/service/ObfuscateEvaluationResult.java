@@ -20,6 +20,7 @@ import static de.medizininformatik_initiative.feasibility_dsf_process.variables.
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.MEASURE_REPORT_PERIOD_START;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static java.lang.String.format;
+import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 
 public class ObfuscateEvaluationResult extends AbstractServiceDelegate
@@ -41,7 +42,13 @@ public class ObfuscateEvaluationResult extends AbstractServiceDelegate
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
         var measureReport = (MeasureReport) variables.getResource(VARIABLE_MEASURE_REPORT);
-        variables.setResource(VARIABLE_MEASURE_REPORT, obfuscateFeasibilityCount(measureReport));
+
+        if (measureReport.getStatus() == COMPLETE) {
+            variables.setResource(VARIABLE_MEASURE_REPORT, obfuscateFeasibilityCount(measureReport));
+        } else {
+            throw new RuntimeException(format("Expected status '%s' but actually is '%s' for measure report (id '%s').",
+                    COMPLETE, measureReport.getStatus(), measureReport.getId()));
+        }
     }
 
     private MeasureReport obfuscateFeasibilityCount(MeasureReport measureReport) {

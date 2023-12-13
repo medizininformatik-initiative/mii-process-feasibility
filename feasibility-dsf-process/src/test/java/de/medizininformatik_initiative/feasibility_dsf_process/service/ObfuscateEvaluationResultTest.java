@@ -37,6 +37,7 @@ import static de.medizininformatik_initiative.feasibility_dsf_process.variables.
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
+import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.PENDING;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
@@ -253,5 +254,28 @@ public class ObfuscateEvaluationResultTest {
             service.doExecute(execution, variables);
         }).hasMessage("Missing population with coding '%s' in measure report (id '%s').",
                         CODESYSTEM_MEASURE_POPULATION_VALUE_INITIAL_POPULATION, reportId);
+    }
+
+    @Test
+    @DisplayName("execution fails on incomplete measure report")
+    void doExecuteFailsOnWrongMeasureReportStatus() throws Exception {
+        var reportDate = new Date();
+        var measureUrl = "http://localhost/fhir/Measure/123456";
+        var reportId = "id-181407";
+        var measureReport = new MeasureReport()
+                .setStatus(PENDING)
+                .setType(SUMMARY)
+                .setMeasure(measureUrl)
+                .setDate(reportDate)
+                .setPeriod(new Period()
+                        .setStart(new LocalDate(1312, 4, 9).toDate())
+                        .setEnd(new LocalDate(1314, 1, 8).toDate()))
+                .setId(reportId);
+        when(variables.getResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
+
+        assertThatThrownBy(() -> {
+            service.doExecute(execution, variables);
+        }).hasMessage("Expected status '%s' but actually is '%s' for measure report (id '%s').",
+                COMPLETE, PENDING, reportId);
     }
 }
