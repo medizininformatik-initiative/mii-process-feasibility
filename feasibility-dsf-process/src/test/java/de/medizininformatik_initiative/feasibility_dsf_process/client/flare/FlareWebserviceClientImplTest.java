@@ -18,6 +18,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
 
+import static jakarta.ws.rs.HttpMethod.POST;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,14 +30,16 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class FlareWebserviceClientImplTest {
 
-    private org.apache.http.client.HttpClient httpClient;
+    private HttpClient httpClient;
+    private URI flareBaseUrl;
     private FlareWebserviceClient flareWebserviceClient;
     @Captor ArgumentCaptor<HttpPost> postCaptor;
 
     @BeforeEach
     public void setUp() throws URISyntaxException {
         httpClient = mock(HttpClient.class);
-        flareWebserviceClient = new FlareWebserviceClientImpl(httpClient, new URI("http://localhost:5000/"));
+        flareBaseUrl = new URI("http://localhost:5000/");
+        flareWebserviceClient = new FlareWebserviceClientImpl(httpClient, flareBaseUrl);
     }
 
     @Test
@@ -133,5 +137,19 @@ public class FlareWebserviceClientImplTest {
                 () -> flareWebserviceClient.requestFeasibility(structuredQuery));
 
         assertEquals("EVALUATION_STRATEGY is not set to 'structured-query'.", e.getMessage());
+    }
+
+    @Test
+    void sendErrorGetsRethrownWithAdditionalInformation() throws Exception {
+        byte[] structuredQuery = "foo".getBytes();
+        IOException error = new IOException("error-151930");
+        when(httpClient.execute(any(HttpPost.class), any(BasicResponseHandler.class))).thenThrow(error);
+
+        assertThatThrownBy(() -> {
+            flareWebserviceClient.requestFeasibility(structuredQuery);
+        })
+            .hasMessage("Error sending %s request to flare webservice url '%s'.", POST,
+                    flareBaseUrl.resolve("/query/execute"))
+            .hasCause(error);
     }
 }
