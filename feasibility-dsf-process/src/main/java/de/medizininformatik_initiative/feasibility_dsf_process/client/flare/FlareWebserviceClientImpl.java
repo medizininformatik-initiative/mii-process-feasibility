@@ -3,6 +3,7 @@ package de.medizininformatik_initiative.feasibility_dsf_process.client.flare;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.message.BasicHeader;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import static ca.uhn.fhir.rest.api.Constants.HEADER_CONTENT_TYPE;
+import static java.lang.String.format;
 
 /**
  * Client for communicating with a Flare instance.
@@ -31,19 +33,28 @@ public class FlareWebserviceClientImpl implements FlareWebserviceClient {
         req.setEntity(new ByteArrayEntity(structuredQuery));
         req.setHeader(new BasicHeader(HEADER_CONTENT_TYPE, "application/sq+json"));
 
-        var response = httpClient.execute(req, new BasicResponseHandler());
+        var response = sendRequest(req);
 
         return Integer.parseInt(response);
-    }
-
-    private URI resolve(String path) {
-        return flareBaseUrl.resolve((flareBaseUrl.getPath() + path).replaceAll("//", "/"));
     }
 
     @Override
     public void testConnection() throws IOException {
         var req = new HttpGet(resolve("/cache/stats"));
 
-        httpClient.execute(req, new BasicResponseHandler());
+        sendRequest(req);
+    }
+
+    private URI resolve(String path) {
+        return flareBaseUrl.resolve((flareBaseUrl.getPath() + path).replaceAll("//", "/"));
+    }
+
+    private String sendRequest(HttpUriRequest req) throws IOException {
+        try {
+            return httpClient.execute(req, new BasicResponseHandler());
+        } catch (IOException e) {
+            throw new IOException(
+                    format("Error sending %s request to flare webservice url '%s'.", req.getMethod(), req.getURI()), e);
+        }
     }
 }
