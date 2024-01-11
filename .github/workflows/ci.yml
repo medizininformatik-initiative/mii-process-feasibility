@@ -94,6 +94,8 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
+        draft: true
+        generate_release_notes: true
         files: |
           feasibility-dsf-process/target/feasibility-dsf-process-*.jar
           feasibility-dsf-process/target/feasibility-dsf-process-*.jar.sha256
