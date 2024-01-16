@@ -99,7 +99,11 @@ public class FlareWebserviceClientSpringConfig {
     public HttpClient flareHttpClient(@Qualifier("base-client") SSLContext sslContext,
                                       EvaluationSettingsProvider evaluationSettingsProvider) {
         if (EvaluationStrategy.STRUCTURED_QUERY == evaluationSettingsProvider.evaluationStrategy()) {
-            HttpClientBuilder builder = new TlsClientFactory(null, sslContext).getNativeHttpClientBuilder();
+            TlsClientFactory clientFactory = new TlsClientFactory(null, sslContext);
+            clientFactory.setConnectTimeout(connectTimeout);
+            clientFactory.setConnectionRequestTimeout(connectTimeout);
+            clientFactory.setSocketTimeout(connectTimeout);
+            HttpClientBuilder builder = clientFactory.getNativeHttpClientBuilder();
 
             BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 

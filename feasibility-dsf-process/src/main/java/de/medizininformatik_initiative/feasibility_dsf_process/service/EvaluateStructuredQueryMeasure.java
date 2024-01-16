@@ -13,7 +13,6 @@ import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
 import org.hl7.fhir.r4.model.Period;
-import org.joda.time.LocalDate;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.io.IOException;
@@ -23,6 +22,8 @@ import java.util.Objects;
 
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_MEASURE_POPULATION;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.CODESYSTEM_MEASURE_POPULATION_VALUE_INITIAL_POPULATION;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.MEASURE_REPORT_PERIOD_END;
+import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.MEASURE_REPORT_PERIOD_START;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE;
 import static de.medizininformatik_initiative.feasibility_dsf_process.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
@@ -78,8 +79,8 @@ public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate impl
                 .setDate(new Date())
                 .setMeasure(measureRef)
                 .setPeriod(new Period()
-                        .setStart(new LocalDate(1900, 1, 1).toDate())
-                        .setEnd(new LocalDate(2100, 1, 1).toDate()));
+                        .setStart(MEASURE_REPORT_PERIOD_START)
+                        .setEnd(MEASURE_REPORT_PERIOD_END));
 
         var populationGroup = new MeasureReportGroupPopulationComponent()
                 .setCount(feasibility)
