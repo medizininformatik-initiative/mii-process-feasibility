@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.medizininformatik-initiative</groupId>
-    <artifactId>feasibility-dsf-process-parent</artifactId>
+    <artifactId>mii-process-feasibility-parent</artifactId>
     <version>0.0.0.0</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>feasibility-dsf-process</module>
-        <module>feasibility-dsf-process-tools</module>
+        <module>mii-process-feasibility</module>
+        <module>mii-process-feasibility-tools</module>
     </modules>
 
     <properties>
@@ -21,15 +21,15 @@
         <testcontainers.version>1.19.3</testcontainers.version>
     </properties>
 
-    <name>MII Feasibility Processes</name>
+    <name>MII Processes Feasibility</name>
     <description>Business processes for the MII feasibility project as plugins for the HiGHmed Data Sharing Framework.
     </description>
-    <url>https://github.com/medizininformatik-initiative/feasibility-dsf-process</url>
+    <url>https://github.com/medizininformatik-initiative/mii-process-feasibility</url>
 
     <scm>
-        <connection>scm:git:git://github.com/nmedizininformatik-initiative/feasibility-dsf-process.git</connection>
-        <developerConnection>scm:git:git@github.com:medizininformatik-initiative/feasibility-dsf-process.git</developerConnection>
-        <url>https://github.com/medizininformatik-initiative/feasibility-dsf-process</url>
+        <connection>scm:git:git://github.com/nmedizininformatik-initiative/mii-process-feasibility.git</connection>
+        <developerConnection>scm:git:git@github.com:medizininformatik-initiative/mii-process-feasibility.git</developerConnection>
+        <url>https://github.com/medizininformatik-initiative/mii-process-feasibility</url>
     </scm>
 
     <licenses>
@@ -193,7 +193,7 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>feasibility-dsf-process-docker-test-setup/dic-1/bpe/app/log</directory>
+                            <directory>mii-process-feasibility-docker-test-setup/dic-1/bpe/app/log</directory>
                             <includes>
                                 <include>*.log</include>
                                 <include>*.log.gz</include>
@@ -201,7 +201,7 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>feasibility-dsf-process-docker-test-setup/dic-1/fhir/app/log</directory>
+                            <directory>mii-process-feasibility-docker-test-setup/dic-1/fhir/app/log</directory>
                             <includes>
                                 <include>*.log</include>
                                 <include>*.log.gz</include>
@@ -209,7 +209,7 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>feasibility-dsf-process-docker-test-setup/dic-2/bpe/app/log</directory>
+                            <directory>mii-process-feasibility-docker-test-setup/dic-2/bpe/app/log</directory>
                             <includes>
                                 <include>*.log</include>
                                 <include>*.log.gz</include>
@@ -217,7 +217,7 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>feasibility-dsf-process-docker-test-setup/dic-2/fhir/app/log</directory>
+                            <directory>mii-process-feasibility-docker-test-setup/dic-2/fhir/app/log</directory>
                             <includes>
                                 <include>*.log</include>
                                 <include>*.log.gz</include>
@@ -225,7 +225,7 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>feasibility-dsf-process-docker-test-setup/zars/bpe/app/log</directory>
+                            <directory>mii-process-feasibility-docker-test-setup/zars/bpe/app/log</directory>
                             <includes>
                                 <include>*.log</include>
                                 <include>*.log.gz</include>
@@ -233,7 +233,7 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>feasibility-dsf-process-docker-test-setup/zars/fhir/app/log</directory>
+                            <directory>mii-process-feasibility-docker-test-setup/zars/fhir/app/log</directory>
                             <includes>
                                 <include>*.log</include>
                                 <include>*.log.gz</include>
@@ -253,7 +253,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/medizininformatik-initiative/feasibility-dsf-process</url>
+            <url>https://maven.pkg.github.com/medizininformatik-initiative/mii-process-feasibility</url>
         </repository>
     </distributionManagement>
 
