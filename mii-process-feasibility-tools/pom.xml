@@ -1,0 +1,44 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>mii-process-feasibility-tools</artifactId>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>de.medizininformatik-initiative</groupId>
+        <artifactId>mii-process-feasibility-parent</artifactId>
+        <version>0.0.0.0</version>
+    </parent>
+
+    <modules>
+        <module>mii-process-feasibility-test-data-generator</module>
+    </modules>
+
+    <name>MII Process Feasibility Tools</name>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- hhn rwh -->
+            <dependency>
+                <groupId>de.hs-heilbronn.mi</groupId>
+                <artifactId>crypto-utils</artifactId>
+                <version>3.7.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>dev.dsf</groupId>
+                <artifactId>dsf-fhir-rest-adapter</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.dsf</groupId>
+                <artifactId>dsf-fhir-server</artifactId>
+                <version>1.1.0</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+</project>

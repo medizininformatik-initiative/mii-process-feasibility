@@ -86,7 +86,7 @@ jobs:
       run: mvn -q versions:set -DnewVersion="${{ steps.prep.outputs.version }}" -DprocessAllModules=true
 
     - name: Build with Maven
-      run: mvn -B deploy -DskipTests --file feasibility-dsf-process/pom.xml
+      run: mvn -B deploy -DskipTests --file mii-process-feasibility/pom.xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         USERNAME: ${{ github.actor }}
@@ -97,7 +97,7 @@ jobs:
         draft: true
         generate_release_notes: true
         files: |
-          feasibility-dsf-process/target/feasibility-dsf-process-*.jar
-          feasibility-dsf-process/target/feasibility-dsf-process-*.jar.sha256
-        name: "Feasibility DSF Process - v${{ steps.prep.outputs.version }}"
+          mii-process-feasibility/target/mii-process-feasibility-*.jar
+          mii-process-feasibility/target/mii-process-feasibility-*.jar.sha256
+        name: "MII Process Feasibility - v${{ steps.prep.outputs.version }}"
 

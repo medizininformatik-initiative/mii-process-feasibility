@@ -30,8 +30,8 @@ mvn clean package
 
 ## Usage
 
-You can test the processes by following the [README](feasibility-dsf-process-docker-test-setup/README.md) in
-the `feasibility-dsf-process-docker-test-setup` directory.
+You can test the processes by following the [README](mii-process-feasibility-docker-test-setup/README.md) in
+the `mii-process-feasibility-docker-test-setup` directory.
 
 ## Edit
 You should edit the *.bpmn files only with the standalone Camunda Modeller, because of different
