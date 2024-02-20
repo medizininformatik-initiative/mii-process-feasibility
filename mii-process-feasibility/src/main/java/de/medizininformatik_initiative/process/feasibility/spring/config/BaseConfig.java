@@ -22,13 +22,13 @@ import javax.net.ssl.SSLContext;
 @Configuration
 public class BaseConfig {
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.trust_store_path:#{null}}") private String trustStorePath;
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_path:#{null}}") private String trustStorePath;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.trust_store_password:#{null}}") private String trustStorePassword;
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_password:#{null}}") private String trustStorePassword;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.key_store_path:#{null}}") private String keyStorePath;
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.key_store_path:#{null}}") private String keyStorePath;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.key_store_password:#{null}}") private String keyStorePassword;
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.key_store_password:#{null}}") private String keyStorePassword;
 
     @Bean
     @Qualifier("base")

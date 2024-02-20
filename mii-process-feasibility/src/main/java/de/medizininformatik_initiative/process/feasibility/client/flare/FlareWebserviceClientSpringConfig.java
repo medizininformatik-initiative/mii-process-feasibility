@@ -43,31 +43,31 @@ import static java.lang.String.format;
 @Import({ BaseConfig.class, EvaluationConfig.class })
 public class FlareWebserviceClientSpringConfig {
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.flare.base_url:}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url:}")
     private String flareBaseUrl;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.flare.timeout.connect:2000}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.timeout.connect:2000}")
     private int connectTimeout;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.proxy.host:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.host:#{null}}")
     private String proxyHost;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.proxy.port:}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.port:}")
     private Integer proxyPort;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.proxy.username:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.username:#{null}}")
     private String proxyUsername;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.proxy.password:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.password:#{null}}")
     private String proxyPassword;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.auth.basic.username:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.username:#{null}}")
     private String basicAuthUsername;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.auth.basic.password:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.password:#{null}}")
     private String basicAuthPassword;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.auth.bearer.token:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.bearer.token:#{null}}")
     private String bearerAuthToken;
 
     @Bean

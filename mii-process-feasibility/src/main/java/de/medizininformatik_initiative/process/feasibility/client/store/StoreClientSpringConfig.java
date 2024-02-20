@@ -19,37 +19,37 @@ import javax.net.ssl.SSLContext;
 @Import(BaseConfig.class)
 public class StoreClientSpringConfig {
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.proxy.host:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.host:#{null}}")
     private String proxyHost;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.proxy.port:}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.port:}")
     private Integer proxyPort;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.proxy.username:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.username:#{null}}")
     private String proxyUsername;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.proxy.password:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.password:#{null}}")
     private String proxyPassword;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.auth.bearer.token:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.bearer.token:#{null}}")
     private String bearerAuthToken;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.auth.basic.username:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.username:#{null}}")
     private String basicAuthUsername;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.auth.basic.password:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.password:#{null}}")
     private String basicAuthPassword;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.timeout.connect:2000}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.timeout.connect:2000}")
     private Integer connectTimeout;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.timeout.connect_request:20000}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.timeout.connect_request:20000}")
     private Integer connectRequestTimeout;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.timeout.socket:20000}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.timeout.socket:20000}")
     private Integer socketTimeout;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.client.store.base_url:}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.base_url:}")
     private String storeBaseUrl;
 
     @Bean

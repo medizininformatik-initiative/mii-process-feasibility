@@ -60,21 +60,21 @@ public class FlareWebserviceClientImplFwdRevProxyBasicAuthIT extends FlareWebser
         var proxyHost = forwardProxy.getHost();
         var proxyPort = forwardProxy.getFirstMappedPort();
 
-        registry.add("de.medizininformatik_initiative.process.feasibility.evaluation.strategy",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.evaluation.strategy",
                 () -> "structured-query");
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.flare.base_url",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url",
                 () -> "http://proxy:8080/");
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.store.proxy.host",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.host",
                 () -> proxyHost);
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.store.proxy.port",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.port",
                 () -> proxyPort);
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.store.proxy.username",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.username",
                 () -> "test");
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.store.proxy.password",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.password",
                 () -> "bar");
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.store.auth.basic.username",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.username",
                 () -> "test");
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.store.auth.basic.password",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.password",
                 () -> "foo");
     }
 

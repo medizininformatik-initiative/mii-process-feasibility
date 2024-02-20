@@ -51,13 +51,13 @@ public class FlareWebserviceClientImplRevProxyBasicAuthIT extends FlareWebservic
         var proxyHost = proxy.getHost();
         var proxyPort = proxy.getFirstMappedPort();
 
-        registry.add("de.medizininformatik_initiative.process.feasibility.evaluation.strategy",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.evaluation.strategy",
                 () -> "structured-query");
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.flare.base_url",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url",
                 () -> String.format("http://%s:%s/", proxyHost, proxyPort));
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.store.auth.basic.username",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.username",
                 () -> basicAuthUsername);
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.store.auth.basic.password",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.password",
                 () -> basicAuthPassword);
     }
 

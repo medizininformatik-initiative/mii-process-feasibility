@@ -27,9 +27,9 @@ public class FlareWebserviceClientImplNonProxyIT extends FlareWebserviceClientIm
         var flareHost = flare.getHost();
         var flarePort = flare.getFirstMappedPort();
 
-        registry.add("de.medizininformatik_initiative.process.feasibility.evaluation.strategy",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.evaluation.strategy",
                 () -> "structured-query");
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.flare.base_url",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url",
                 () -> String.format("http://%s:%s/", flareHost, flarePort));
     }
 

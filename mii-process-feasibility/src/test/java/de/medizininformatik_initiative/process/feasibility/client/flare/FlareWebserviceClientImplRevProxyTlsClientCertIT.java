@@ -53,17 +53,17 @@ public class FlareWebserviceClientImplRevProxyTlsClientCertIT extends FlareWebse
         var proxyHost = proxy.getHost();
         var proxyPort = proxy.getFirstMappedPort();
 
-        registry.add("de.medizininformatik_initiative.process.feasibility.evaluation.strategy",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.evaluation.strategy",
                 () -> "structured-query");
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.flare.base_url",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url",
                 () -> String.format("https://%s:%s/", proxyHost, proxyPort));
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.store.trust_store_path",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_path",
                 () -> trustStoreFile.getPath());
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.store.trust_store_password",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_password",
                 () -> "changeit");
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.store.key_store_path",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.key_store_path",
                 () -> keyStoreFile.getPath());
-        registry.add("de.medizininformatik_initiative.process.feasibility.client.store.key_store_password",
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.key_store_password",
                 () -> "changeit");
     }
 

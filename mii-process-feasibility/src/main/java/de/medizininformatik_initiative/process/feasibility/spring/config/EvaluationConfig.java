@@ -12,22 +12,22 @@ import java.time.Duration;
 @Configuration
 public class EvaluationConfig {
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.evaluation.strategy:cql}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.evaluation.strategy:cql}")
     private String evaluationStrategy;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.evaluation.obfuscate:true}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.evaluation.obfuscate:true}")
     private boolean obfuscateEvaluationResult;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.evaluation.obfuscation.sensitivity:1.0}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.evaluation.obfuscation.sensitivity:1.0}")
     private double obfuscationLaplaceSensitivity;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.evaluation.obfuscation.epsilon:0.5}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.evaluation.obfuscation.epsilon:0.5}")
     private double obfuscationLaplaceEpsilon;
 
-    @Value("${de.medizininformatik_initiative.process.feasibility.rate.limit.count:999}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.rate.limit.count:999}")
     private Integer rateLimitCount;
 
-    @Value("#{T(java.time.Duration).parse('${de.medizininformatik_initiative.process.feasibility.rate.limit.interval.duration:PT1H}')}")
+    @Value("#{T(java.time.Duration).parse('${de.medizininformatik_initiative.feasibility_dsf_process.rate.limit.interval.duration:PT1H}')}")
     private Duration rateLimitTimeIntervalDuration;
 
     @Bean
