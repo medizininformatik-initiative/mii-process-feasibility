@@ -31,6 +31,8 @@ public abstract class FlareWebserviceClientImplBaseIT {
             flare.stop();
             fhirServer.stop();
         }));
+        flare.start();
+        fhirServer.start();
     }
 
     protected static URL getResource(final String name) {
