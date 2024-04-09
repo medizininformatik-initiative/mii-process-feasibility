@@ -7,6 +7,8 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.ParameterComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.stream.Stream;
 
@@ -15,6 +17,7 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
 
 public class SendDicRequest extends AbstractTaskMessageSend {
+    private static final Logger logger = LoggerFactory.getLogger(SendDicRequest.class);
 
     public SendDicRequest(ProcessPluginApi api) {
         super(api);
@@ -23,6 +26,8 @@ public class SendDicRequest extends AbstractTaskMessageSend {
     @Override
     protected Stream<ParameterComponent> getAdditionalInputParameters(DelegateExecution execution,
                                                                       Variables variables) {
+        logger.info("getAdditionalInputParameters Send DIC Request");
+
         return Stream.of(api.getTaskHelper().createInput(
                 new Reference(checkNotNull(variables.getString("measure-id"), "variable 'measure-id' not set")),
                 CODESYSTEM_FEASIBILITY, CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE));

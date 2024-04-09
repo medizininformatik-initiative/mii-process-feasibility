@@ -38,6 +38,8 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
+        logger.info("doExecute store live result");
+
         var task = variables.getLatestTask();
 
         var measureReport = (MeasureReport) execution.getVariableLocal(VARIABLE_MEASURE_REPORT);

@@ -10,6 +10,8 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
 import org.hl7.fhir.r4.model.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Objects;
@@ -25,6 +27,7 @@ import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 
 public class ObfuscateEvaluationResult extends AbstractServiceDelegate
         implements InitializingBean {
+    private static final Logger logger = LoggerFactory.getLogger(ObfuscateEvaluationResult.class);
 
     private final Obfuscator<Integer> obfuscator;
 
@@ -41,6 +44,8 @@ public class ObfuscateEvaluationResult extends AbstractServiceDelegate
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
+        logger.info("doExecute obfuscate evaluation result");
+
         var measureReport = (MeasureReport) variables.getResource(VARIABLE_MEASURE_REPORT);
 
         if (measureReport.getStatus() == COMPLETE) {
