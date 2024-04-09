@@ -44,6 +44,8 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
+        logger.info("doExecute download feasibility resources");
+
         var task = variables.getStartTask();
 
         var measureId = getMeasureId(task);
@@ -69,8 +71,8 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
     private Bundle getMeasureAndLibrary(IdType measureId, FhirWebserviceClient client) {
         try {
             var bundle = client.searchWithStrictHandling(Measure.class,
-                    Map.of("_id", Collections.singletonList(measureId.getIdPart()), "_include",
-                            Collections.singletonList("Measure:depends-on")));
+                    Map.of("_id", Collections.singletonList(measureId.getIdPart()),
+                            "_include", Collections.singletonList("Measure:depends-on")));
 
             if (bundle.getEntry().size() < 2) {
                 throw new RuntimeException("Returned search-set contained less then two entries");

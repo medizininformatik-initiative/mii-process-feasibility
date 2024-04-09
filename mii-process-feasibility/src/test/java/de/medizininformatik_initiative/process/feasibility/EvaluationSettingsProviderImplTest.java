@@ -18,7 +18,7 @@ public class EvaluationSettingsProviderImplTest {
     public void testEvaluationStrategyRepresentation() {
         EvaluationSettingsProvider provider;
         for (EvaluationStrategy strategy : EvaluationStrategy.values()) {
-            provider = new EvaluationSettingsProviderImpl(strategy, false, 0d, 0d, 0, Duration.ofSeconds(1));
+            provider = new EvaluationSettingsProviderImpl(strategy, false, 0d, 0d, 0, Duration.ofSeconds(1),false,"medizininformatik-initiative.de");
             assertEquals(strategy, provider.evaluationStrategy());
         }
     }
@@ -26,14 +26,14 @@ public class EvaluationSettingsProviderImplTest {
     @Test
     public void testEvaluationResultObfuscationEnabled() {
         EvaluationSettingsProvider provider = new EvaluationSettingsProviderImpl(EvaluationStrategy.CQL, true, 1d, 0d,
-                0, Duration.ofSeconds(1));
+                0, Duration.ofSeconds(1),false,"medizininformatik-initiative.de");
         assertTrue(provider.evaluationResultObfuscationEnabled());
     }
 
     @Test
     public void testEvaluationResultObfuscationDisabled() {
         EvaluationSettingsProvider provider = new EvaluationSettingsProviderImpl(EvaluationStrategy.CQL, false, 1d, 0d,
-                0, Duration.ofSeconds(1));
+                0, Duration.ofSeconds(1),false,"medizininformatik-initiative.de");
         assertFalse(provider.evaluationResultObfuscationEnabled());
     }
 
@@ -42,7 +42,7 @@ public class EvaluationSettingsProviderImplTest {
     public void rateLimitTimeInterval() {
         var duration = ofSeconds(134651);
         EvaluationSettingsProvider provider = new EvaluationSettingsProviderImpl(EvaluationStrategy.CQL, false, 1d, 0d,
-                0, duration);
+                0, duration,false,"medizininformatik-initiative.de");
         assertEquals(duration, provider.getRateLimitTimeIntervalDuration());
     }
 
@@ -50,7 +50,7 @@ public class EvaluationSettingsProviderImplTest {
     @DisplayName("invalid rate limit time interval ends in error")
     public void invalidRateLimitTimeInterval() {
         assertThrows(IllegalArgumentException.class,
-                () -> new EvaluationSettingsProviderImpl(EvaluationStrategy.CQL, false, 1d, 0d, 0, Duration.ZERO));
+                () -> new EvaluationSettingsProviderImpl(EvaluationStrategy.CQL, false, 1d, 0d, 0, Duration.ZERO,false,"medizininformatik-initiative.de"));
     }
 
     @Test
@@ -58,7 +58,7 @@ public class EvaluationSettingsProviderImplTest {
     public void rateLimitMaxCount() {
         Integer limit = 134651;
         EvaluationSettingsProvider provider = new EvaluationSettingsProviderImpl(EvaluationStrategy.CQL, false, 1d, 0d,
-                limit, Duration.ofSeconds(1));
+                limit, Duration.ofSeconds(1),false,"medizininformatik-initiative.de");
         assertEquals(limit, provider.getRateLimitCount());
     }
 
@@ -67,6 +67,6 @@ public class EvaluationSettingsProviderImplTest {
     public void invalidRateLimit() {
         assertThrows(IllegalArgumentException.class,
                 () -> new EvaluationSettingsProviderImpl(EvaluationStrategy.CQL, false, 1d, 0d, -140942,
-                        Duration.ofSeconds(1)));
+                        Duration.ofSeconds(1),false,"medizininformatik-initiative.de"));
     }
 }

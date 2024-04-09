@@ -17,13 +17,17 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
     private final double evaluationResultObfuscationLaplaceEpsilon;
     private final Integer rateLimitCount;
     private final Duration rateLimitTimeIntervalDuration;
+    private final boolean feasibilityDistributionEnabled;
+    private final String organizationIdentifierValue;
 
     public EvaluationSettingsProviderImpl(EvaluationStrategy evaluationStrategy,
                                           Boolean evaluationResultObfuscationEnabled,
                                           Double evaluationResultObfuscationLaplaceSensitivity,
                                           Double evaluationResultObfuscationLaplaceEpsilon,
                                           Integer rateLimitCount,
-                                          Duration rateLimitTimeIntervalDuration) {
+                                          Duration rateLimitTimeIntervalDuration,
+                                          Boolean feasibilityDistributionEnabled,
+                                          String organizationIdentifierValue) {
         this.evaluationStrategy = Objects.requireNonNull(evaluationStrategy);
         this.evaluationResultObfuscationEnabled = Objects.requireNonNull(evaluationResultObfuscationEnabled);
         this.evaluationResultObfuscationLaplaceSensitivity = Objects
@@ -36,6 +40,11 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
         isTrue(this.rateLimitCount >= 0, format("given request limit '%d' is not >= 0", this.getRateLimitCount()));
         isTrue(this.rateLimitTimeIntervalDuration.compareTo(Duration.ZERO) > 0,
                 format("given request limit time interval '%s' is not > 0", this.rateLimitTimeIntervalDuration));
+
+        this.feasibilityDistributionEnabled = Objects.requireNonNull(feasibilityDistributionEnabled);
+
+        this.organizationIdentifierValue = Objects.requireNonNull(organizationIdentifierValue);
+
     }
 
     @Override
@@ -68,4 +77,12 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
         return rateLimitTimeIntervalDuration;
     }
 
+    @Override
+    public boolean feasibilityDistributionEnabled() {
+        return feasibilityDistributionEnabled;
+    }
+    @Override
+    public String organizationIdentifierValue() {
+        return organizationIdentifierValue;
+    }
 }

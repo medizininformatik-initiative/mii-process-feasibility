@@ -28,7 +28,6 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
 
     public StoreFeasibilityResources(IGenericClient storeClient, ProcessPluginApi api, FeasibilityResourceCleaner cleaner) {
         super(api);
-
         this.storeClient = storeClient;
         this.cleaner = cleaner;
     }
@@ -43,6 +42,8 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
+        logger.info("doExecute store feasibility resources");
+
         Measure measure = variables.getResource(VARIABLE_MEASURE);
         Library library = variables.getResource(VARIABLE_LIBRARY);
 

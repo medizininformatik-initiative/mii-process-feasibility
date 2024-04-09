@@ -1,5 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
+import de.medizininformatik_initiative.process.feasibility.EvaluationSettingsProvider;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
 import dev.dsf.bpe.v1.variables.Target;
@@ -24,25 +25,30 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
 import static dev.dsf.common.auth.conf.Identity.ORGANIZATION_IDENTIFIER_SYSTEM;
 
+// TODO Überladen
 public class SelectRequestTargets extends AbstractServiceDelegate {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectRequestTargets.class);
+    private final EvaluationSettingsProvider evaluationSettingsProvider;
 
-    public SelectRequestTargets(ProcessPluginApi api) {
+    public SelectRequestTargets(ProcessPluginApi api, EvaluationSettingsProvider evaluationSettingsProvider) {
         super(api);
+        this.evaluationSettingsProvider = evaluationSettingsProvider;
     }
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
+        logger.info("doExecute select request targets");
 
         var organizationProvider = api.getOrganizationProvider();
         var client = api.getFhirWebserviceClientProvider().getLocalWebserviceClient();
         var parentIdentifier = new Identifier()
                 .setSystem(ORGANIZATION_IDENTIFIER_SYSTEM)
-                .setValue("medizininformatik-initiative.de");
+                .setValue(this.evaluationSettingsProvider.organizationIdentifierValue());                   //TODO als env auslagern
         var memberOrganizationRole = new Coding()
-                .setSystem("http://dsf.dev/fhir/CodeSystem/organization-role")
-                .setCode("DIC");
+                .setSystem("http://dsf.dev/fhir/CodeSystem/organization-role")  //TODO als env auslagern
+                .setCode("DIC"); // TODO < --- selektiert er sich hierbei nicht selbst? Rekursion?
+
         List<Target> targets = organizationProvider
                 .getOrganizations(parentIdentifier, memberOrganizationRole)
                 .stream()

@@ -13,6 +13,8 @@ import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
 import org.hl7.fhir.r4.model.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.io.IOException;
@@ -31,6 +33,7 @@ import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 
 public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate implements InitializingBean {
+    private static final Logger logger = LoggerFactory.getLogger(EvaluateStructuredQueryMeasure.class);
 
     private static final String STRUCTURED_QUERY_CONTENT_TYPE = "application/json";
 
@@ -50,6 +53,8 @@ public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate impl
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables)
             throws IOException, InterruptedException {
+        logger.info("doExecute evaluate Structured Query measure");
+
         var library = (Library) variables.getResource(VARIABLE_LIBRARY);
         var measure = (Measure) variables.getResource(VARIABLE_MEASURE);
 

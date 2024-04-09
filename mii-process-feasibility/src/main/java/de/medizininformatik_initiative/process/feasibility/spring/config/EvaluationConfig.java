@@ -30,6 +30,14 @@ public class EvaluationConfig {
     @Value("#{T(java.time.Duration).parse('${de.medizininformatik_initiative.feasibility_dsf_process.rate.limit.interval.duration:PT1H}')}")
     private Duration rateLimitTimeIntervalDuration;
 
+    // bpe.environment: DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_FEASIBILITY_DISTRIBUTION: "false"
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.feasibility.distribution:false}")
+    private boolean feasibilityDistribution;
+
+    // bpe.environment: DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_FEASIBILITY_ORGANIZATION_IDENTIFIER_VALUE: "broker-org.de"
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.feasibility.organization_identifier_value:medizininformatik-initiative.de}")
+    private String organizationIdentifierValue;
+
     @Bean
     public EvaluationSettingsProvider executionSettingsProvider() {
         return new EvaluationSettingsProviderImpl(
@@ -38,7 +46,9 @@ public class EvaluationConfig {
                 obfuscationLaplaceSensitivity,
                 obfuscationLaplaceEpsilon,
                 rateLimitCount,
-                rateLimitTimeIntervalDuration
+                rateLimitTimeIntervalDuration,
+                feasibilityDistribution,
+                organizationIdentifierValue
         );
     }
 }
