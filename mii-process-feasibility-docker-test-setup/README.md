@@ -133,36 +133,33 @@ Quick restart of the debugging stack:
 docker-compose down -v 
 
 docker-compose up -d zars-fhir-app 
-# Wait for the successful health check from service zars-fhir-app
-until docker-compose exec zars-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} zars-fhir-app)' == "healthy"; do
+until docker-compose exec zars-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-zars-fhir-app-1)' == "healthy"; do
     sleep 1
 done
 
 docker-compose up -d zars-bpe-app 
-# Wait for the successful health check from service zars-bpe-app 
-until docker-compose exec zars-bpe-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} zars-bpe-app)' == "healthy"; do
+until docker-compose exec zars-bpe-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-zars-bpe-app-1)' == "healthy"; do
     sleep 1
 done
 
-docker-compose up -d dic-1-fhir-app 
-# Wait for the successful health check from service dic-1-fhir-app 
-until docker-compose exec dic-1-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} dic-1-fhir-app)' == "healthy"; do
+docker-compose up -d dic-2-fhir-app 
+until docker-compose exec dic-2-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-dic-2-fhir-app-1)' == "healthy"; do
     sleep 1
 done
 ```
-Now you can start the debugger with `docker-compose up -d dic-1-bpe-app`.
+Now you can start the debugger with `docker-compose up -d dic-2-bpe-app`.
 
 Set debug environment in IntelliJ:
 1. Edit Configurations...
-1. New Configuration: Docker - Docker Compose with a name like `dic-1-bpe-app up`.
+1. New Configuration: Docker - Docker Compose with a name like `dic-2-bpe-app up`.
    1. Server: your local Docker
    1. Compose files: `/mii-process-feasibility-docker-test-setup/docker-compose.yml;`
-   1. Services: `dic-1-bpe-app,`
-1. New Configuration: Remote JVM Debug with a name like `remote dic_1_bpe debugging`
+   1. Services: `dic-2-bpe-app,`
+1. New Configuration: Remote JVM Debug with a name like `remote dic_2_bpe debugging`
    1. Use module classpath: `mii-process-feasibility`
-   1. Before launch: Run Another Configuration: `dic-1-bpe-app up`
+   1. Before launch: Run Another Configuration: `dic-2-bpe-app up`
 
-Start Debugging 'remote dic_1_bpe debugging'
+Start Debugging 'remote dic_2_bpe debugging'
 
 After that we can POST the first Task to the ZARS:
 
