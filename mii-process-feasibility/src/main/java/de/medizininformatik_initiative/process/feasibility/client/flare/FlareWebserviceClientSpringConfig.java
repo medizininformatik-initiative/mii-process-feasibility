@@ -37,6 +37,7 @@ import javax.net.ssl.SSLContext;
 import static ca.uhn.fhir.rest.api.Constants.HEADER_AUTHORIZATION;
 import static ca.uhn.fhir.rest.api.Constants.HEADER_AUTHORIZATION_VALPREFIX_BEARER;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CLIENT_TIMEOUT_DEFAULT;
 import static java.lang.String.format;
 
 @Configuration
@@ -46,7 +47,7 @@ public class FlareWebserviceClientSpringConfig {
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url:}")
     private String flareBaseUrl;
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.timeout.connect:2000}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.timeout.connect:" + CLIENT_TIMEOUT_DEFAULT + "}")
     private int connectTimeout;
 
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.host:#{null}}")
