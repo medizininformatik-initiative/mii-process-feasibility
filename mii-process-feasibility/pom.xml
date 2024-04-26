@@ -295,6 +295,61 @@
                             </outputDirectory>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>copy-process-plugin-to-broker-dic-5</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>../mii-process-feasibility-docker-test-setup/broker-dic-5/bpe/process
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-process-plugin-to-broker-dic-6</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>../mii-process-feasibility-docker-test-setup/broker-dic-6/bpe/process
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-process-plugin-to-broker</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>../mii-process-feasibility-docker-test-setup/broker/bpe/process
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -381,6 +436,49 @@
                         </fileset>
                         <fileset>
                             <directory>../mii-process-feasibility-docker-test-setup/zars/bpe/process</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+
+                        <fileset>
+                            <directory>../mii-process-feasibility-docker-test-setup/broker-dic-5/bpe/plugin</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>../mii-process-feasibility-docker-test-setup/broker-dic-5/bpe/process</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>../mii-process-feasibility-docker-test-setup/broker-dic-6/bpe/plugin</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>../mii-process-feasibility-docker-test-setup/broker-dic-6/bpe/process</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>../mii-process-feasibility-docker-test-setup/broker/bpe/plugin</directory>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>../mii-process-feasibility-docker-test-setup/broker/bpe/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>

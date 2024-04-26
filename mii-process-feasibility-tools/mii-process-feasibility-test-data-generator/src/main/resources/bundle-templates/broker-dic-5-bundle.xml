@@ -3,6 +3,7 @@
     <entry>
         <fullUrl value="urn:uuid:bb73165c-c7b9-4342-8e28-531f07fa7735"/>
         <resource>
+            <!-- Test_Broker -->
             <Organization xmlns="http://hl7.org/fhir">
                 <meta>
                     <profile value="http://dsf.dev/fhir/StructureDefinition/organization"/>
@@ -41,6 +42,7 @@
     <entry>
         <fullUrl value="urn:uuid:d0f56621-7737-43f7-964e-9c7ee9ac4234"/>
         <resource>
+<!--            Test_BROKER_DIC_5-->
             <Organization xmlns="http://hl7.org/fhir">
                 <meta>
                     <profile value="http://dsf.dev/fhir/StructureDefinition/organization"/>
@@ -54,7 +56,7 @@
                 </extension>
                 <identifier>
                     <system value="http://dsf.dev/sid/organization-identifier"/>
-                    <value value="Test_DIC_5"/>
+                    <value value="Test_BROKER_DIC_5"/>
                 </identifier>
                 <active value="true"/>
                 <type>
@@ -73,12 +75,13 @@
         <request>
             <method value="POST"/>
             <url value="Organization"/>
-            <ifNoneExist value="identifier=http://dsf.dev/sid/organization-identifier|Test_DIC_5"/>
+            <ifNoneExist value="identifier=http://dsf.dev/sid/organization-identifier|Test_BROKER_DIC_5"/>
         </request>
     </entry>
     <entry>
         <fullUrl value="urn:uuid:4179883e-2776-45c4-9d5a-3be299bbe39a"/>
         <resource>
+<!--            Test Broker Endpoint-->
             <Endpoint xmlns="http://hl7.org/fhir">
                 <meta>
                     <profile value="http://dsf.dev/fhir/StructureDefinition/endpoint"/>
@@ -122,6 +125,7 @@
     <entry>
         <fullUrl value="urn:uuid:8a9a1cdc-b84f-4657-8ed9-e1b5de549db1"/>
         <resource>
+<!--            Test DIC 5 Endpoint-->
             <Endpoint xmlns="http://hl7.org/fhir">
                 <meta>
                     <profile value="http://dsf.dev/fhir/StructureDefinition/endpoint"/>
@@ -132,7 +136,7 @@
                 </meta>
                 <identifier>
                     <system value="http://dsf.dev/sid/endpoint-identifier"/>
-                    <value value="Test_DIC_5_Endpoint"/>
+                    <value value="Test_BROKER_DIC_5_Endpoint"/>
                 </identifier>
                 <status value="active"/>
                 <connectionType>
@@ -152,20 +156,21 @@
                 </payloadType>
                 <payloadMimeType value="application/fhir+json"/>
                 <payloadMimeType value="application/fhir+xml"/>
-                <address value="https://dic-5/fhir"/>
+                <address value="https://broker-dic-5/fhir"/>
             </Endpoint>
         </resource>
         <request>
             <method value="POST"/>
             <url value="Endpoint"/>
             <ifNoneExist
-                    value="identifier=http://dsf.dev/sid/endpoint-identifier|Test_DIC_5_Endpoint"/>
+                    value="identifier=http://dsf.dev/sid/endpoint-identifier|Test_BROKER_DIC_5_Endpoint"/>
         </request>
     </entry>
 
     <entry>
         <fullUrl value="urn:uuid:c4a7b553-01b1-4b50-bcb3-1467f5ae6791"/>
         <resource>
+<!--            Distributed Organization-->
             <Organization xmlns="http://hl7.org/fhir">
                 <meta>
                     <profile value="http://dsf.dev/fhir/StructureDefinition/organization-parent"/>
@@ -193,6 +198,7 @@
     <entry>
         <fullUrl value="urn:uuid:6da23450-e2e2-49e1-8591-02c553d53e3b"/>
         <resource>
+            <!--            Distributed Organization AND Test_Broker -->
             <OrganizationAffiliation xmlns="http://hl7.org/fhir">
                 <meta>
                     <profile value="http://dsf.dev/fhir/StructureDefinition/organization-affiliation"/>
@@ -233,6 +239,7 @@
     <entry>
         <fullUrl value="urn:uuid:53f82135-a749-472b-a870-3d52feb649dc"/>
         <resource>
+            <!--            Distributed Organization AND Test_BROKER_DIC_5 -->
             <OrganizationAffiliation xmlns="http://hl7.org/fhir">
                 <meta>
                     <profile value="http://dsf.dev/fhir/StructureDefinition/organization-affiliation"/>
@@ -266,7 +273,7 @@
             <method value="POST"/>
             <url value="OrganizationAffiliation"/>
             <ifNoneExist
-                    value="primary-organization:identifier=http://dsf.dev/sid/organization-identifier|distributed-org.de&amp;participating-organization:identifier=http://dsf.dev/sid/organization-identifier|Test_DIC_5"/>
+                    value="primary-organization:identifier=http://dsf.dev/sid/organization-identifier|distributed-org.de&amp;participating-organization:identifier=http://dsf.dev/sid/organization-identifier|Test_BROKER_DIC_5"/>
         </request>
     </entry>
 </Bundle>

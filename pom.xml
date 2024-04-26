@@ -240,6 +240,55 @@
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
+
+                        <fileset>
+                            <directory>mii-process-feasibility-docker-test-setup/broker-dic-5/fhir/app/log</directory>
+                            <includes>
+                                <include>*.log</include>
+                                <include>*.log.gz</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>mii-process-feasibility-docker-test-setup/broker-dic-5/bpe/app/log</directory>
+                            <includes>
+                                <include>*.log</include>
+                                <include>*.log.gz</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>mii-process-feasibility-docker-test-setup/broker-dic-6/fhir/app/log</directory>
+                            <includes>
+                                <include>*.log</include>
+                                <include>*.log.gz</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>mii-process-feasibility-docker-test-setup/broker-dic-6/bpe/app/log</directory>
+                            <includes>
+                                <include>*.log</include>
+                                <include>*.log.gz</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>mii-process-feasibility-docker-test-setup/broker/fhir/app/log</directory>
+                            <includes>
+                                <include>*.log</include>
+                                <include>*.log.gz</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>mii-process-feasibility-docker-test-setup/broker/bpe/app/log</directory>
+                            <includes>
+                                <include>*.log</include>
+                                <include>*.log.gz</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
                     </filesets>
                 </configuration>
             </plugin>

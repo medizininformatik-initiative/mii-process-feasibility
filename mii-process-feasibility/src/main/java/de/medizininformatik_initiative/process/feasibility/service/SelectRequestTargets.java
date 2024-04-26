@@ -47,7 +47,7 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
                 .setValue(this.evaluationSettingsProvider.organizationIdentifierValue());                   //TODO als env auslagern
         var memberOrganizationRole = new Coding()
                 .setSystem("http://dsf.dev/fhir/CodeSystem/organization-role")  //TODO als env auslagern
-                .setCode("DIC"); // TODO < --- selektiert er sich hierbei nicht selbst? Rekursion?
+                .setCode("DIC");
 
         List<Target> targets = organizationProvider
                 .getOrganizations(parentIdentifier, memberOrganizationRole)
