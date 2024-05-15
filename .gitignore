@@ -1,5 +1,5 @@
 /mii-process-feasibility/target/
-/mii-process-feasibility/src/test/resources/de/medizininformatik_initiative/feasibility_dsf_process/client/store/certs
+/mii-process-feasibility/src/test/resources/de/medizininformatik_initiative/process/feasibility/client/certs
 
 /mii-process-feasibility-docker-test-setup/certs/*.pem
 /mii-process-feasibility-docker-test-setup/certs/*.p12
