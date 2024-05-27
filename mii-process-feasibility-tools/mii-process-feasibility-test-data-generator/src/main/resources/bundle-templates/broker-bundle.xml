@@ -339,7 +339,7 @@
                 </payloadType>
                 <payloadMimeType value="application/fhir+json"/>
                 <payloadMimeType value="application/fhir+xml"/>
-                <address value="https://dic-5/fhir"/>
+                <address value="https://broker-dic-5/fhir"/>
             </Endpoint>
         </resource>
         <request>
@@ -382,7 +382,7 @@
                 </payloadType>
                 <payloadMimeType value="application/fhir+json"/>
                 <payloadMimeType value="application/fhir+xml"/>
-                <address value="https://dic-6/fhir"/>
+                <address value="https://broker-dic-6/fhir"/>
             </Endpoint>
         </resource>
         <request>

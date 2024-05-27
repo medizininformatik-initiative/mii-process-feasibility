@@ -39,21 +39,15 @@ until docker-compose exec zars-fhir-app sh -c 'exit $(docker inspect -f {{.State
 done
 
 docker-compose up -d zars-bpe-app 
-until docker-compose exec zars-bpe-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-zars-bpe-app-1)' == "healthy"; do
-    sleep 1
-done
 
 docker-compose up -d broker-fhir-app
 until docker-compose exec broker-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-broker-fhir-app-1)' == "healthy"; do
     sleep 1
 done
 
-docker-compose up -d broker-bpe-app
-until docker-compose exec broker-bpe-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-broker-bpe-app-1)' == "healthy"; do
-    sleep 1
-done
+#docker-compose up -d broker-bpe-app
 
-docker-compose up -d broker-dic-5-fhir-app
+#docker-compose up -d broker-dic-5-fhir-app
 
 ```
 #### Now you can start the debugger with `docker-compose up -d broker-dic-5-bpe-app`.
