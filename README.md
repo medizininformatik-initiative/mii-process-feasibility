@@ -1,26 +1,10 @@
 # Feasibility Processes
 
-Business processes for the MII feasibility project as plugins for the [HiGHmed Data Sharing Framework][1].
+Business processes for the MII feasibility project as plugins for the [Data Sharing Framework][1].
 
 ## Build
 
-Prerequisite: Java 11, Maven >= 3.6
-
-Add the Github Package Registry server to your Maven `.m2/settings.xml`. Instructions on how to generate the `USERNAME`
-and `TOKEN` can be found in the HiGHmed DSF Wiki page with the
-name [Using the Github Maven Package Registry](https://github.com/highmed/highmed-dsf/wiki/Using-the-Github-Maven-Package-Registry)
-. The token need at least the `read:packages` scope.
-
-```xml
-
-<servers>
-    <server>
-        <id>highmed-dsf</id>
-        <username>USERNAME</username>
-        <password>TOKEN</password>
-    </server>
-</servers>
-```
+Prerequisite: Java 17, Maven >= 3.6
 
 Build the project from the root directory of this repository by executing the following command.
 
@@ -30,8 +14,8 @@ mvn clean package
 
 ## Usage
 
-You can test the processes by following the [README](feasibility-dsf-process-docker-test-setup/README.md) in
-the `feasibility-dsf-process-docker-test-setup` directory.
+You can test the processes by following the [README](mii-process-feasibility-docker-test-setup/README.md) in
+the `mii-process-feasibility-docker-test-setup` directory.
 
 ## Edit
 You should edit the *.bpmn files only with the standalone Camunda Modeller, because of different
@@ -51,4 +35,4 @@ Unless required by applicable law or agreed to in writing, software distributed 
 AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
 language governing permissions and limitations under the License.
 
-[1]: <https://github.com/highmed/highmed-dsf>
+[1]: <https://github.com/datasharingframework/dsf>
