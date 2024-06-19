@@ -63,7 +63,7 @@ public class StoreClientSpringConfig {
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.client.id:#{null}}")
     private String oauthClientId;
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.token.url:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.issuer.url:#{null}}")
     private String oauthTokenUrl;
 
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.proxy.host:#{null}}")

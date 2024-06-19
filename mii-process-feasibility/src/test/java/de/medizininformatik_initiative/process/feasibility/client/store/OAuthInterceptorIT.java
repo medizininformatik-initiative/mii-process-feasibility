@@ -48,9 +48,8 @@ public class OAuthInterceptorIT {
 
     @Test
     public void getToken() {
-        String tokenUrl = "http://" + keycloak.getHost() + ":" + keycloak.getFirstMappedPort()
-                + "/realms/test/protocol/openid-connect/token";
-        OAuthInterceptor interceptor = new OAuthInterceptor("account", "test", tokenUrl, Optional.empty(),
+        String issuerUrl = "http://" + keycloak.getHost() + ":" + keycloak.getFirstMappedPort() + "/realms/test";
+        OAuthInterceptor interceptor = new OAuthInterceptor("account", "test", issuerUrl, Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty());
 
         String token = interceptor.getToken();
@@ -60,8 +59,8 @@ public class OAuthInterceptorIT {
 
     @Test
     public void getTokenViaProxyNoAuth() {
-        String tokenUrl = "http://keycloak:8080/realms/test/protocol/openid-connect/token";
-            OAuthInterceptor interceptor = new OAuthInterceptor("account", "test", tokenUrl,
+        String issuerUrl = "http://keycloak:8080/realms/test";
+            OAuthInterceptor interceptor = new OAuthInterceptor("account", "test", issuerUrl,
                     Optional.of(forwardProxyNoAuth.getHost()),
                     Optional.of(forwardProxyNoAuth.getFirstMappedPort()),
                     Optional.empty(), Optional.empty());
@@ -73,8 +72,8 @@ public class OAuthInterceptorIT {
 
     @Test
     public void getTokenViaProxyBasicAuth() {
-        String tokenUrl = "http://keycloak:8080/realms/test/protocol/openid-connect/token";
-        OAuthInterceptor interceptor = new OAuthInterceptor("account", "test", tokenUrl,
+        String issuerUrl = "http://keycloak:8080/realms/test";
+        OAuthInterceptor interceptor = new OAuthInterceptor("account", "test", issuerUrl,
                 Optional.of(forwardProxyBasicAuth.getHost()),
                 Optional.of(forwardProxyBasicAuth.getFirstMappedPort()),
                 Optional.of("test"),
