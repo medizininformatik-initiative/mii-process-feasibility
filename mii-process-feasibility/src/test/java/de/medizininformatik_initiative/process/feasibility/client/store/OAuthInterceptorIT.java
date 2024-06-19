@@ -20,7 +20,7 @@ public class OAuthInterceptorIT {
     protected static final Network DEFAULT_CONTAINER_NETWORK = Network.newNetwork();
 
     @Container
-    public static KeycloakContainer keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:24.0")
+    public static KeycloakContainer keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:25.0")
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("keycloak")
             .withAdminUsername("admin")
