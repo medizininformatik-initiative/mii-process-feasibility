@@ -1,0 +1,77 @@
+version: '3.8'
+services:
+ broker-bpe-app:
+  image: ghcr.io/datasharingframework/bpe:1.3.1
+  restart: on-failure
+  healthcheck:
+    test: [ "CMD-SHELL", "./healthcheck.sh" ]
+    interval: 10s
+    timeout: 15s
+    retries: 5
+  secrets:
+    - db_liquibase.password
+    - db_broker_bpe_user.password
+    - db_broker_bpe_user_camunda.password
+    - app_client_trust_certificates.pem
+    - app_broker_client_certificate.pem
+    - app_broker_client_certificate_private_key.pem
+    - app_client_certificate_private_key.pem.password
+  volumes:
+    - type: bind
+      source: ./broker/bpe/plugin
+      target: /opt/bpe/plugin
+      read_only: true
+    - type: bind
+      source: ./broker/bpe/process
+      target: /opt/bpe/process
+      read_only: true
+    - type: bind
+      source: ./broker/bpe/log
+      target: /opt/bpe/log
+    - type: bind
+      source: ./broker/bpe/cache
+      target: /opt/bpe/cache
+  ports:
+    - 5005:5005
+  environment:
+    EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+    DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_DISTRIBUTION: "true"
+    #de.medizininformatik.initiative.feasibility.dsf.process.parent.organization.identifier.value
+    DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_PARENT_ORGANIZATION_IEDNTIFIER_VALUE: "distributed-org.de"
+
+    EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
+    REQUEST_PROPERTY_NAME: "distributed-org.de"
+    #  für die Request: PROPERTY_NAME: "medizininformatik-initiative.de"
+    #  für die Execute: PROPERTY_NAME: "medizininformatik-initiative.de"
+    TZ: Europe/Berlin
+    DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+    DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
+    DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_broker_bpe_user.password
+    DEV_DSF_BPE_DB_USER_CAMUNDA_PASSWORD_FILE: /run/secrets/db_broker_bpe_user_camunda.password
+    DEV_DSF_BPE_FHIR_CLIENT_TRUST_SERVER_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
+    DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE: /run/secrets/app_broker_client_certificate.pem
+    DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY: /run/secrets/app_broker_client_certificate_private_key.pem
+    DEV_DSF_BPE_FHIR_CLIENT_CERTIFICATE_PRIVATE_KEY_PASSWORD_FILE: /run/secrets/app_client_certificate_private_key.pem.password
+    DEV_DSF_BPE_DB_URL: jdbc:postgresql://db/broker_bpe
+    DEV_DSF_BPE_DB_USER_GROUP: broker_bpe_users
+    DEV_DSF_BPE_DB_USER_USERNAME: broker_bpe_server_user
+    DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: broker_camunda_users
+    DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: broker_camunda_server_user
+    DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://broker/fhir
+    DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://broker-store:8080/fhir
+    DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
+    DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "true"
+  networks:
+    broker-bpe-frontend:
+    broker-bpe-backend:
+    internet:
+  depends_on:
+    db:
+      condition: service_healthy
+      restart: true
+    broker-fhir-app:
+      condition:  service_healthy
+      restart: true
+    broker-store:
+      condition: service_healthy
+      restart: true

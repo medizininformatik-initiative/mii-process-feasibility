@@ -209,6 +209,10 @@ services:
       target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
+
+      EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
+      REQUEST_PROPERTY_NAME: "medizininformatik-initiative.de"
+
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_zars_bpe_user.password
@@ -335,6 +339,10 @@ services:
       target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
+
+      EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
+      REQUEST_PROPERTY_NAME: "medizininformatik-initiative.de"
+
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_1_bpe_user.password
@@ -530,6 +538,10 @@ services:
       target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
+
+      EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
+      REQUEST_PROPERTY_NAME: "medizininformatik-initiative.de"
+
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_2_bpe_user.password
@@ -683,6 +695,10 @@ services:
         target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
+
+      EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
+      REQUEST_PROPERTY_NAME: "medizininformatik-initiative.de"
+
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_3_bpe_user.password
@@ -870,6 +886,10 @@ services:
         target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
+
+      EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
+      REQUEST_PROPERTY_NAME: "medizininformatik-initiative.de"
+
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_4_bpe_user.password
@@ -1067,6 +1087,10 @@ services:
         target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
+
+      EXECUTE_PROPERTY_NAME: "distributed-org.de"
+      REQUEST_PROPERTY_NAME: "distributed-org.de"
+
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_broker_dic_5_bpe_user.password
@@ -1122,7 +1146,6 @@ services:
         source: broker-dic-5-store-data
         target: /app/data
 
-
   # ---- BROKER-DIC-6 - FHIR ---------------------------------------------------------
   broker-dic-6-fhir-app:
     image: ghcr.io/datasharingframework/fhir:1.5.1
@@ -1149,6 +1172,9 @@ services:
         target: /opt/fhir/log
     environment:
       TZ: Europe/Berlin
+
+      PROPERTY_NAME: "distributed-org.de"
+
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_broker_dic_6_user.password
@@ -1222,6 +1248,10 @@ services:
         target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
+
+      EXECUTE_PROPERTY_NAME: "distributed-org.de"
+      REQUEST_PROPERTY_NAME: "distributed-org.de"
+
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_broker_dic_6_bpe_user.password
@@ -1379,14 +1409,15 @@ services:
       - type: bind
         source: ./broker/bpe/cache
         target: /opt/bpe/cache
-
-    ports:
-      - 5005:5005
     environment:
-      EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_FEASIBILITY_DISTRIBUTION: "true"
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_FEASIBILITY_ORGANIZATION_IEDNTIFIER_VALUE: "distributed-org.de"
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_DISTRIBUTION: "true"
+      #de.medizininformatik.initiative.feasibility.dsf.process.parent.organization.identifier.value
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_PARENT_ORGANIZATION_IEDNTIFIER_VALUE: "distributed-org.de"
 
+      EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
+      REQUEST_PROPERTY_NAME: "distributed-org.de"
+      #  für die Request: PROPERTY_NAME: "medizininformatik-initiative.de"
+   #  für die Execute: PROPERTY_NAME: "medizininformatik-initiative.de"
       TZ: Europe/Berlin
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
@@ -1402,6 +1433,9 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: broker_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: broker_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://broker/fhir
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://broker-store:8080/fhir
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "true"
     networks:
       broker-bpe-frontend:
       broker-bpe-backend:
@@ -1413,7 +1447,32 @@ services:
       broker-fhir-app:
         condition:  service_healthy
         restart: true
+      broker-store:
+        condition: service_healthy
+        restart: true
 
+  # ---- BROKER-DIC - FHIR Data Store ----------------------------------------------
+  broker-store:
+    image: samply/blaze:0.24
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 15s
+      retries: 5
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      BASE_URL: http://127.0.0.1:8080
+      LOG_LEVEL: debug
+    networks:
+      broker-bpe-backend:
+        aliases:
+          - broker-store
+    volumes:
+      - type: volume
+        source: broker-store-data
+        target: /app/data
 
 secrets:
   proxy_certificate_and_int_cas.pem:
@@ -1648,6 +1707,9 @@ volumes:
 
   broker-dic-6-store-data:
     name: "broker-dic-6-store-data"
+
+  broker-store-data:
+    name: "broker-store-data"
 
   db-data:
     name: "db-data-mii-dsf-process-feasibility"

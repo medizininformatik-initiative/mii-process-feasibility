@@ -28,31 +28,7 @@ ports:
 environment:
   EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
 ```
-
-### Quick restart of the debugging the broker-dic-5-bpe-app stack:
-```sh
-docker-compose down -v 
-
-docker-compose up -d zars-fhir-app 
-until docker-compose exec zars-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-zars-fhir-app-1)' == "healthy"; do
-    sleep 1
-done
-
-docker-compose up -d zars-bpe-app 
-
-docker-compose up -d broker-fhir-app
-until docker-compose exec broker-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-broker-fhir-app-1)' == "healthy"; do
-    sleep 1
-done
-
-#docker-compose up -d broker-bpe-app
-
-#docker-compose up -d broker-dic-5-fhir-app
-
-```
-#### Now you can start the debugger with `docker-compose up -d broker-dic-5-bpe-app`.
-
-Set debug environment in IntelliJ:
+## Set debug environment in IntelliJ:
 1. Edit Configurations...
 1. New Configuration: Docker - Docker Compose with a name like `broker-dic-5-bpe-app up`.
    1. Server: your local Docker
@@ -62,7 +38,53 @@ Set debug environment in IntelliJ:
    1. Use module classpath: `mii-process-feasibility`
    1. Before launch: Run Another Configuration: `broker-dic-5-bpe-app up`
 
+
+### Quick restart of the debugging the broker-bpe-app stack:
+```sh
+docker-compose down -v  
+
+docker-compose -f docker-compose.yml up -d zars-fhir-app 
+until docker-compose exec zars-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-zars-fhir-app-1)' == "healthy"; do
+    sleep 1
+done
+
+docker-compose -f docker-compose.yml up -d zars-bpe-app 
+
+docker-compose -f docker-compose.yml up -d broker-fhir-app
+until docker-compose exec broker-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-broker-fhir-app-1)' == "healthy"; do
+    sleep 1
+done
+
+docker-compose -f docker-compose.yml -f docker-compose.debug.broker-bpe.yml up -d broker-bpe-app
+
+```
+#### Start Debugging 'remote broker-bpe-app debugging'
+
+Check replacement de.medizininformatik_initiative.feasibility_dsf_process.feasibility.parent.organization_identifier_value with "distributed-org.de"
+
+```sh
+curl \
+  --cacert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/ca/testca_certificate.pem \
+  --cert-type P12 \
+  --cert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
+  -H accept:application/fhir+json \
+  -s "https://broker/fhir/ActivityDefinition" | jq .
+```
+
+```sh
+curl \
+  --cacert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/ca/testca_certificate.pem \
+  --cert-type P12 \
+  --cert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
+  -H accept:application/fhir+json \
+  -s "https://zars/fhir/ActivityDefinition" | jq .
+```
+
+### Now you can start the debugger with `docker-compose up -d broker-dic-5-bpe-app`.
+
 #### Start Debugging 'remote broker-dic-5-bpe-app debugging'
+
+_______
 
 ### Quick restart of the debugging the broker-bpe-app stack:
 ```sh
@@ -76,18 +98,18 @@ done
 docker-compose up -d zars-bpe-app 
 
 docker-compose up -d broker-fhir-app
+until docker-compose exec broker-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-broker-fhir-app-1)' == "healthy"; do
+    sleep 1000
+done
+
+docker-compose up -d broker-bpe-app
 
 docker-compose up -d broker-dic-5-fhir-app
 until docker-compose exec broker-dic-5-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-broker-dic-5-fhir-app-1)' == "healthy"; do
     sleep 1000
 done
-
-docker-compose up -d broker-dic-5-bpe-app
-
-
 ```
-#### Now you can start the debugger with `docker-compose up -d broker-bpe-app`.
-
+#### Now you can start the debugger with `docker-compose up -d broker-dic-5-bpe-app`.
 
 
 ### After that we can POST the first Task to the ZARS:

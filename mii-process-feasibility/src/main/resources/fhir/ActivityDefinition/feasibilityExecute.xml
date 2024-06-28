@@ -20,7 +20,8 @@
                     <extension url="parent-organization">
                         <valueIdentifier>
                             <system value="http://dsf.dev/sid/organization-identifier"/>
-                            <value value="medizininformatik-initiative.de"/>
+                            <value value="#{execute.property.name}"/>
+<!--                            <value value="de.medizininformatik.initiative.feasibility.dsf.process.parent.organization.identifier.value}"/>-->
                         </valueIdentifier>
                     </extension>
                     <extension url="organization-role">
@@ -41,7 +42,8 @@
                     <extension url="parent-organization">
                         <valueIdentifier>
                             <system value="http://dsf.dev/sid/organization-identifier"/>
-                            <value value="medizininformatik-initiative.de"/>
+                            <value value="#{execute.property.name}"/>
+<!--                            <value value="de.medizininformatik.initiative.feasibility.dsf.process.parent.organization.identifier.value}"/>-->
                         </valueIdentifier>
                     </extension>
                     <extension url="organization-role">

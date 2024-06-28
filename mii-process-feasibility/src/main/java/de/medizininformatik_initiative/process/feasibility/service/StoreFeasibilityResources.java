@@ -1,24 +1,25 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
+import connectjar.org.apache.http.client.ClientProtocolException;
 import de.medizininformatik_initiative.process.feasibility.StoreBundleProvider;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
 import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Library;
+import org.hl7.fhir.r4.model.Measure;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.*;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hl7.fhir.r4.model.Bundle.BundleType.TRANSACTION;
-import static org.hl7.fhir.r4.model.Bundle.HTTPVerb.POST;
 
 public class StoreFeasibilityResources extends AbstractServiceDelegate implements InitializingBean, StoreBundleProvider {
 
@@ -63,6 +64,16 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
 
     @Override
     public Bundle storeBundle(Bundle bundle) {
-        return storeClient.transaction().withBundle(bundle).execute();
+        try {
+            return storeClient.transaction().withBundle(bundle).execute();
+        } catch (FhirClientConnectionException e) {
+            logger.error("FHIR Client Connection Exception: " + e.getMessage(), e);
+            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("General Exception: " + e.getMessage(), e);
+            e.printStackTrace();
+        }
+        return null;
     }
+
 }

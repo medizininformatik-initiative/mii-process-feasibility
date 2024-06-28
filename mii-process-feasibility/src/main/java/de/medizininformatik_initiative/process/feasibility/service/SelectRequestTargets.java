@@ -46,8 +46,9 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
                 .setSystem(ORGANIZATION_IDENTIFIER_SYSTEM)
                 .setValue(this.evaluationSettingsProvider != null
                         ? this.evaluationSettingsProvider.organizationIdentifierValue() : "medizininformatik-initiative.de");
+
         var memberOrganizationRole = new Coding()
-                .setSystem("http://dsf.dev/fhir/CodeSystem/organization-role")  //TODO als env auslagern
+                .setSystem("http://dsf.dev/fhir/CodeSystem/organization-role")
                 .setCode("DIC");
 
         List<Target> targets = organizationProvider
@@ -68,9 +69,9 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
 
         targets.forEach(t -> logger.info("SelectRequestTargets: " + t.getOrganizationIdentifierValue() +
                 "\n EndpointUrl: " + t.getEndpointUrl() +
-                "\n OrganizationIdentifierValue : " + t.getOrganizationIdentifierValue() +
-                "\n EndpointIdentifierValue" + t.getEndpointIdentifierValue() +
-                "\n CorrelationKey" + t.getCorrelationKey()));
+                "\n OrganizationIdentifierValue: " + t.getOrganizationIdentifierValue() +
+                "\n EndpointIdentifierValue: " + t.getEndpointIdentifierValue() +
+                "\n CorrelationKey: " + t.getCorrelationKey()));
         variables.setTargets(variables.createTargets(targets));
         variables.setString("measure-id",
                 api.getFhirWebserviceClientProvider().getLocalWebserviceClient().getBaseUrl()
