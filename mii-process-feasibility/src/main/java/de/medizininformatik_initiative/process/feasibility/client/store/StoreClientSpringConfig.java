@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Import;
 
 import javax.net.ssl.SSLContext;
 
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CLIENT_TIMEOUT_DEFAULT;
+
 @Configuration
 @Import(BaseConfig.class)
 public class StoreClientSpringConfig {
@@ -46,7 +48,7 @@ public class StoreClientSpringConfig {
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.timeout.connect_request:20000}")
     private Integer connectRequestTimeout;
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.timeout.socket:20000}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.timeout.socket:" + CLIENT_TIMEOUT_DEFAULT + "}")
     private Integer socketTimeout;
 
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.base_url:}")
