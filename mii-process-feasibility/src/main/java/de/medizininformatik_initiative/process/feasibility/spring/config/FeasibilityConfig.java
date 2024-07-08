@@ -66,7 +66,7 @@ public class FeasibilityConfig {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SendDicRequest sendDicRequests() {
-        return new SendDicRequest(api);
+        return new SendDicRequest(api, evaluationSettingsProvider.requestOrganizationIdentifierValue());
     }
 
     @Bean

@@ -42,7 +42,7 @@
     <entry>
         <fullUrl value="urn:uuid:d0f56621-7737-43f7-964e-9c7ee9ac4234"/>
         <resource>
-<!--            Test_BROKER_DIC_5-->
+<!--            Test_Broker_DIC_5-->
             <Organization xmlns="http://hl7.org/fhir">
                 <meta>
                     <profile value="http://dsf.dev/fhir/StructureDefinition/organization"/>
@@ -56,7 +56,7 @@
                 </extension>
                 <identifier>
                     <system value="http://dsf.dev/sid/organization-identifier"/>
-                    <value value="Test_BROKER_DIC_5"/>
+                    <value value="Test_Broker_DIC_5"/>
                 </identifier>
                 <active value="true"/>
                 <type>
@@ -75,7 +75,7 @@
         <request>
             <method value="POST"/>
             <url value="Organization"/>
-            <ifNoneExist value="identifier=http://dsf.dev/sid/organization-identifier|Test_BROKER_DIC_5"/>
+            <ifNoneExist value="identifier=http://dsf.dev/sid/organization-identifier|Test_Broker_DIC_5"/>
         </request>
     </entry>
     <entry>
@@ -136,7 +136,7 @@
                 </meta>
                 <identifier>
                     <system value="http://dsf.dev/sid/endpoint-identifier"/>
-                    <value value="Test_BROKER_DIC_5_Endpoint"/>
+                    <value value="Test_Broker_DIC_5_Endpoint"/>
                 </identifier>
                 <status value="active"/>
                 <connectionType>
@@ -163,7 +163,7 @@
             <method value="POST"/>
             <url value="Endpoint"/>
             <ifNoneExist
-                    value="identifier=http://dsf.dev/sid/endpoint-identifier|Test_BROKER_DIC_5_Endpoint"/>
+                    value="identifier=http://dsf.dev/sid/endpoint-identifier|Test_Broker_DIC_5_Endpoint"/>
         </request>
     </entry>
 
@@ -239,7 +239,7 @@
     <entry>
         <fullUrl value="urn:uuid:53f82135-a749-472b-a870-3d52feb649dc"/>
         <resource>
-            <!--            Distributed Organization AND Test_BROKER_DIC_5 -->
+            <!--            Distributed Organization AND Test_Broker_DIC_5 -->
             <OrganizationAffiliation xmlns="http://hl7.org/fhir">
                 <meta>
                     <profile value="http://dsf.dev/fhir/StructureDefinition/organization-affiliation"/>
@@ -273,7 +273,7 @@
             <method value="POST"/>
             <url value="OrganizationAffiliation"/>
             <ifNoneExist
-                    value="primary-organization:identifier=http://dsf.dev/sid/organization-identifier|distributed-org.de&amp;participating-organization:identifier=http://dsf.dev/sid/organization-identifier|Test_BROKER_DIC_5"/>
+                    value="primary-organization:identifier=http://dsf.dev/sid/organization-identifier|distributed-org.de&amp;participating-organization:identifier=http://dsf.dev/sid/organization-identifier|Test_Broker_DIC_5"/>
         </request>
     </entry>
 </Bundle>

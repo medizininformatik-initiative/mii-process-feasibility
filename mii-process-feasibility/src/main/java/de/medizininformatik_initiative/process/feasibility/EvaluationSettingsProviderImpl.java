@@ -18,7 +18,10 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
     private final Integer rateLimitCount;
     private final Duration rateLimitTimeIntervalDuration;
     private final boolean feasibilityDistributionEnabled;
-    private final String organizationIdentifierValue;
+    private final String requestOrganizationIdentifierValue;
+    private final String executeOrganizationIdentifierValue;
+
+    private final String fhirServerOrganizationIdentifierValue;
 
     public EvaluationSettingsProviderImpl(EvaluationStrategy evaluationStrategy,
                                           Boolean evaluationResultObfuscationEnabled,
@@ -27,7 +30,9 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
                                           Integer rateLimitCount,
                                           Duration rateLimitTimeIntervalDuration,
                                           Boolean feasibilityDistributionEnabled,
-                                          String organizationIdentifierValue) {
+                                          String requestOrganizationIdentifierValue,
+                                          String executeOrganizationIdentifierValue,
+                                          String fhirServerOrganizationIdentifierValue) {
         this.evaluationStrategy = Objects.requireNonNull(evaluationStrategy);
         this.evaluationResultObfuscationEnabled = Objects.requireNonNull(evaluationResultObfuscationEnabled);
         this.evaluationResultObfuscationLaplaceSensitivity = Objects
@@ -43,10 +48,11 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
 
         this.feasibilityDistributionEnabled = Objects.requireNonNull(feasibilityDistributionEnabled);
 
-        this.organizationIdentifierValue = Objects.requireNonNull(organizationIdentifierValue);
+        this.requestOrganizationIdentifierValue = Objects.requireNonNull(requestOrganizationIdentifierValue);
 
+        this.executeOrganizationIdentifierValue = Objects.requireNonNull(executeOrganizationIdentifierValue);
 
-
+        this.fhirServerOrganizationIdentifierValue = fhirServerOrganizationIdentifierValue;
     }
 
     @Override
@@ -83,8 +89,21 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
     public boolean feasibilityDistributionEnabled() {
         return feasibilityDistributionEnabled;
     }
+
     @Override
-    public String organizationIdentifierValue() {
-        return organizationIdentifierValue;
+    public String requestOrganizationIdentifierValue() {
+        return requestOrganizationIdentifierValue;
     }
+
+    @Override
+    public String executeOrganizationIdentifierValue() {
+        return executeOrganizationIdentifierValue;
+    }
+
+    @Override
+    public String fhirServerOrganizationIdentifierValue() {
+        return fhirServerOrganizationIdentifierValue;
+    }
+
+
 }

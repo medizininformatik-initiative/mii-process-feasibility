@@ -42,7 +42,7 @@
     <entry>
         <fullUrl value="urn:uuid:d0f56621-7737-43f7-964e-9c7ee9ac4234"/>
         <resource>
-            <!--            Test_BROKER_DIC_6-->
+            <!--            Test_Broker_DIC_6-->
             <Organization xmlns="http://hl7.org/fhir">
                 <meta>
                     <profile value="http://dsf.dev/fhir/StructureDefinition/organization"/>
@@ -56,7 +56,7 @@
                 </extension>
                 <identifier>
                     <system value="http://dsf.dev/sid/organization-identifier"/>
-                    <value value="Test_BROKER_DIC_6"/>
+                    <value value="Test_Broker_DIC_6"/>
                 </identifier>
                 <active value="true"/>
                 <type>
@@ -75,7 +75,7 @@
         <request>
             <method value="POST"/>
             <url value="Organization"/>
-            <ifNoneExist value="identifier=http://dsf.dev/sid/organization-identifier|Test_BROKER_DIC_6"/>
+            <ifNoneExist value="identifier=http://dsf.dev/sid/organization-identifier|Test_Broker_DIC_6"/>
         </request>
     </entry>
     <entry>
@@ -134,7 +134,7 @@
                 </meta>
                 <identifier>
                     <system value="http://dsf.dev/sid/endpoint-identifier"/>
-                    <value value="Test_BROKER_DIC_6_Endpoint"/>
+                    <value value="Test_Broker_DIC_6_Endpoint"/>
                 </identifier>
                 <status value="active"/>
                 <connectionType>
@@ -161,7 +161,7 @@
             <method value="POST"/>
             <url value="Endpoint"/>
             <ifNoneExist
-                    value="identifier=http://dsf.dev/sid/endpoint-identifier|Test_BROKER_DIC_6_Endpoint"/>
+                    value="identifier=http://dsf.dev/sid/endpoint-identifier|Test_Broker_DIC_6_Endpoint"/>
         </request>
     </entry>
 
@@ -268,7 +268,7 @@
             <method value="POST"/>
             <url value="OrganizationAffiliation"/>
             <ifNoneExist
-                    value="primary-organization:identifier=http://dsf.dev/sid/organization-identifier|distributed-org.de&amp;participating-organization:identifier=http://dsf.dev/sid/organization-identifier|Test_BROKER_DIC_6"/>
+                    value="primary-organization:identifier=http://dsf.dev/sid/organization-identifier|distributed-org.de&amp;participating-organization:identifier=http://dsf.dev/sid/organization-identifier|Test_Broker_DIC_6"/>
         </request>
     </entry>
 </Bundle>

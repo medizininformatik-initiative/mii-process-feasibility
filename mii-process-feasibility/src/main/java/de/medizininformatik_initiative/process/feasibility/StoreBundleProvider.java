@@ -4,7 +4,6 @@ import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -18,7 +17,8 @@ public interface StoreBundleProvider {
 
     Bundle storeBundle(Bundle bundle);
 
-    default Bundle storeResources(MetadataResource... metadataResources) {
+
+    default Bundle storeTransactionBundle(MetadataResource... metadataResources) {
         Bundle bundle = new Bundle().setType(TRANSACTION);
         for (MetadataResource mr : metadataResources) {
             logger.info("Store `{}` `{}` `{}`", mr.getResourceType().name(), mr.getId(), mr.getUrl());
@@ -37,27 +37,35 @@ public interface StoreBundleProvider {
             var measureId = measureUrlMatcher.group(2);
             var libraryId = libraryUrlMatcher.group(1);
             var libraryUrl = base + "/Library/" + libraryId;
-            measure.setLibrary(new ArrayList<>());
+            measure.setLibrary(new java.util.ArrayList<>());
             measure.addLibrary(libraryUrl);
             measure.setName(measureId);
             library.setUrl(libraryUrl);
             library.setName(libraryId);
             library.setVersion("1.0.0");
-            var data = new String(library.getContent().get(0).getData(), UTF_8);
-            var rest = data.split("\n", 2)[1];
-            var newData = "library \"%s\" version '1.0.0'\n".formatted(libraryId) + rest;
-            library.getContent().get(0).setData(newData.getBytes(UTF_8));
+            if (library.getContent() != null && !library.getContent().isEmpty()) {
+                var data = new String(library.getContent().get(0).getData(), UTF_8);
+                var rest = data.split("\n", 2)[1];
+                var newData = "library \"%s\" version '1.0.0'\n".formatted(libraryId) + rest;
+                library.getContent().get(0).setData(newData.getBytes(UTF_8));
+            }
         }
     }
 
     default String findIdPartInFirstBundleResourceType(Bundle transactionResponse, ResourceType resourceType) {
-        return transactionResponse.getEntry().stream()
-                .filter(e -> e.getResource().getResourceType() == resourceType)
-                .findFirst().filter(bundleEntryComponent ->
-                        bundleEntryComponent.getResource() != null &&
-                        bundleEntryComponent.getResource().getIdElement() != null)
-                .map(bundleEntryComponent -> bundleEntryComponent.getResource().getIdElement().getIdPart())
-                .orElse(null);
+        try {
+            return transactionResponse.getEntry().stream()
+                    .filter(e -> e.getResource().getResourceType() == resourceType)
+                    .findFirst().filter(bundleEntryComponent ->
+                            bundleEntryComponent.getResource() != null &&
+                                    bundleEntryComponent.getResource().getIdElement() != null)
+                    .map(bundleEntryComponent -> bundleEntryComponent.getResource().getIdElement().getIdPart())
+                    .orElse(null);
+        } catch (Exception e) {
+            logger.error("General Exception: " + e.getMessage(), e);
+            e.printStackTrace();
+        }
+        return null;
     }
 }
 

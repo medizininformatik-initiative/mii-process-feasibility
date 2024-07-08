@@ -7,16 +7,15 @@ import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
 import dev.dsf.bpe.v1.variables.Variables;
 import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Library;
-import org.hl7.fhir.r4.model.Measure;
-import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.List;
 import java.util.UUID;
+
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 
 public class StoreFeasibilityResourcesLocally extends AbstractServiceDelegate implements InitializingBean, StoreBundleProvider {
 
@@ -38,12 +37,34 @@ public class StoreFeasibilityResourcesLocally extends AbstractServiceDelegate im
 
         fixCanonical(measureFromRequest, libraryFromRequest);
 
-        var transactionResponse = storeResources(measureFromRequest, libraryFromRequest);
 
-        variables.setString(ConstantsFeasibility.VARIABLE_DISTRIBUTION_MEASURE_ID,
-                findIdPartInFirstBundleResourceType(transactionResponse, ResourceType.Measure));
+        var transactionResponse = storeTransactionBundle(measureFromRequest, libraryFromRequest);
+
+        String newMeasureId =
+                findIdPartInFirstBundleResourceType(transactionResponse, ResourceType.Measure);
+
+        fixMeasureInTaskLocal(newMeasureId, variables.getLatestTask());
+
+        variables.setString(ConstantsFeasibility.VARIABLE_DISTRIBUTION_MEASURE_ID, newMeasureId);
         variables.setString(ConstantsFeasibility.VARIABLE_DISTRIBUTION_LIBRARY_ID,
                 findIdPartInFirstBundleResourceType(transactionResponse, ResourceType.Library));
+    }
+
+    private void fixMeasureInTaskLocal(String newMeasureId, Task task) {
+        String measureRef = localWebserviceClient.getBaseUrl() + "Measure/" + newMeasureId;
+        Task newTask = task.copy().setStatus(
+                Task.TaskStatus.REQUESTED);
+        newTask.setId((String) null);
+        try {
+            newTask.getInput().stream().filter(e ->
+                    CODESYSTEM_FEASIBILITY.equals(e.getType().getCoding().get(0).getSystem())
+            ).findFirst().ifPresent(e ->
+                    e.setValue(new Reference(measureRef)));
+            localWebserviceClient.create(newTask);
+        } catch (Exception e) {
+            logger.error("Can`t create Task with measure reference {}.", measureRef);
+            throw e;
+        }
     }
 
     @Override

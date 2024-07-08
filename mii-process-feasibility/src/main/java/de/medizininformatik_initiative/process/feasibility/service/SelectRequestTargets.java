@@ -6,12 +6,7 @@ import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
 import dev.dsf.bpe.v1.variables.Target;
 import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Endpoint;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Organization;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Task;
+import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +39,7 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
         var client = api.getFhirWebserviceClientProvider().getLocalWebserviceClient();
         var parentIdentifier = new Identifier()
                 .setSystem(ORGANIZATION_IDENTIFIER_SYSTEM)
-                .setValue(this.evaluationSettingsProvider != null
-                        ? this.evaluationSettingsProvider.organizationIdentifierValue() : "medizininformatik-initiative.de");
+                .setValue(this.evaluationSettingsProvider.requestOrganizationIdentifierValue());
 
         var memberOrganizationRole = new Coding()
                 .setSystem("http://dsf.dev/fhir/CodeSystem/organization-role")
@@ -54,8 +48,7 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
         List<Target> targets = organizationProvider
                 .getOrganizations(parentIdentifier, memberOrganizationRole)
                 .stream()
-                .filter(Organization::hasEndpoint)
-                .filter(Organization::hasIdentifier)
+                .filter(e -> e.hasIdentifier() && e.hasActive())
                 .map(organization -> {
                     var organizationIdentifier = organization.getIdentifierFirstRep();
                     var path = URI.create(organization.getEndpointFirstRep().getReference()).getPath();
@@ -84,7 +77,7 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
                 .getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                         CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class);
 
-        if (measureRef.isPresent()) {
+        if (measureRef.isPresent() && measureRef.get().getReference() != null) {
             return measureRef.get().getReference();
         } else {
             logger.error("Task {} is missing the measure reference.", task.getId());

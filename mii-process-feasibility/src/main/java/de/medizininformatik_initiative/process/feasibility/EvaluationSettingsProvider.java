@@ -20,6 +20,7 @@ public interface EvaluationSettingsProvider {
      * @return True if evaluation result obfuscation is enabled and false otherwise.
      */
     boolean evaluationResultObfuscationEnabled();
+
     /**
      * Returns the sensitivity value of the Laplace algorithm to be used for obfuscating the feasibility result.
      *
@@ -34,6 +35,7 @@ public interface EvaluationSettingsProvider {
      */
 
     double resultObfuscationLaplaceEpsilon();
+
     /**
      * Provides the user specified maximum number of request allowed for the given time interval
      *
@@ -56,9 +58,23 @@ public interface EvaluationSettingsProvider {
     boolean feasibilityDistributionEnabled();
 
     /**
-     * Returns the set organization identifier value (default: "medizininformatik-initiative.de")
+     * Returns the set request organization identifier value (default: "medizininformatik-initiative.de")
      *
      * @return the set organization identifier value
      */
-    String organizationIdentifierValue();
+    String requestOrganizationIdentifierValue();
+
+    /**
+     * Returns the set execute organization identifier value (default: "medizininformatik-initiative.de")
+     *
+     * @return the set organization identifier value
+     */
+    String executeOrganizationIdentifierValue();
+
+    /**
+     * Returns the local organization identifier value
+     *
+     * @return the set organization identifier value
+     */
+    String fhirServerOrganizationIdentifierValue();
 }

@@ -4,6 +4,7 @@ import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractTaskMessageSend;
 import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.ParameterComponent;
@@ -18,9 +19,11 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 
 public class SendDicRequest extends AbstractTaskMessageSend {
     private static final Logger logger = LoggerFactory.getLogger(SendDicRequest.class);
+    private final FixedValue requestOrganizationIdentifierValue;
 
-    public SendDicRequest(ProcessPluginApi api) {
+    public SendDicRequest(ProcessPluginApi api, String organizationIdentifierValue) {
         super(api);
+        this.requestOrganizationIdentifierValue = new FixedValue(organizationIdentifierValue);
     }
 
     @Override
@@ -29,7 +32,8 @@ public class SendDicRequest extends AbstractTaskMessageSend {
         logger.info("getAdditionalInputParameters Send DIC Request");
 
         return Stream.of(api.getTaskHelper().createInput(
-                new Reference(checkNotNull(variables.getString("measure-id"), "variable 'measure-id' not set")),
+                new Reference(checkNotNull(variables.getString("measure-id"),
+                        "variable 'measure-id' not set")),
                 CODESYSTEM_FEASIBILITY, CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE));
     }
 
@@ -42,4 +46,9 @@ public class SendDicRequest extends AbstractTaskMessageSend {
     @Override
     protected void addErrorMessage(Task task, String errorMessage) {
     }
+
+    public FixedValue getRequestOrganizationIdentifierValue() {
+        return requestOrganizationIdentifierValue;
+    }
+
 }

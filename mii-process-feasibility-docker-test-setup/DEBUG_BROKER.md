@@ -18,46 +18,48 @@ If you use Linux, you have to set some rights on directories where containers sh
 ./set-rights.sh
 ```
 
-## Debugging
+# Debugging
 
-You can use the following env var and port mapping to enable debugging of one container:
-
-```
-ports:
-- 5005:5005
-environment:
-  EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
-```
 ## Set debug environment in IntelliJ:
 1. Edit Configurations...
-1. New Configuration: Docker - Docker Compose with a name like `broker-dic-5-bpe-app up`.
-   1. Server: your local Docker
-   1. Compose files: `/mii-process-feasibility-docker-test-setup/docker-compose.yml;`
-   1. Services: `broker-dic-5-bpe-app,`
 1. New Configuration: Remote JVM Debug with a name like `remote broker_dic_5_bpe debugging`
    1. Use module classpath: `mii-process-feasibility`
-   1. Before launch: Run Another Configuration: `broker-dic-5-bpe-app up`
 
+#### Quick restart of the debugging only broker-bpe-app (change stack):
+```sh
+docker-compose down -v broker-bpe-app
+
+docker-compose -f docker-compose.yml -f docker-compose.debug.broker-bpe.yml up -d broker-bpe-app
+```
 
 ### Quick restart of the debugging the broker-bpe-app stack:
 ```sh
 docker-compose down -v  
 
 docker-compose -f docker-compose.yml up -d zars-fhir-app 
-until docker-compose exec zars-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-zars-fhir-app-1)' == "healthy"; do
-    sleep 1
-done
+sleep 3
 
 docker-compose -f docker-compose.yml up -d zars-bpe-app 
 
 docker-compose -f docker-compose.yml up -d broker-fhir-app
-until docker-compose exec broker-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-broker-fhir-app-1)' == "healthy"; do
-    sleep 1
-done
+sleep 3
 
 docker-compose -f docker-compose.yml -f docker-compose.debug.broker-bpe.yml up -d broker-bpe-app
-
 ```
+
+#### After that we can POST the first Task to the ZARS:
+```sh
+curl \
+  --cacert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/ca/testca_certificate.pem \
+  --cert-type P12 \
+  --cert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
+  -H accept:application/fhir+json \
+  -H content-type:application/fhir+json \
+  -d @data/feasibility-bundle.json \
+  -s https://zars/fhir/ |\
+  jq .
+```
+
 #### Start Debugging 'remote broker-bpe-app debugging'
 
 Check replacement de.medizininformatik_initiative.feasibility_dsf_process.feasibility.parent.organization_identifier_value with "distributed-org.de"
@@ -77,7 +79,16 @@ curl \
   --cert-type P12 \
   --cert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
   -H accept:application/fhir+json \
-  -s "https://zars/fhir/ActivityDefinition" | jq .
+  -s "https://broker/fhir/Measure" | jq .
+```
+
+```sh
+curl \
+  --cacert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/ca/testca_certificate.pem \
+  --cert-type P12 \
+  --cert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
+  -H accept:application/fhir+json \
+  -s "https://broker/fhir/Library" | jq .
 ```
 
 ### Now you can start the debugger with `docker-compose up -d broker-dic-5-bpe-app`.
@@ -86,28 +97,29 @@ curl \
 
 _______
 
-### Quick restart of the debugging the broker-bpe-app stack:
+### Quick restart of the debugging the broker-bpe-app and broker-dic-5-bpe-app stack:
 ```sh
-docker-compose down -v 
+docker-compose down -v  
 
-docker-compose up -d zars-fhir-app 
-until docker-compose exec zars-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-zars-fhir-app-1)' == "healthy"; do
-    sleep 1000
-done
+docker-compose -f docker-compose.yml up -d zars-fhir-app 
+sleep 3
 
-docker-compose up -d zars-bpe-app 
+docker-compose -f docker-compose.yml up -d zars-bpe-app 
 
-docker-compose up -d broker-fhir-app
-until docker-compose exec broker-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-broker-fhir-app-1)' == "healthy"; do
-    sleep 1000
-done
+docker-compose -f docker-compose.yml up -d broker-fhir-app
+sleep 3
 
-docker-compose up -d broker-bpe-app
+docker-compose -f docker-compose.yml -f docker-compose.debug.broker-bpe.yml up -d broker-bpe-app
+
+docker-compose -f docker-compose.yml up -d broker-dic-6-fhir-app
+sleep 2
+
+docker-compose -f docker-compose.yml up -d broker-dic-6-bpe-app
 
 docker-compose up -d broker-dic-5-fhir-app
-until docker-compose exec broker-dic-5-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-broker-dic-5-fhir-app-1)' == "healthy"; do
-    sleep 1000
-done
+sleep 2
+
+docker-compose -f docker-compose.yml -f docker-compose.debug.broker-dic-5-bpe.yml up -d broker-dic-5-bpe-app
 ```
 #### Now you can start the debugger with `docker-compose up -d broker-dic-5-bpe-app`.
 
@@ -135,6 +147,25 @@ curl \
   --cert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
   -H accept:application/fhir+json \
   -s "https://zars/fhir/Task/${TASK_ID}" |\
+  jq .
+```
+
+```sh
+curl \
+  --cacert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/ca/testca_certificate.pem \
+  --cert-type P12 \
+  --cert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
+  -H accept:application/fhir+json \
+  -s "https://broker/fhir/Task/${TASK_ID}" |\
+  jq .
+```
+```sh
+curl \
+  --cacert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/ca/testca_certificate.pem \
+  --cert-type P12 \
+  --cert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
+  -H accept:application/fhir+json \
+  -s "https://broker-dic-5/fhir/Task/${TASK_ID}" |\
   jq .
 ```
 

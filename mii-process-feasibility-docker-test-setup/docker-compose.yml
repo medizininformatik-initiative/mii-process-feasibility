@@ -209,10 +209,6 @@ services:
       target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
-
-      EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
-      REQUEST_PROPERTY_NAME: "medizininformatik-initiative.de"
-
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_zars_bpe_user.password
@@ -227,6 +223,8 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: zars_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: zars_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://zars/fhir
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_EXECUTE_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_REQUEST_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
     networks:
       zars-bpe-frontend:
       zars-bpe-backend:
@@ -339,10 +337,6 @@ services:
       target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
-
-      EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
-      REQUEST_PROPERTY_NAME: "medizininformatik-initiative.de"
-
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_1_bpe_user.password
@@ -361,6 +355,8 @@ services:
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_TIMEOUT_CONNECT: 2000
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: structured-query
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_EXECUTE_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_REQUEST_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
     networks:
       dic-1-bpe-frontend:
       dic-1-bpe-backend:
@@ -538,10 +534,6 @@ services:
       target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
-
-      EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
-      REQUEST_PROPERTY_NAME: "medizininformatik-initiative.de"
-
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_2_bpe_user.password
@@ -559,6 +551,8 @@ services:
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-2-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "true"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_EXECUTE_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_REQUEST_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
     networks:
       dic-2-bpe-frontend:
       dic-2-bpe-backend:
@@ -695,10 +689,6 @@ services:
         target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
-
-      EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
-      REQUEST_PROPERTY_NAME: "medizininformatik-initiative.de"
-
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_3_bpe_user.password
@@ -720,6 +710,8 @@ services:
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: https://dic-3-store-proxy/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_EXECUTE_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_REQUEST_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
     networks:
       dic-3-bpe-frontend:
       dic-3-bpe-backend:
@@ -886,10 +878,6 @@ services:
         target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
-
-      EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
-      REQUEST_PROPERTY_NAME: "medizininformatik-initiative.de"
-
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_dic_4_bpe_user.password
@@ -907,6 +895,8 @@ services:
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-4-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_EXECUTE_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_REQUEST_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
     networks:
       dic-4-bpe-frontend:
       dic-4-bpe-backend:
@@ -1028,7 +1018,7 @@ services:
       DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: broker_dic_5_fhir_permanent_delete_users
       DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: broker_dic_5_fhir_server_permanent_delete_user
       DEV_DSF_FHIR_SERVER_BASE_URL: https://broker-dic-5/fhir
-      DEV_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_BROKER_DIC_5
+      DEV_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_Broker_DIC_5
       DEV_DSF_FHIR_SERVER_ORGANIZATION_THUMBPRINT: ${BROKER_DIC_5_USER_THUMBPRINTS}
       DEV_DSF_FHIR_SERVER_ROLECONFIG: |
         - webbrowser_test_user:
@@ -1087,10 +1077,6 @@ services:
         target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
-
-      EXECUTE_PROPERTY_NAME: "distributed-org.de"
-      REQUEST_PROPERTY_NAME: "distributed-org.de"
-
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_broker_dic_5_bpe_user.password
@@ -1108,6 +1094,8 @@ services:
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://broker-dic-5-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "true"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_EXECUTE_ORGANIZATION_IDENTIFIER_VALUE: "distributed-org.de"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_REQUEST_ORGANIZATION_IDENTIFIER_VALUE: "distributed-org.de"
     networks:
       broker-dic-5-bpe-frontend:
       broker-dic-5-bpe-backend:
@@ -1133,9 +1121,9 @@ services:
       timeout: 15s
       retries: 5
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8085:8080"
     environment:
-      BASE_URL: http://127.0.0.1:8080
+      BASE_URL: http://127.0.0.1:8085
       LOG_LEVEL: debug
     networks:
       broker-dic-5-bpe-backend:
@@ -1172,9 +1160,6 @@ services:
         target: /opt/fhir/log
     environment:
       TZ: Europe/Berlin
-
-      PROPERTY_NAME: "distributed-org.de"
-
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_FHIR_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_FHIR_DB_USER_PASSWORD_FILE: /run/secrets/db_fhir_broker_dic_6_user.password
@@ -1189,7 +1174,7 @@ services:
       DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_GROUP: broker_dic_6_fhir_permanent_delete_users
       DEV_DSF_FHIR_DB_USER_PERMANENT_DELETE_USERNAME: broker_dic_6_fhir_server_permanent_delete_user
       DEV_DSF_FHIR_SERVER_BASE_URL: https://broker-dic-6/fhir
-      DEV_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_BROKER_DIC_6
+      DEV_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_Broker_DIC_6
       DEV_DSF_FHIR_SERVER_ORGANIZATION_THUMBPRINT: ${BROKER_DIC_6_USER_THUMBPRINTS}
       DEV_DSF_FHIR_SERVER_ROLECONFIG: |
         - webbrowser_test_user:
@@ -1248,10 +1233,6 @@ services:
         target: /opt/bpe/cache
     environment:
       TZ: Europe/Berlin
-
-      EXECUTE_PROPERTY_NAME: "distributed-org.de"
-      REQUEST_PROPERTY_NAME: "distributed-org.de"
-
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
       DEV_DSF_BPE_DB_USER_PASSWORD_FILE: /run/secrets/db_broker_dic_6_bpe_user.password
@@ -1269,6 +1250,8 @@ services:
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://broker-dic-6-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "true"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_EXECUTE_ORGANIZATION_IDENTIFIER_VALUE: "distributed-org.de"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_REQUEST_ORGANIZATION_IDENTIFIER_VALUE: "distributed-org.de"
     networks:
       broker-dic-6-bpe-frontend:
       broker-dic-6-bpe-backend:
@@ -1294,9 +1277,9 @@ services:
       timeout: 15s
       retries: 5
     ports:
-      - "127.0.0.1:8080:8080"
+     - "127.0.0.1:8086:8080"
     environment:
-      BASE_URL: http://127.0.0.1:8080
+      BASE_URL: http://127.0.0.1:8086
       LOG_LEVEL: debug
     networks:
       broker-dic-6-bpe-backend:
@@ -1410,14 +1393,6 @@ services:
         source: ./broker/bpe/cache
         target: /opt/bpe/cache
     environment:
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_DISTRIBUTION: "true"
-      #de.medizininformatik.initiative.feasibility.dsf.process.parent.organization.identifier.value
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_PARENT_ORGANIZATION_IEDNTIFIER_VALUE: "distributed-org.de"
-
-      EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
-      REQUEST_PROPERTY_NAME: "distributed-org.de"
-      #  für die Request: PROPERTY_NAME: "medizininformatik-initiative.de"
-   #  für die Execute: PROPERTY_NAME: "medizininformatik-initiative.de"
       TZ: Europe/Berlin
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
@@ -1433,9 +1408,12 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: broker_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: broker_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://broker/fhir
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://broker-store:8080/fhir
+#      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://broker-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "true"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_DISTRIBUTION: true
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_EXECUTE_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
+      EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_REQUEST_ORGANIZATION_IDENTIFIER_VALUE: "distributed-org.de"
     networks:
       broker-bpe-frontend:
       broker-bpe-backend:
@@ -1447,32 +1425,32 @@ services:
       broker-fhir-app:
         condition:  service_healthy
         restart: true
-      broker-store:
-        condition: service_healthy
-        restart: true
+#      broker-store:
+#        condition: service_healthy
+#        restart: true
 
-  # ---- BROKER-DIC - FHIR Data Store ----------------------------------------------
-  broker-store:
-    image: samply/blaze:0.24
-    restart: on-failure
-    healthcheck:
-      test: [ "CMD", "curl", "http://localhost:8080/health" ]
-      interval: 10s
-      timeout: 15s
-      retries: 5
-    ports:
-      - "127.0.0.1:8080:8080"
-    environment:
-      BASE_URL: http://127.0.0.1:8080
-      LOG_LEVEL: debug
-    networks:
-      broker-bpe-backend:
-        aliases:
-          - broker-store
-    volumes:
-      - type: volume
-        source: broker-store-data
-        target: /app/data
+#  # ---- BROKER-DIC - FHIR Data Store ----------------------------------------------
+#  broker-store:
+#    image: samply/blaze:0.24
+#    restart: on-failure
+#    healthcheck:
+#      test: [ "CMD", "curl", "http://localhost:8080/health" ]
+#      interval: 10s
+#      timeout: 15s
+#      retries: 5
+#    ports:
+#      - "127.0.0.1:8080:8080"
+#    environment:
+#      BASE_URL: http://127.0.0.1:8080
+#      LOG_LEVEL: debug
+#    networks:
+#      broker-bpe-backend:
+#        aliases:
+#          - broker-store
+#    volumes:
+#      - type: volume
+#        source: broker-store-data
+#        target: /app/data
 
 secrets:
   proxy_certificate_and_int_cas.pem:
@@ -1708,8 +1686,8 @@ volumes:
   broker-dic-6-store-data:
     name: "broker-dic-6-store-data"
 
-  broker-store-data:
-    name: "broker-store-data"
+#  broker-store-data:
+#    name: "broker-store-data"
 
   db-data:
     name: "db-data-mii-dsf-process-feasibility"

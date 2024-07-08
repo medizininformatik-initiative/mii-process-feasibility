@@ -32,17 +32,9 @@ services:
       source: ./broker/bpe/cache
       target: /opt/bpe/cache
   ports:
-    - 5005:5005
+    - 5000:5005
   environment:
     EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
-    DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_DISTRIBUTION: "true"
-    #de.medizininformatik.initiative.feasibility.dsf.process.parent.organization.identifier.value
-    DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_PARENT_ORGANIZATION_IEDNTIFIER_VALUE: "distributed-org.de"
-
-    EXECUTE_PROPERTY_NAME: "medizininformatik-initiative.de"
-    REQUEST_PROPERTY_NAME: "distributed-org.de"
-    #  für die Request: PROPERTY_NAME: "medizininformatik-initiative.de"
-    #  für die Execute: PROPERTY_NAME: "medizininformatik-initiative.de"
     TZ: Europe/Berlin
     DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
     DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
@@ -58,9 +50,13 @@ services:
     DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: broker_camunda_users
     DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: broker_camunda_server_user
     DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://broker/fhir
-    DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://broker-store:8080/fhir
+#    DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://broker-store:8080/fhir
     DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
     DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "true"
+    DEV_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE: Test_Broker
+    EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_DISTRIBUTION: true
+    EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_EXECUTE_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
+    EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_REQUEST_ORGANIZATION_IDENTIFIER_VALUE: "distributed-org.de"
   networks:
     broker-bpe-frontend:
     broker-bpe-backend:
@@ -72,6 +68,6 @@ services:
     broker-fhir-app:
       condition:  service_healthy
       restart: true
-    broker-store:
-      condition: service_healthy
-      restart: true
+#    broker-store:
+#      condition: service_healthy
+#      restart: true

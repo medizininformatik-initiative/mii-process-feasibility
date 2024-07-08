@@ -7,12 +7,7 @@ import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
 import dev.dsf.bpe.v1.variables.Variables;
 import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.Library;
-import org.hl7.fhir.r4.model.Measure;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Task;
+import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -60,7 +55,7 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
         Optional<Reference> measureRef = api.getTaskHelper()
                 .getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                         CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class);
-        if (measureRef.isPresent()) {
+        if (measureRef.isPresent() && measureRef.get().getReference() != null) {
             return new IdType(measureRef.get().getReference());
         } else {
             logger.error("Task {} is missing the measure reference.", task.getId());
