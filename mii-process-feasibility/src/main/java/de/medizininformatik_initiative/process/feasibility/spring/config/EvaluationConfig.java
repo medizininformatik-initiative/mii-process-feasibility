@@ -38,8 +38,6 @@ public class EvaluationConfig {
 
     @Value("${edu.ubi.medfak.feasibility.dsf.process.execute.organization.identifier.value:medizininformatik-initiative.de}")
     private String executeOrganizationIdentifierValue;
-    @Value("${dev.dsf.fhir.server.organization.identifier.value:<change env DEV_DSF_FHIR_SERVER_ORGANIZATION_IDENTIFIER_VALUE>}")
-    private String fhirServerOrganizationIdentifierValue;
 
 
     @Bean
@@ -53,8 +51,7 @@ public class EvaluationConfig {
                 rateLimitTimeIntervalDuration,
                 feasibilityDistribution,
                 requestOrganizationIdentifierValue,
-                executeOrganizationIdentifierValue,
-                fhirServerOrganizationIdentifierValue
+                executeOrganizationIdentifierValue
         );
     }
 }

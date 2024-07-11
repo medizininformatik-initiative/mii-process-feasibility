@@ -1,5 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
+import de.medizininformatik_initiative.process.feasibility.EvaluationSettingsProvider;
 import de.medizininformatik_initiative.process.feasibility.StoreBundleProvider;
 import de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility;
 import dev.dsf.bpe.v1.ProcessPluginApi;
@@ -37,7 +38,6 @@ public class StoreFeasibilityResourcesLocally extends AbstractServiceDelegate im
 
         fixCanonical(measureFromRequest, libraryFromRequest);
 
-
         var transactionResponse = storeTransactionBundle(measureFromRequest, libraryFromRequest);
 
         String newMeasureId =
@@ -49,7 +49,6 @@ public class StoreFeasibilityResourcesLocally extends AbstractServiceDelegate im
         variables.setString(ConstantsFeasibility.VARIABLE_DISTRIBUTION_LIBRARY_ID,
                 findIdPartInFirstBundleResourceType(transactionResponse, ResourceType.Library));
     }
-
     private void fixMeasureInTaskLocal(String newMeasureId, Task task) {
         String measureRef = localWebserviceClient.getBaseUrl() + "Measure/" + newMeasureId;
         Task newTask = task.copy().setStatus(
@@ -60,6 +59,10 @@ public class StoreFeasibilityResourcesLocally extends AbstractServiceDelegate im
                     CODESYSTEM_FEASIBILITY.equals(e.getType().getCoding().get(0).getSystem())
             ).findFirst().ifPresent(e ->
                     e.setValue(new Reference(measureRef)));
+            if (api.getOrganizationProvider().getLocalOrganization().isPresent())
+                newTask.getRequester().getIdentifier().setValue(api.getOrganizationProvider()
+                        .getLocalOrganization().get()
+                        .getIdentifier().get(0).getValue());
             localWebserviceClient.create(newTask);
         } catch (Exception e) {
             logger.error("Can`t create Task with measure reference {}.", measureRef);

@@ -36,6 +36,7 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
         logger.info("doExecute select request targets");
 
         var organizationProvider = api.getOrganizationProvider();
+
         var client = api.getFhirWebserviceClientProvider().getLocalWebserviceClient();
         var parentIdentifier = new Identifier()
                 .setSystem(ORGANIZATION_IDENTIFIER_SYSTEM)

@@ -71,10 +71,4 @@ public interface EvaluationSettingsProvider {
      */
     String executeOrganizationIdentifierValue();
 
-    /**
-     * Returns the local organization identifier value
-     *
-     * @return the set organization identifier value
-     */
-    String fhirServerOrganizationIdentifierValue();
 }

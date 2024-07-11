@@ -21,8 +21,6 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
     private final String requestOrganizationIdentifierValue;
     private final String executeOrganizationIdentifierValue;
 
-    private final String fhirServerOrganizationIdentifierValue;
-
     public EvaluationSettingsProviderImpl(EvaluationStrategy evaluationStrategy,
                                           Boolean evaluationResultObfuscationEnabled,
                                           Double evaluationResultObfuscationLaplaceSensitivity,
@@ -31,8 +29,7 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
                                           Duration rateLimitTimeIntervalDuration,
                                           Boolean feasibilityDistributionEnabled,
                                           String requestOrganizationIdentifierValue,
-                                          String executeOrganizationIdentifierValue,
-                                          String fhirServerOrganizationIdentifierValue) {
+                                          String executeOrganizationIdentifierValue) {
         this.evaluationStrategy = Objects.requireNonNull(evaluationStrategy);
         this.evaluationResultObfuscationEnabled = Objects.requireNonNull(evaluationResultObfuscationEnabled);
         this.evaluationResultObfuscationLaplaceSensitivity = Objects
@@ -52,7 +49,6 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
 
         this.executeOrganizationIdentifierValue = Objects.requireNonNull(executeOrganizationIdentifierValue);
 
-        this.fhirServerOrganizationIdentifierValue = fhirServerOrganizationIdentifierValue;
     }
 
     @Override
@@ -98,11 +94,6 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
     @Override
     public String executeOrganizationIdentifierValue() {
         return executeOrganizationIdentifierValue;
-    }
-
-    @Override
-    public String fhirServerOrganizationIdentifierValue() {
-        return fhirServerOrganizationIdentifierValue;
     }
 
 

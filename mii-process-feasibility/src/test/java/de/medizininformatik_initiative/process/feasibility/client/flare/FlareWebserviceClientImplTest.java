@@ -93,7 +93,7 @@ public class FlareWebserviceClientImplTest {
             return config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
                     EvaluationStrategy.STRUCTURED_QUERY, true,
                     0d, 0d, 0, Duration.ofMillis(1), false,
-                    "medizininformatik-initiative.de", "medizininformatik-initiative.de", null));
+                    "medizininformatik-initiative.de", "medizininformatik-initiative.de"));
         });
     }
 
@@ -103,7 +103,9 @@ public class FlareWebserviceClientImplTest {
         var structuredQuery = "foo".getBytes();
         flareWebserviceClient = config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
                 EvaluationStrategy.STRUCTURED_QUERY, true, 0d,
-                0d, 0, Duration.ofMillis(1), false, "medizininformatik-initiative.de", "medizininformatik-initiative.de", null));
+                0d, 0, Duration.ofMillis(1),
+                false, "medizininformatik-initiative.de",
+                "medizininformatik-initiative.de"));
 
         var e = assertThrows(IllegalArgumentException.class,
                 () -> flareWebserviceClient.requestFeasibility(structuredQuery));
@@ -119,7 +121,7 @@ public class FlareWebserviceClientImplTest {
         ReflectionTestUtils.setField(config, "flareBaseUrl", invalidUrl);
         flareWebserviceClient = config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
                 EvaluationStrategy.STRUCTURED_QUERY, true, 0d, 0d, 0, Duration.ofMillis(1), false,
-                "medizininformatik-initiative.de", "medizininformatik-initiative.de", null));
+                "medizininformatik-initiative.de", "medizininformatik-initiative.de"));
 
         var e = assertThrows(IllegalArgumentException.class,
                 () -> flareWebserviceClient.requestFeasibility(structuredQuery));
@@ -134,8 +136,9 @@ public class FlareWebserviceClientImplTest {
         var structuredQuery = "foo".getBytes();
         ReflectionTestUtils.setField(config, "flareBaseUrl", invalidUrl);
         flareWebserviceClient = config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
-                EvaluationStrategy.CQL, true, 0d, 0d, 0, Duration.ofMillis(1), false,
-                "medizininformatik-initiative.de", "medizininformatik-initiative.de", null));
+                EvaluationStrategy.CQL, true, 0d,
+                0d, 0, Duration.ofMillis(1), false,
+                "medizininformatik-initiative.de", "medizininformatik-initiative.de"));
 
         var e = assertThrows(IllegalStateException.class,
                 () -> flareWebserviceClient.requestFeasibility(structuredQuery));
