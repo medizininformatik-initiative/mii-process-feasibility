@@ -1,6 +1,5 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import de.medizininformatik_initiative.process.feasibility.EvaluationSettingsProvider;
 import de.medizininformatik_initiative.process.feasibility.StoreBundleProvider;
 import de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility;
 import dev.dsf.bpe.v1.ProcessPluginApi;
@@ -15,8 +14,6 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.util.List;
 import java.util.UUID;
-
-import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 
 public class StoreFeasibilityResourcesLocally extends AbstractServiceDelegate implements InitializingBean, StoreBundleProvider {
 
@@ -44,26 +41,15 @@ public class StoreFeasibilityResourcesLocally extends AbstractServiceDelegate im
                 findIdPartInFirstBundleResourceType(transactionResponse, ResourceType.Measure);
 
         fixMeasureInTaskLocal(newMeasureId, variables.getLatestTask());
-
-        variables.setString(ConstantsFeasibility.VARIABLE_DISTRIBUTION_MEASURE_ID, newMeasureId);
-        variables.setString(ConstantsFeasibility.VARIABLE_DISTRIBUTION_LIBRARY_ID,
-                findIdPartInFirstBundleResourceType(transactionResponse, ResourceType.Library));
     }
+
     private void fixMeasureInTaskLocal(String newMeasureId, Task task) {
-        String measureRef = localWebserviceClient.getBaseUrl() + "Measure/" + newMeasureId;
-        Task newTask = task.copy().setStatus(
-                Task.TaskStatus.REQUESTED);
-        newTask.setId((String) null);
+        String measureRef = "Measure/" + newMeasureId;
         try {
-            newTask.getInput().stream().filter(e ->
-                    CODESYSTEM_FEASIBILITY.equals(e.getType().getCoding().get(0).getSystem())
+            task.getInput().stream().filter(e ->
+                    ConstantsFeasibility.CODESYSTEM_FEASIBILITY.equals(e.getType().getCoding().get(0).getSystem())
             ).findFirst().ifPresent(e ->
                     e.setValue(new Reference(measureRef)));
-            if (api.getOrganizationProvider().getLocalOrganization().isPresent())
-                newTask.getRequester().getIdentifier().setValue(api.getOrganizationProvider()
-                        .getLocalOrganization().get()
-                        .getIdentifier().get(0).getValue());
-            localWebserviceClient.create(newTask);
         } catch (Exception e) {
             logger.error("Can`t create Task with measure reference {}.", measureRef);
             throw e;

@@ -45,11 +45,11 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
         var memberOrganizationRole = new Coding()
                 .setSystem("http://dsf.dev/fhir/CodeSystem/organization-role")
                 .setCode("DIC");
-
         List<Target> targets = organizationProvider
                 .getOrganizations(parentIdentifier, memberOrganizationRole)
                 .stream()
-                .filter(e -> e.hasIdentifier() && e.hasActive())
+                .filter(Organization::hasEndpoint)
+                .filter(Organization::hasIdentifier)
                 .map(organization -> {
                     var organizationIdentifier = organization.getIdentifierFirstRep();
                     var path = URI.create(organization.getEndpointFirstRep().getReference()).getPath();
@@ -66,7 +66,9 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
                 "\n OrganizationIdentifierValue: " + t.getOrganizationIdentifierValue() +
                 "\n EndpointIdentifierValue: " + t.getEndpointIdentifierValue() +
                 "\n CorrelationKey: " + t.getCorrelationKey()));
+
         variables.setTargets(variables.createTargets(targets));
+
         variables.setString("measure-id",
                 api.getFhirWebserviceClientProvider().getLocalWebserviceClient().getBaseUrl()
                         + getMeasureId(variables.getStartTask()));
@@ -78,7 +80,7 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
                 .getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                         CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class);
 
-        if (measureRef.isPresent() && measureRef.get().getReference() != null) {
+        if (measureRef.isPresent()) {
             return measureRef.get().getReference();
         } else {
             logger.error("Task {} is missing the measure reference.", task.getId());

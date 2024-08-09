@@ -133,31 +133,16 @@ Quick restart of the debugging stack:
 docker-compose down -v 
 
 docker-compose up -d zars-fhir-app 
-until docker-compose exec zars-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-zars-fhir-app-1)' == "healthy"; do
-    sleep 1
-done
+sleep 3
 
 docker-compose up -d zars-bpe-app 
-until docker-compose exec zars-bpe-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-zars-bpe-app-1)' == "healthy"; do
-    sleep 1
-done
+sleep 2
 
 docker-compose up -d dic-2-fhir-app 
-until docker-compose exec dic-2-fhir-app sh -c 'exit $(docker inspect -f {{.State.Health.Status}} mii-process-feasibility-docker-test-setup-dic-2-fhir-app-1)' == "healthy"; do
-    sleep 1
-done
-```
-Now you can start the debugger with `docker-compose up -d dic-2-bpe-app`.
+sleep 3
 
-Set debug environment in IntelliJ:
-1. Edit Configurations...
-1. New Configuration: Docker - Docker Compose with a name like `dic-2-bpe-app up`.
-   1. Server: your local Docker
-   1. Compose files: `/mii-process-feasibility-docker-test-setup/docker-compose.yml;`
-   1. Services: `dic-2-bpe-app,`
-1. New Configuration: Remote JVM Debug with a name like `remote dic_2_bpe debugging`
-   1. Use module classpath: `mii-process-feasibility`
-   1. Before launch: Run Another Configuration: `dic-2-bpe-app up`
+docker-compose up -d dic-2-bpe-app 
+```
 
 Start Debugging 'remote dic_2_bpe debugging'
 

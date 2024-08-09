@@ -51,4 +51,10 @@ public class SendDicRequest extends AbstractTaskMessageSend {
         return requestOrganizationIdentifierValue;
     }
 
+    @Override
+    protected String getInstantiatesCanonical(DelegateExecution execution, Variables variables) {
+        String defaultInstantiatesCanonical = super.getInstantiatesCanonical(execution, variables);
+        return defaultInstantiatesCanonical;
+    }
+
 }

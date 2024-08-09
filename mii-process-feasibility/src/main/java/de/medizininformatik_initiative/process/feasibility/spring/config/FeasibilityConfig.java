@@ -162,7 +162,7 @@ public class FeasibilityConfig {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SendDicResponse sendDicResponse() {
-        return new SendDicResponse(api);
+        return new SendDicResponse(api, evaluationSettingsProvider);
     }
 
     @Bean

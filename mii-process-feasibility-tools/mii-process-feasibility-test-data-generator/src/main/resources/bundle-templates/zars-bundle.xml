@@ -4,6 +4,7 @@
     <entry>
         <fullUrl value="urn:uuid:bb73165c-c7b9-4342-8e28-531f07fa7735"/>
         <resource>
+            <!-- Test_ZARS -->
             <Organization xmlns="http://hl7.org/fhir">
                 <meta>
                     <profile value="http://dsf.dev/fhir/StructureDefinition/organization"/>
@@ -214,7 +215,7 @@
                 <type>
                     <coding>
                         <system value="http://dsf.dev/fhir/CodeSystem/organization-role"/>
-                        <code value="HRP"/>
+                        <code value="DIC"/>
                     </coding>
                 </type>
                 <name value="Test Broker"/>

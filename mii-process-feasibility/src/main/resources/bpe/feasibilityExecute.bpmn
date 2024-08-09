@@ -174,7 +174,7 @@
       <bpmn:intermediateCatchEvent id="Event_16srgcj" name="Receive DIC Result">
         <bpmn:incoming>Flow_189p0u1</bpmn:incoming>
         <bpmn:outgoing>Flow_00nox0i</bpmn:outgoing>
-        <bpmn:messageEventDefinition id="MessageEventDefinition_0zo75zb" messageRef="Message_0yzhcza" />
+        <bpmn:messageEventDefinition id="MessageEventDefinition_0zo75zb" messageRef="Message_1dr71re" />
       </bpmn:intermediateCatchEvent>
       <bpmn:eventBasedGateway id="Gateway_1u29fet" name="Gateway Receive DIC Result">
         <bpmn:extensionElements>
@@ -221,7 +221,7 @@
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.hasVariable("sendError")}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
     </bpmn:subProcess>
-    <bpmn:serviceTask id="aggregateMeasureReports" name="store and aggregate measure reports" camunda:class="de.medizininformatik_initiative.process.feasibility.service.AggregateMeasureReports">
+    <bpmn:serviceTask id="aggregateMeasureReports" name="aggregate measure reports" camunda:class="de.medizininformatik_initiative.process.feasibility.service.AggregateMeasureReports">
       <bpmn:documentation>History-Service.activity geben lassen und dort gesetzten Variablen </bpmn:documentation>
       <bpmn:incoming>Flow_1tto9af</bpmn:incoming>
       <bpmn:outgoing>Flow_0ql5236</bpmn:outgoing>
@@ -229,7 +229,7 @@
     <bpmn:sequenceFlow id="Flow_03xzllf" sourceRef="selectRequestTargetsDistributed" targetRef="Activity_1u187ty" />
     <bpmn:sequenceFlow id="Flow_1tto9af" sourceRef="Activity_1u187ty" targetRef="aggregateMeasureReports" />
     <bpmn:sequenceFlow id="Flow_0zcs8nd" name="yes" sourceRef="feasibilityDistribution" targetRef="storeFeasibilityResourcesLocally">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('feasibility-distribution') == true}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('feasibility-distribution')}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0ql5236" sourceRef="aggregateMeasureReports" targetRef="gatewayObfuscate" />
     <bpmn:serviceTask id="storeFeasibilityResourcesLocally" name="store feasibility resource for distribution" camunda:class="de.medizininformatik_initiative.process.feasibility.service.StoreFeasibilityResourcesLocally">
@@ -242,6 +242,7 @@
   <bpmn:message id="Message_1yz2a31" name="feasibilityExecuteMessage" />
   <bpmn:message id="Message_1dr71re" name="feasibilitySingleDicResultMessage" />
   <bpmn:message id="Message_0yzhcza" name="feasibilitySingleDicResultMessage" />
+  <bpmn:message id="Message_2416gj4" name="feasibilityExecute" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="medizininformatik-initiativede_feasibilityExecute">
       <bpmndi:BPMNShape id="StartEvent_1fzso6r_di" bpmnElement="StartEvent">
@@ -264,12 +265,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0yfzrja_di" bpmnElement="storeMeasureReport">
         <dc:Bounds x="1380" y="250" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1kfqiko_di" bpmnElement="Gateway_1kfqiko" isMarkerVisible="true">
-        <dc:Bounds x="945" y="177" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1003" y="195" width="74" height="14" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1rmldcf_di" bpmnElement="evaluateStructuredQueryMeasure">
         <dc:Bounds x="1080" y="250" width="100" height="80" />
@@ -318,6 +313,16 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1ens5d9" bpmnElement="selectRequestTargetsDistributed">
         <dc:Bounds x="710" y="410" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0mpiwsx" bpmnElement="aggregateMeasureReports">
+        <dc:Bounds x="1240" y="410" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1kfqiko_di" bpmnElement="Gateway_1kfqiko" isMarkerVisible="true">
+        <dc:Bounds x="928" y="177" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="986" y="195" width="74" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1ky9q3n" bpmnElement="Activity_1u187ty" isExpanded="true">
         <dc:Bounds x="510" y="530" width="870" height="330" />
@@ -429,10 +434,6 @@
           <dc:Bounds x="739" y="813" width="72" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="BPMNShape_0mpiwsx" bpmnElement="aggregateMeasureReports">
-        <dc:Bounds x="1240" y="410" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1wa5jta" bpmnElement="storeFeasibilityResourcesLocally">
         <dc:Bounds x="710" y="280" width="100" height="80" />
         <bpmndi:BPMNLabel />
@@ -450,19 +451,19 @@
         <di:waypoint x="1430" y="380" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_09g5hz4_di" bpmnElement="Flow_09g5hz4">
-        <di:waypoint x="970" y="177" />
-        <di:waypoint x="970" y="120" />
+        <di:waypoint x="953" y="177" />
+        <di:waypoint x="953" y="120" />
         <di:waypoint x="1010" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="939" y="113" width="23" height="14" />
+          <dc:Bounds x="922" y="113" width="23" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0gowl5w_di" bpmnElement="Flow_0gowl5w">
-        <di:waypoint x="970" y="227" />
-        <di:waypoint x="970" y="290" />
+        <di:waypoint x="953" y="227" />
+        <di:waypoint x="953" y="290" />
         <di:waypoint x="1080" y="290" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="928" y="293" width="84" height="14" />
+          <dc:Bounds x="911" y="293" width="84" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1qdam0i_di" bpmnElement="Flow_1qdam0i">
@@ -533,7 +534,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_15qb7yx_di" bpmnElement="Flow_15qb7yx">
         <di:waypoint x="785" y="202" />
-        <di:waypoint x="945" y="202" />
+        <di:waypoint x="928" y="202" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="823" y="184" width="13" height="14" />
         </bpmndi:BPMNLabel>

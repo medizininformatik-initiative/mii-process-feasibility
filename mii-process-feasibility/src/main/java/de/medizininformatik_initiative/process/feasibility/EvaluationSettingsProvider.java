@@ -71,4 +71,10 @@ public interface EvaluationSettingsProvider {
      */
     String executeOrganizationIdentifierValue();
 
+    /**
+     * Returns whether this instance is a Sub-DIC
+     *
+     * @return True if this instance is a Sub-DIC
+     */
+    boolean subDic();
 }

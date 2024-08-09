@@ -26,6 +26,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>dev.dsf</groupId>
+            <artifactId>dsf-bpe-server</artifactId>
+            <version>${dsf.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-client</artifactId>
         </dependency>

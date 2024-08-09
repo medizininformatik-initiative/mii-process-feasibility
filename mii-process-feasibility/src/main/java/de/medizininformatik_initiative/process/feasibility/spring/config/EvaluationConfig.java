@@ -33,6 +33,9 @@ public class EvaluationConfig {
     @Value("${edu.ubi.medfak.feasibility.dsf.process.distribution:false}")
     private boolean feasibilityDistribution;
 
+    @Value("${edu.ubi.medfak.feasibility.dsf.process.distribution.subdic:false}")
+    private boolean subDic;
+
     @Value("${edu.ubi.medfak.feasibility.dsf.process.request.organization.identifier.value:medizininformatik-initiative.de}")
     private String requestOrganizationIdentifierValue;
 
@@ -51,7 +54,8 @@ public class EvaluationConfig {
                 rateLimitTimeIntervalDuration,
                 feasibilityDistribution,
                 requestOrganizationIdentifierValue,
-                executeOrganizationIdentifierValue
+                executeOrganizationIdentifierValue,
+                subDic
         );
     }
 }

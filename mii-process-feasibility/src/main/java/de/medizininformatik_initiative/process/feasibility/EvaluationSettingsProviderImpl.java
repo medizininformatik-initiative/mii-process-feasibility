@@ -20,6 +20,7 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
     private final boolean feasibilityDistributionEnabled;
     private final String requestOrganizationIdentifierValue;
     private final String executeOrganizationIdentifierValue;
+    private final boolean subDic;
 
     public EvaluationSettingsProviderImpl(EvaluationStrategy evaluationStrategy,
                                           Boolean evaluationResultObfuscationEnabled,
@@ -29,7 +30,8 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
                                           Duration rateLimitTimeIntervalDuration,
                                           Boolean feasibilityDistributionEnabled,
                                           String requestOrganizationIdentifierValue,
-                                          String executeOrganizationIdentifierValue) {
+                                          String executeOrganizationIdentifierValue,
+                                          Boolean subDic) {
         this.evaluationStrategy = Objects.requireNonNull(evaluationStrategy);
         this.evaluationResultObfuscationEnabled = Objects.requireNonNull(evaluationResultObfuscationEnabled);
         this.evaluationResultObfuscationLaplaceSensitivity = Objects
@@ -45,9 +47,13 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
 
         this.feasibilityDistributionEnabled = Objects.requireNonNull(feasibilityDistributionEnabled);
 
-        this.requestOrganizationIdentifierValue = Objects.requireNonNull(requestOrganizationIdentifierValue);
+        this.subDic = Objects.requireNonNull(subDic);
 
-        this.executeOrganizationIdentifierValue = Objects.requireNonNull(executeOrganizationIdentifierValue);
+        this.requestOrganizationIdentifierValue = requestOrganizationIdentifierValue != null ?
+                requestOrganizationIdentifierValue : "medizininformatik-initiative.de";
+
+        this.executeOrganizationIdentifierValue = executeOrganizationIdentifierValue != null ?
+                executeOrganizationIdentifierValue : "medizininformatik-initiative.de";
 
     }
 
@@ -96,5 +102,8 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
         return executeOrganizationIdentifierValue;
     }
 
-
+    @Override
+    public boolean subDic() {
+        return subDic;
+    }
 }
