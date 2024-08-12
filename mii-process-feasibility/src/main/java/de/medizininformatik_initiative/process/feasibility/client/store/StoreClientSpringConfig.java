@@ -57,7 +57,7 @@ public class StoreClientSpringConfig {
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.base_url:}")
     private String storeBaseUrl;
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.client.secret:#{null}}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.client.password:#{null}}")
     private String oauthClientSecret;
 
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.client.id:#{null}}")
