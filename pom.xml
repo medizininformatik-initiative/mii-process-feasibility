@@ -17,7 +17,7 @@
         <compileSource>17</compileSource>
         <compileTarget>17</compileTarget>
         <dsf.version>1.5.0</dsf.version>
-        <hapi.fhir.version>5.1.0</hapi.fhir.version>
+        <hapi.fhir.version>5.2.1</hapi.fhir.version>
         <testcontainers.version>1.19.8</testcontainers.version>
     </properties>
 
@@ -28,7 +28,8 @@
 
     <scm>
         <connection>scm:git:git://github.com/nmedizininformatik-initiative/mii-process-feasibility.git</connection>
-        <developerConnection>scm:git:git@github.com:medizininformatik-initiative/mii-process-feasibility.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:medizininformatik-initiative/mii-process-feasibility.git
+        </developerConnection>
         <url>https://github.com/medizininformatik-initiative/mii-process-feasibility</url>
     </scm>
 
@@ -311,6 +312,28 @@
             <id>highmed-dsf</id>
             <name>GitHub HiGHmed Apache Maven Packages</name>
             <url>https://maven.pkg.github.com/highmed/highmed-dsf</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>github-mii</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/medizininformatik-initiative</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>dsf-dev</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/datasharingframework/dsf</url>
             <releases>
                 <enabled>true</enabled>
             </releases>

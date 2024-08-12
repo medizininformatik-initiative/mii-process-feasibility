@@ -1,15 +1,22 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
+import de.medizininformatik_initiative.process.feasibility.MeasureReportIterator;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
+import dev.dsf.bpe.v1.variables.Target;
 import dev.dsf.bpe.v1.variables.Targets;
 import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AggregateMeasureReports extends AbstractServiceDelegate {
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
+
+public class AggregateMeasureReports extends AbstractServiceDelegate implements MeasureReportIterator {
     private static final Logger logger = LoggerFactory.getLogger(AggregateMeasureReports.class);
 
     public AggregateMeasureReports(ProcessPluginApi api) {
@@ -23,36 +30,31 @@ public class AggregateMeasureReports extends AbstractServiceDelegate {
         // Die Reports rausholen. Ggf. die Tasks aus StoreLiveResult holen.
         Targets targets = variables.getTargets();
 
-        targets.getEntries().forEach(target -> {
+        AtomicInteger i = new AtomicInteger(0);
+
+        MeasureReport firstMeasureReport = null;
+        MeasureReport.MeasureReportGroupPopulationComponent populationComponent = null;
+
+        for (Target target : targets.getEntries()) {
             String correlationKey = target.getCorrelationKey();
             Resource measure = variables.getResource("subMeasure_" + correlationKey);
-            if (measure != null) {
-                logger.info(measure.toString());
+            if (measure instanceof MeasureReport measureReport) {
+                populationComponent = extractInitialPopulation(measureReport);
+
+                i.addAndGet(populationComponent.getCount());
+
+                if (firstMeasureReport == null)
+                    firstMeasureReport = measureReport;
             }
-        });
-        //  variables.getTarget().getCorrelationKey()
-        //      var measureReport = (MeasureReport) variables.getResource(VARIABLE_MEASURE_REPORT);
-        //    api.getTaskHelper().out
+        }
 
-        //     List<Task.TaskOutputComponent> output = variables.getLatestTask().getOutput();
-        //  Resource r = (Resource) output.get(0).getValue();
-/*
+        if (firstMeasureReport != null) {
+            populationComponent.setCount(i.get());
+            firstMeasureReport.setId((String) null);
+        }
 
-- Speichen und zurordnen der empfangenen Ergebnisse.
-Hi, Hauke hat ein Beispiel im dsf-process-ping-pong:
-
-Dort wird in den einzelnen Sub-Prozessen eine Variable angelegt,
-die den correlationKey im Namen enthält, der bei der Erstellung der targets für
-jedes einzelne target angelegt wird. Die Variablennamen der einzelnen Subprozesse
-werden dann in dem Aggregations-Service wieder anhand der targets generiert und damit
-die einzelnen Werte geholt.
-
-
-        List<HistoricActivityInstance> list = delegateExecution.getProcessEngine().getHistoryService()
-                .createHistoricActivityInstanceQuery().activityId("Activity_08pv42f").list();
-        HistoricActivityInstance i = list.get(0);
-
-        logger.info(i.toString());
- */
+        variables.setResource(VARIABLE_MEASURE_REPORT, firstMeasureReport);
     }
+
+
 }

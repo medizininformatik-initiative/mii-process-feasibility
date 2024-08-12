@@ -1,5 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
+import de.medizininformatik_initiative.process.feasibility.MeasureReportIterator;
 import de.medizininformatik_initiative.process.feasibility.Obfuscator;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
@@ -26,7 +27,7 @@ import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 
 public class ObfuscateEvaluationResult extends AbstractServiceDelegate
-        implements InitializingBean {
+        implements InitializingBean, MeasureReportIterator {
     private static final Logger logger = LoggerFactory.getLogger(ObfuscateEvaluationResult.class);
 
     private final Obfuscator<Integer> obfuscator;
@@ -75,14 +76,4 @@ public class ObfuscateEvaluationResult extends AbstractServiceDelegate
         return obfuscatedMeasureReport;
     }
 
-    private MeasureReportGroupPopulationComponent extractInitialPopulation(MeasureReport measureReport) {
-        return measureReport.getGroupFirstRep().getPopulation().stream()
-                .filter((p) -> p.getCode().getCoding().stream()
-                        .anyMatch((c) -> c.getSystem().equals(CODESYSTEM_MEASURE_POPULATION) && c.getCode()
-                                .equals(CODESYSTEM_MEASURE_POPULATION_VALUE_INITIAL_POPULATION)))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(
-                        format("Missing population with coding '%s' in measure report (id '%s').",
-                                CODESYSTEM_MEASURE_POPULATION_VALUE_INITIAL_POPULATION, measureReport.getId())));
-    }
 }

@@ -15,8 +15,9 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
+import static de.medizininformatik_initiative.process.feasibility.StoreBundleProvider.LIBRARY_URL_PATTERN;
+import static de.medizininformatik_initiative.process.feasibility.StoreBundleProvider.MEASURE_URL_PATTERN;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hl7.fhir.r4.model.Bundle.BundleType.TRANSACTION;
