@@ -101,8 +101,8 @@ public class StoreClientSpringConfig {
         } else if (!isNullOrEmpty(oauthClientId) && !isNullOrEmpty(oauthClientSecret)
                 && !isNullOrEmpty(oauthTokenUrl)) {
             client.registerInterceptor(new OAuthInterceptor(oauthClientId, oauthClientSecret, oauthTokenUrl,
-                    Optional.of(oauthProxyHost), Optional.of(oauthProxyPort), Optional.of(oauthProxyUsername),
-                    Optional.of(oauthProxyPassword)));
+                    Optional.ofNullable(oauthProxyHost), Optional.ofNullable(oauthProxyPort),
+                    Optional.ofNullable(oauthProxyUsername), Optional.ofNullable(oauthProxyPassword)));
         }
 
         if (basicAuthUsername != null || basicAuthPassword != null) {
