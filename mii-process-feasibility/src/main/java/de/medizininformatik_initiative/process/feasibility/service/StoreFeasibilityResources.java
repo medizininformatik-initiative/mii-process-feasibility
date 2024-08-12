@@ -25,8 +25,6 @@ import static org.hl7.fhir.r4.model.Bundle.HTTPVerb.POST;
 public class StoreFeasibilityResources extends AbstractServiceDelegate implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(StoreFeasibilityResources.class);
-    private static final Pattern MEASURE_URL_PATTERN = Pattern.compile("(.+)/Measure/(.+)");
-    private static final Pattern LIBRARY_URL_PATTERN = Pattern.compile("urn:uuid:(.+)");
 
     private final IGenericClient storeClient;
     private final FeasibilityResourceCleaner cleaner;
@@ -54,7 +52,6 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
         cleaner.cleanLibrary(library);
         cleaner.cleanMeasure(measure);
 
-        fixCanonical(measure, library);
         fixCanonical(measure, library);
 
         var transactionResponse = storeResources(measure, library);

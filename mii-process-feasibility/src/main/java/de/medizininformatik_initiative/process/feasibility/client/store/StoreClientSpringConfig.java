@@ -13,8 +13,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import java.util.Optional;
+
 import javax.net.ssl.SSLContext;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CLIENT_TIMEOUT_DEFAULT;
 
 @Configuration
@@ -54,6 +57,27 @@ public class StoreClientSpringConfig {
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.base_url:}")
     private String storeBaseUrl;
 
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.client.secret:#{null}}")
+    private String oauthClientSecret;
+
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.client.id:#{null}}")
+    private String oauthClientId;
+
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.issuer.url:#{null}}")
+    private String oauthTokenUrl;
+
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.proxy.host:#{null}}")
+    private String oauthProxyHost;
+
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.proxy.port:}")
+    private Integer oauthProxyPort;
+
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.proxy.username:#{null}}")
+    private String oauthProxyUsername;
+
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.proxy.password:#{null}}")
+    private String oauthProxyPassword;
+
     @Bean
     @Qualifier("store-client")
     IGenericClient client(@Qualifier("store-client") FhirContext fhirContext,
@@ -70,12 +94,17 @@ public class StoreClientSpringConfig {
                 clientFactory.setProxyCredentials(proxyUsername, proxyPassword);
             }
         }
-
         fhirContext.setRestfulClientFactory(clientFactory);
         var client = fhirContext.newRestfulGenericClient(storeBaseUrl);
         if (bearerAuthToken != null) {
             client.registerInterceptor(new BearerTokenAuthInterceptor(bearerAuthToken));
+        } else if (!isNullOrEmpty(oauthClientId) && !isNullOrEmpty(oauthClientSecret)
+                && !isNullOrEmpty(oauthTokenUrl)) {
+            client.registerInterceptor(new OAuthInterceptor(oauthClientId, oauthClientSecret, oauthTokenUrl,
+                    Optional.of(oauthProxyHost), Optional.of(oauthProxyPort), Optional.of(oauthProxyUsername),
+                    Optional.of(oauthProxyPassword)));
         }
+
         if (basicAuthUsername != null || basicAuthPassword != null) {
             client.registerInterceptor(new BasicAuthInterceptor(basicAuthUsername, basicAuthPassword));
         }
