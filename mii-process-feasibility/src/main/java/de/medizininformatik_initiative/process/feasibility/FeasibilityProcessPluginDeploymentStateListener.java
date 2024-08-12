@@ -44,18 +44,19 @@ public class FeasibilityProcessPluginDeploymentStateListener
                 try {
                     var statement = storeClient.capabilities().ofType(CapabilityStatement.class)
                             .execute();
-                    logger.info("Connection test OK ({} - {})", statement.getSoftware().getName(),
-                            statement.getSoftware().getVersion());
+                    logger.info("Feasibility plugin connection test to FHIR store ({} - {}) SUCCEEDED.",
+                            statement.getSoftware().getName(), statement.getSoftware().getVersion());
                 } catch (Exception e) {
-                    logger.error("Connection test FAILED - error: {} - {}", e.getClass().getName(), e.getMessage());
+                    logger.error("Feasibility plugin connection test to FHIR store FAILED. Error: {} - {}",
+                            e.getClass().getName(), e.getMessage());
                 }
             } else {
                 try {
                     flareWebserviceClient.testConnection();
-                    logger.info("Connection test OK (flare)");
+                    logger.info("Feasibility plugin connection test to flare SUCCEEDED.");
                 } catch (Exception e) {
-                    logger.error("Connection test FAILED (flare) - error: {} - {}", e.getClass().getName(),
-                            e.getMessage());
+                    logger.error("Feasibility plugin connection test to flare FAILED. Error: {} - {}",
+                            e.getClass().getName(), e.getMessage());
                 }
             }
         }
