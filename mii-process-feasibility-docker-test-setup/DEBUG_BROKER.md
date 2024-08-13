@@ -48,6 +48,7 @@ curl \
 # Add Testdata
 
 ```sh
+# 4 -> 0
 curl -H accept:application/fhir+json  -H content-type:application/fhir+json  -d @data/POLAR_TestData-001.json  http://broker-dic-6-store:8086/fhir
 curl -H accept:application/fhir+json  -H content-type:application/fhir+json  -d @data/POLAR_TestData-002.json  http://broker-dic-6-store:8086/fhir 
 curl -H accept:application/fhir+json  -H content-type:application/fhir+json  -d @data/POLAR_TestData-003.json  http://broker-dic-6-store:8086/fhir
@@ -57,6 +58,7 @@ curl -H accept:application/fhir+json  -H content-type:application/fhir+json  -d 
 curl -H accept:application/fhir+json  -H content-type:application/fhir+json  -d @data/POLAR_TestData-007.json  http://broker-dic-6-store:8086/fhir
 curl -H accept:application/fhir+json  -H content-type:application/fhir+json  -d @data/POLAR_TestData-008.json  http://broker-dic-6-store:8086/fhir 
 
+# 4 -> 10
 curl -H accept:application/fhir+json  -H content-type:application/fhir+json  -d @data/POLAR_TestData-009.json  http://broker-dic-5-store:8085/fhir
 curl -H accept:application/fhir+json  -H content-type:application/fhir+json  -d @data/POLAR_TestData-010.json  http://broker-dic-5-store:8085/fhir 
 curl -H accept:application/fhir+json  -H content-type:application/fhir+json  -d @data/POLAR_TestData-011.json  http://broker-dic-5-store:8085/fhir
@@ -116,20 +118,12 @@ curl \
 ```
 ```sh
 curl \
-  --cacert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/ca/testca_certificate.pem \
-  --cert-type P12 \
-  --cert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
-  -H accept:application/fhir+json \
-  -s "https://broker-dic-6-store:8086/fhir/Patient" |\
+  -s "http://localhost:8086/fhir/Patient" |\
   jq .
 ```
 ```sh
 curl \
-  --cacert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/ca/testca_certificate.pem \
-  --cert-type P12 \
-  --cert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
-  -H accept:application/fhir+json \
-  -s "https://broker-dic-5-store:8085/fhir/Patient" |\
+  -s "http://localhost:8085/fhir/Patient" |\
   jq .
 ```
 ```sh

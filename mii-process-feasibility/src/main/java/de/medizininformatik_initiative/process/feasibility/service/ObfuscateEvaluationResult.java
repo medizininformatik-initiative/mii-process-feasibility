@@ -1,6 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import de.medizininformatik_initiative.process.feasibility.MeasureReportIterator;
+import de.medizininformatik_initiative.process.feasibility.MeasureReportGenerator;
 import de.medizininformatik_initiative.process.feasibility.Obfuscator;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
@@ -9,7 +9,6 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MeasureReport;
-import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
 import org.hl7.fhir.r4.model.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 
 public class ObfuscateEvaluationResult extends AbstractServiceDelegate
-        implements InitializingBean, MeasureReportIterator {
+        implements InitializingBean, MeasureReportGenerator {
     private static final Logger logger = LoggerFactory.getLogger(ObfuscateEvaluationResult.class);
 
     private final Obfuscator<Integer> obfuscator;
