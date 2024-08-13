@@ -146,19 +146,6 @@ curl \
 ```
 
 
-WARN pool-4-thread-3 - FhirWebserviceClientJersey.handleError(101) | 
-OperationOutcome: ERROR PROCESSING Value is 'http://medizininformatik-initiative.de/bpe/Process/feasibilityExecute|0.0' but must be 'http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest|0.0'
-2024-08-08T16:12:58.725422341Z
-
-WARN pool-4-thread-3 - AbstractTaskMessageSend.doExecute(212) | 
-Task http://medizininformatik-initiative.de/bpe/Process/feasibilityExecute|0.0 send failed [recipient: Test_Broker, endpoint: Test_Broker_Endpoint, businessKey: 600db7d6-ff7c-4545-b21e-2f6a371bddc1, correlationKey: e94d1925-1f22-49eb-8718-fae29a4a89cd, message: feasibilitySingleDicResultMessage, error: jakarta.ws.rs.WebApplicationException - ERROR PROCESSING Value is 'http://medizininformatik-initiative.de/bpe/Process/feasibilityExecute|0.0' but must be 'http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest|0.0']
-2024-08-08T16:12:58.730677216Z
-
-ERROR pool-4-thread-3 - AbstractTaskMessageSend.handleEndEventError(246) | 
-Process medizininformatik-initiativede_feasibilityExecute:1:10 has fatal error in step sendDicResponse:153 for task https://broker-dic-5/fhir/Task/b02bef1f-b97f-423b-8a63-b4fe46447b9c, 
-reason: jakarta.ws.rs.WebApplicationException - ERROR PROCESSING Value is 'http://medizininformatik-initiative.de/bpe/Process/feasibilityExecute|0.0' but must be 'http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest|0.0'
-
-
 [1]: <https://www.hl7.org/fhir/capabilitystatement.html>
 
 [2]: <https://curl.se>
