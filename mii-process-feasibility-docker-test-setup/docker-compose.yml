@@ -306,10 +306,6 @@ services:
     - app_client_certificate_private_key.pem.password
     volumes:
     - type: bind
-      source: ./dic-1/bpe/plugin
-      target: /opt/bpe/plugin
-      read_only: true
-    - type: bind
       source: ./dic-1/bpe/process
       target: /opt/bpe/process
       read_only: true
@@ -502,10 +498,6 @@ services:
     - app_client_certificate_private_key.pem.password
     volumes:
     - type: bind
-      source: ./dic-2/bpe/plugin
-      target: /opt/bpe/plugin
-      read_only: true
-    - type: bind
       source: ./dic-2/bpe/process
       target: /opt/bpe/process
       read_only: true
@@ -654,10 +646,6 @@ services:
       - app_dic_3_client_certificate_private_key.pem
       - app_client_certificate_private_key.pem.password
     volumes:
-      - type: bind
-        source: ./dic-3/bpe/plugin
-        target: /opt/bpe/plugin
-        read_only: true
       - type: bind
         source: ./dic-3/bpe/process
         target: /opt/bpe/process
@@ -841,10 +829,6 @@ services:
       - app_dic_4_client_certificate_private_key.pem
       - app_client_certificate_private_key.pem.password
     volumes:
-      - type: bind
-        source: ./dic-4/bpe/plugin
-        target: /opt/bpe/plugin
-        read_only: true
       - type: bind
         source: ./dic-4/bpe/process
         target: /opt/bpe/process
