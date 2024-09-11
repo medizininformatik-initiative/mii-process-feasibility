@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import java.security.KeyStore;
 import java.util.Optional;
 
 import javax.net.ssl.SSLContext;
@@ -87,7 +88,8 @@ public class StoreClientSpringConfig {
     @Bean
     @Qualifier("store-client")
     IGenericClient client(@Qualifier("store-client") FhirContext fhirContext,
-                          @Qualifier("store-client") RestfulClientFactory clientFactory) {
+                          @Qualifier("store-client") RestfulClientFactory clientFactory,
+                          @Qualifier("base-client-trust") KeyStore trustStore) {
         logger.info("Setting up store client for direct access using {}.",
                 EvaluationStrategy.CQL);
 
@@ -122,7 +124,7 @@ public class StoreClientSpringConfig {
                         Optional.ofNullable(oauthProxyPassword).map(p -> "'***'").orElse("none"));
             }
             client.registerInterceptor(new OAuthInterceptor(oauthClientId, oauthClientSecret, oauthIssuerUrl,
-                    Optional.ofNullable(oauthProxyHost), Optional.ofNullable(oauthProxyPort),
+                    trustStore, Optional.ofNullable(oauthProxyHost), Optional.ofNullable(oauthProxyPort),
                     Optional.ofNullable(oauthProxyUsername), Optional.ofNullable(oauthProxyPassword)));
         }
 

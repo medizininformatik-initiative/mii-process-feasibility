@@ -16,6 +16,7 @@ import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
+import com.nimbusds.oauth2.sdk.util.tls.TLSUtils;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import org.joda.time.DateTime;
 
@@ -24,6 +25,11 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -38,11 +44,13 @@ final class OAuthInterceptor implements IClientInterceptor {
     private Optional<String> proxyAuthHeader;
     private Issuer issuer;
     private ClientSecretBasic clientAuth;
+    private KeyStore trustStore;
 
     public OAuthInterceptor(String oauthClientId, String oauthClientSecret, String oauthIssuerUrl,
-            Optional<String> proxyHost, Optional<Integer> proxyPort, Optional<String> proxyUsername,
-            Optional<String> proxyPassword) {
+            KeyStore trustStore, Optional<String> proxyHost, Optional<Integer> proxyPort,
+            Optional<String> proxyUsername, Optional<String> proxyPassword) {
         super();
+        this.trustStore = trustStore;
         clientAuth = new ClientSecretBasic(new ClientID(oauthClientId), new Secret(oauthClientSecret));
         issuer = new Issuer(oauthIssuerUrl);
         proxy = proxyHost.map(
@@ -71,24 +79,34 @@ final class OAuthInterceptor implements IClientInterceptor {
 
                 token = successResponse.getTokens().getAccessToken();
                 tokenExpiry = DateTime.now().plus(token.getLifetime() * 1000);
-            } catch (GeneralException | IOException e) {
-                throw new OAuth2ClientException("OAuth2 access token tokenRequest failed", e);
+            } catch (Exception e) {
+                throw new OAuth2ClientException("Requesting OAuth2 access token failed: " + e.getMessage(), e);
             }
         }
         return token.getValue();
     }
 
-    private HTTPRequest getTokenRequest() throws GeneralException, IOException {
+    private HTTPRequest getTokenRequest() throws GeneralException, IOException, KeyManagementException,
+            UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException {
         if (tokenRequest == null) {
             HTTPRequest request = new TokenRequest(getTokenUri(), clientAuth, new ClientCredentialsGrant())
                     .toHTTPRequest();
-            tokenRequest = setProxy(request);
+            tokenRequest = setProxy(setSSLSocketFactory(request));
         }
         return tokenRequest;
     }
 
     private URI getTokenUri() throws GeneralException, IOException {
-        return OIDCProviderMetadata.resolve(issuer, r -> { setProxy(r); }).getTokenEndpointURI();
+        return OIDCProviderMetadata.resolve(issuer, r -> setProxy(setSSLSocketFactory(r))).getTokenEndpointURI();
+    }
+
+    private HTTPRequest setSSLSocketFactory(HTTPRequest request) {
+        try {
+            request.setSSLSocketFactory(TLSUtils.createSSLSocketFactory(trustStore));
+        } catch (KeyManagementException | UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException e) {
+            throw new IllegalArgumentException("Could not configure TLS with given trust store.", e);
+        }
+        return request;
     }
 
     private HTTPRequest setProxy(HTTPRequest request) {
