@@ -6,7 +6,10 @@ import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
 import ca.uhn.fhir.rest.client.impl.RestfulClientFactory;
 import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
+import de.medizininformatik_initiative.process.feasibility.EvaluationStrategy;
 import de.medizininformatik_initiative.process.feasibility.spring.config.BaseConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,10 +22,13 @@ import javax.net.ssl.SSLContext;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CLIENT_TIMEOUT_DEFAULT;
+import static java.util.Objects.nonNull;
 
 @Configuration
 @Import(BaseConfig.class)
 public class StoreClientSpringConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(StoreClientSpringConfig.class);
 
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.host:#{null}}")
     private String proxyHost;
@@ -64,7 +70,7 @@ public class StoreClientSpringConfig {
     private String oauthClientId;
 
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.issuer.url:#{null}}")
-    private String oauthTokenUrl;
+    private String oauthIssuerUrl;
 
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.oauth.proxy.host:#{null}}")
     private String oauthProxyHost;
@@ -82,30 +88,47 @@ public class StoreClientSpringConfig {
     @Qualifier("store-client")
     IGenericClient client(@Qualifier("store-client") FhirContext fhirContext,
                           @Qualifier("store-client") RestfulClientFactory clientFactory) {
+        logger.info("Setting up store client for direct access using {}.",
+                EvaluationStrategy.CQL);
+
         clientFactory.setServerValidationMode(ServerValidationModeEnum.NEVER);
         clientFactory.setConnectTimeout(connectTimeout);
         clientFactory.setConnectionRequestTimeout(connectRequestTimeout);
         clientFactory.setSocketTimeout(socketTimeout);
 
         if (proxyHost != null) {
+            logger.info("Setting proxy (host: '{}', port: '{}') for store client.", proxyHost, proxyPort);
             clientFactory.setProxy(proxyHost, proxyPort);
 
             if (proxyUsername != null || proxyPassword != null) {
+                logger.info("Setting proxy credentials (username: '{}', password: '***') for store client.",
+                        proxyUsername);
                 clientFactory.setProxyCredentials(proxyUsername, proxyPassword);
             }
         }
         fhirContext.setRestfulClientFactory(clientFactory);
         var client = fhirContext.newRestfulGenericClient(storeBaseUrl);
         if (bearerAuthToken != null) {
+            logger.info("Setting bearer token '***' for store client.");
             client.registerInterceptor(new BearerTokenAuthInterceptor(bearerAuthToken));
         } else if (!isNullOrEmpty(oauthClientId) && !isNullOrEmpty(oauthClientSecret)
-                && !isNullOrEmpty(oauthTokenUrl)) {
-            client.registerInterceptor(new OAuthInterceptor(oauthClientId, oauthClientSecret, oauthTokenUrl,
+                && !isNullOrEmpty(oauthIssuerUrl)) {
+            logger.info("Setting OAuth2.0 authentication (issuer url: '{}', client id: '{}', password: '***')"
+                    + " for store client.", oauthIssuerUrl, oauthClientId);
+            if (nonNull(oauthProxyHost) && nonNull(oauthProxyPort)) {
+                logger.info("Setting proxy (host: '{}', port: '{}', username: {},"
+                        + " password {}) for OAuth2.0 authentication.", oauthProxyHost, oauthProxyPassword,
+                        Optional.ofNullable(oauthProxyUsername).map(u -> "'" + u + "'").orElse("none"),
+                        Optional.ofNullable(oauthProxyPassword).map(p -> "'***'").orElse("none"));
+            }
+            client.registerInterceptor(new OAuthInterceptor(oauthClientId, oauthClientSecret, oauthIssuerUrl,
                     Optional.ofNullable(oauthProxyHost), Optional.ofNullable(oauthProxyPort),
                     Optional.ofNullable(oauthProxyUsername), Optional.ofNullable(oauthProxyPassword)));
         }
 
         if (basicAuthUsername != null || basicAuthPassword != null) {
+            logger.info("Setting basic authentication (username: '{}', password: '***') for store client.",
+                    basicAuthUsername);
             client.registerInterceptor(new BasicAuthInterceptor(basicAuthUsername, basicAuthPassword));
         }
 
