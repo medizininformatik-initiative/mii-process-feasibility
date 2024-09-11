@@ -53,7 +53,7 @@ public class StoreClientIT {
     private static final Network DEFAULT_CONTAINER_NETWORK = Network.newNetwork();
 
     @Container
-    public GenericContainer<?> fhirServer = new GenericContainer<>(DockerImageName.parse("samply/blaze:0.27"))
+    public GenericContainer<?> fhirServer = new GenericContainer<>(DockerImageName.parse("samply/blaze:0.30"))
             .withExposedPorts(8080)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("fhir-server")
@@ -201,7 +201,7 @@ public class StoreClientIT {
         var serverCertChain = getResource("../certs/server_cert_chain.pem");
         var serverCertKey = getResource("../certs/server_cert_key.pem");
 
-        NginxContainer<?> nginx = new NginxContainer<>("nginx:1.25.1")
+        NginxContainer<?> nginx = new NginxContainer<>("nginx:1.27.1")
                 .withExposedPorts(80)
                 .withFileSystemBind(nginxConf.getPath(), "/etc/nginx/nginx.conf", READ_ONLY)
                 .withFileSystemBind(staticFhirMetadata.getPath(), "/static/fhir_metadata.json", READ_ONLY)
@@ -249,7 +249,7 @@ public class StoreClientIT {
         var indexFile = getResource("index.html");
         var passwordFile = getResource(".htpasswd");
 
-        NginxContainer<?> nginx = new NginxContainer<>("nginx:1.25.1")
+        NginxContainer<?> nginx = new NginxContainer<>("nginx:1.27.1")
                 .withExposedPorts(80)
                 .withFileSystemBind(nginxConf.getPath(), "/etc/nginx/nginx.conf", READ_ONLY)
                 .withFileSystemBind(staticFhirMetadata.getPath(), "/static/fhir_metadata.json", READ_ONLY)
@@ -282,7 +282,7 @@ public class StoreClientIT {
         var nginxConf = this.getClass().getResource("nginx.conf");
         var forwardProxyConfigTemplate = getResource("forward_proxy.conf.template");
 
-        NginxContainer<?> nginx = new NginxContainer<>("nginx:1.25.1")
+        NginxContainer<?> nginx = new NginxContainer<>("nginx:1.27.1")
                 .withExposedPorts(80)
                 .withFileSystemBind(nginxConf.getPath(), "/etc/nginx/nginx.conf", READ_ONLY)
                 .withFileSystemBind(forwardProxyConfigTemplate.getPath(), "/etc/nginx/templates/default.conf.template", READ_ONLY)

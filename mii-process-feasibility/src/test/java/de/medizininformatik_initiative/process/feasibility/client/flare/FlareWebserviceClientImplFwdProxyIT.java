@@ -30,7 +30,7 @@ public class FlareWebserviceClientImplFwdProxyIT extends FlareWebserviceClientIm
 
     @Container
     public static GenericContainer<?> forwardProxy = new GenericContainer<>(
-            DockerImageName.parse("ubuntu/squid:6.1-23.10_edge"))
+            DockerImageName.parse("ubuntu/squid:6.6-24.04_edge"))
                     .withExposedPorts(8080)
                     .withFileSystemBind(squidProxyConf.getPath(), "/etc/squid/squid.conf", READ_ONLY)
                     .withNetwork(DEFAULT_CONTAINER_NETWORK)

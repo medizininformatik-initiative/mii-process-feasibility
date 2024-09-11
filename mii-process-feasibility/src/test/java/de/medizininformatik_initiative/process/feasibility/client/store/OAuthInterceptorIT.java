@@ -59,7 +59,7 @@ public class OAuthInterceptorIT {
 
     @Container
     public static GenericContainer<?> forwardProxyNoAuth = new GenericContainer<>(
-            DockerImageName.parse("ubuntu/squid:6.1-23.10_edge"))
+            DockerImageName.parse("ubuntu/squid:6.6-24.04_edge"))
                     .withNetwork(DEFAULT_CONTAINER_NETWORK)
                     .withExposedPorts(8080)
                     .withFileSystemBind(getResource("keycloak_forward_proxy.conf").getPath(), "/etc/squid/squid.conf",
@@ -67,7 +67,7 @@ public class OAuthInterceptorIT {
 
     @Container
     public static GenericContainer<?> forwardProxyBasicAuth = new GenericContainer<>(
-            DockerImageName.parse("ubuntu/squid:6.1-23.10_edge"))
+            DockerImageName.parse("ubuntu/squid:6.6-24.04_edge"))
                     .withNetwork(DEFAULT_CONTAINER_NETWORK)
                     .withExposedPorts(8080)
                     .withFileSystemBind(getResource("keycloak_forward_proxy_basic_auth.conf").getPath(),

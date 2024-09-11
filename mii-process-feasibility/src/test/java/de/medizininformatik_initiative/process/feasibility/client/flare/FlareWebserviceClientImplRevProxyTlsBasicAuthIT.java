@@ -38,7 +38,7 @@ public class FlareWebserviceClientImplRevProxyTlsBasicAuthIT extends FlareWebser
 
     @Container
     public static GenericContainer<?> proxy = new GenericContainer<>(
-            DockerImageName.parse("nginx:1.25.1"))
+            DockerImageName.parse("nginx:1.27.1"))
                     .withExposedPorts(8443)
                     .withFileSystemBind(nginxConf.getPath(), "/etc/nginx/nginx.conf", READ_ONLY)
                     .withFileSystemBind(indexFile.getPath(), "/usr/share/nginx/html/index.html", READ_ONLY)
