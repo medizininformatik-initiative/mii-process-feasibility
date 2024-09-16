@@ -3,8 +3,8 @@ set -e
 
 BASE_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-mvn -f ../mii-process-feasibility/pom.xml clean package
-mvn -f ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/pom.xml clean package
+mvn -f "${BASE_DIR}/../mii-process-feasibility/pom.xml" clean package
+mvn -f "${BASE_DIR}/../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/pom.xml" clean package
 
 # Create a self signed CA
 openssl req -x509 -sha256 -days 365 -nodes -newkey rsa:2048 -keyout ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca_key.pem \
@@ -29,12 +29,15 @@ keytool -importcert -file ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.p
 # Issue certificate using said self signed CA
 openssl req -nodes -sha256 -new -newkey rsa:2048 -keyout ${BASE_DIR}/secrets/dic_3_store_proxy_cert_key.pem \
   -out ${BASE_DIR}/secrets/dic_3_store_proxy_cert_csr.pem \
-  -subj "/C=DE/ST=Berlin/L=Berlin/O=Bar/CN=dic-3-store-proxy"
+  -subj "/C=DE/ST=Berlin/L=Berlin/O=Bar/CN=dic-3-store-proxy" \
+  -addext "basicConstraints=CA:false" \
+  -addext "subjectAltName = DNS:dic-3-store-proxy, DNS:dic-3-keycloak-proxy"
 
 openssl x509 -req -days 365 -sha256 -in ${BASE_DIR}/secrets/dic_3_store_proxy_cert_csr.pem \
   -CA ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.pem \
   -CAkey ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca_key.pem \
   -CAcreateserial \
+  -copy_extensions=copyall \
   -out ${BASE_DIR}/secrets/dic_3_store_proxy_cert.pem
 
 rm -f ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.srl

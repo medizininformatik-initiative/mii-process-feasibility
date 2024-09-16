@@ -1,9 +1,8 @@
-version: '3.8'
 services:
 
   # ---- Static cURL binary for health check in HAPI container
   hapi-curl-download:
-    image: alpine:3.18
+    image: alpine:3.20
     command: >
       sh -c "wget https://github.com/moparisthebest/static-curl/releases/download/v8.1.2/curl-amd64 -O /opt/bin/curl &&
              chmod +x /opt/bin/curl"
@@ -38,15 +37,10 @@ services:
       read_only: true
     networks:
       zars-fhir-frontend:
-        ipv4_address: 172.10.0.66
       dic-1-fhir-frontend:
-        ipv4_address: 172.10.0.82
       dic-2-fhir-frontend:
-        ipv4_address: 172.10.0.98
       dic-3-fhir-frontend:
-        ipv4_address: 172.10.0.114
       dic-4-fhir-frontend:
-        ipv4_address: 172.10.0.130
       internet:
         aliases:
         - zars
@@ -94,7 +88,7 @@ services:
 
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.3.1
+    image: ghcr.io/datasharingframework/fhir:1.5.2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -151,7 +145,6 @@ services:
               - http://dsf.dev/fhir/CodeSystem/practitioner-role|DSF_ADMIN
     networks:
       zars-fhir-frontend:
-        ipv4_address: 172.10.0.69
       zars-fhir-backend:
       internet:
     depends_on:
@@ -163,7 +156,7 @@ services:
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.3.1
+    image: ghcr.io/datasharingframework/bpe:1.5.2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -209,6 +202,7 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: zars_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: zars_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://zars/fhir
+      DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityExecute|0.0
     networks:
       zars-bpe-frontend:
       zars-bpe-backend:
@@ -223,7 +217,7 @@ services:
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.3.1
+    image: ghcr.io/datasharingframework/fhir:1.5.2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -277,7 +271,6 @@ services:
               - PERMANENT_DELETE
     networks:
       dic-1-fhir-frontend:
-        ipv4_address: 172.10.0.83
       dic-1-fhir-backend:
       internet:
     depends_on:
@@ -289,7 +282,7 @@ services:
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.3.1
+    image: ghcr.io/datasharingframework/bpe:1.5.2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -305,10 +298,6 @@ services:
     - app_dic_1_client_certificate_private_key.pem
     - app_client_certificate_private_key.pem.password
     volumes:
-    - type: bind
-      source: ./dic-1/bpe/plugin
-      target: /opt/bpe/plugin
-      read_only: true
     - type: bind
       source: ./dic-1/bpe/process
       target: /opt/bpe/process
@@ -335,6 +324,7 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_1_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_1_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-1/fhir
+      DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityRequest|0.0
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_BASE_URL: http://dic-1-store:8080/
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_TIMEOUT_CONNECT: 2000
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: structured-query
@@ -419,7 +409,7 @@ services:
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.3.1
+    image: ghcr.io/datasharingframework/fhir:1.5.2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -473,7 +463,6 @@ services:
               - PERMANENT_DELETE
     networks:
       dic-2-fhir-frontend:
-        ipv4_address: 172.10.0.99
       dic-2-fhir-backend:
       internet:
     depends_on:
@@ -485,7 +474,7 @@ services:
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.3.1
+    image: ghcr.io/datasharingframework/bpe:1.5.2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -501,10 +490,6 @@ services:
     - app_dic_2_client_certificate_private_key.pem
     - app_client_certificate_private_key.pem.password
     volumes:
-    - type: bind
-      source: ./dic-2/bpe/plugin
-      target: /opt/bpe/plugin
-      read_only: true
     - type: bind
       source: ./dic-2/bpe/process
       target: /opt/bpe/process
@@ -531,6 +516,7 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_2_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_2_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-2/fhir
+      DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityRequest|0.0
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-2-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "true"
@@ -574,7 +560,7 @@ services:
 
   # ---- DIC-3 - FHIR ---------------------------------------------------------
   dic-3-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.3.1
+    image: ghcr.io/datasharingframework/fhir:1.5.2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -628,7 +614,6 @@ services:
               - PERMANENT_DELETE
     networks:
       dic-3-fhir-frontend:
-        ipv4_address: 172.10.0.115
       dic-3-fhir-backend:
       internet:
     depends_on:
@@ -637,7 +622,7 @@ services:
 
   # ---- DIC-3 - BPE ----------------------------------------------------------
   dic-3-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.3.1
+    image: ghcr.io/datasharingframework/bpe:1.5.2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -655,10 +640,6 @@ services:
       - app_client_certificate_private_key.pem.password
     volumes:
       - type: bind
-        source: ./dic-3/bpe/plugin
-        target: /opt/bpe/plugin
-        read_only: true
-      - type: bind
         source: ./dic-3/bpe/process
         target: /opt/bpe/process
         read_only: true
@@ -668,7 +649,10 @@ services:
       - type: bind
         source: ./dic-3/bpe/cache
         target: /opt/bpe/cache
+    ports:
+    - 5005:5005
     environment:
+      EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       TZ: Europe/Berlin
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
@@ -684,10 +668,12 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_3_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_3_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-3/fhir
+      DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityRequest|0.0
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_TRUST_STORE_PATH: /run/secrets/dic_3_store_proxy_self_signed_ca.p12
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_TRUST_STORE_PASSWORD: "testpw"
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_AUTH_BASIC_USERNAME: test
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_AUTH_BASIC_PASSWORD: PF4Q4pEpXFkYToPSDre5tFr9P9MkqeDc
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_AUTH_OAUTH_ISSUER_URL: "https://dic-3-keycloak-proxy/realms/test"
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_AUTH_OAUTH_CLIENT_ID: "account"
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_AUTH_OAUTH_CLIENT_PASSWORD: "test"
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: https://dic-3-store-proxy/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
@@ -702,12 +688,35 @@ services:
       dic-3-fhir-app:
         condition: service_healthy
         restart: true
-      dedicated-dic-3-store-proxy:
+      dic-3-store-proxy:
+        condition: service_healthy
+      dic-3-keycloak:
         condition: service_healthy
 
   # ---- DIC-3 - DEDICATED PROXY WITH SELF SIGNED CERT ------------------------
-  dedicated-dic-3-store-proxy:
-    image: nginx:1.25.1
+  dic-3-keycloak:
+    image: "keycloak/keycloak:25.0.1"
+    command: ["start", "--import-realm"]
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e \"GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3"]
+      interval: "5s"
+      timeout: "5s"
+      retries: 3
+      start_period: "30s"
+    networks:
+      dic-3-keycloak:
+    environment:
+      KC_HOSTNAME: "https://dic-3-keycloak-proxy"
+      KC_HOSTNAME_ADMIN: "https://dic-3-keycloak-proxy"
+      KC_HTTP_RELATIVE_PATH: "/"
+      KC_PROXY_HEADERS: "xforwarded"
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+      KC_LOG_LEVEL: "info"
+    volumes:
+    - "./dic-3/keycloak/realm-test.json:/opt/keycloak/data/import/realm-test.json"
+  dic-3-store-proxy:
+    image: nginx:1.27.1
     restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "curl -ks https://localhost || exit 1"]
@@ -722,16 +731,17 @@ services:
     - dic_3_store_proxy.htpasswd
     volumes:
     - type: bind
-      source: ./dic-3-store-proxy/nginx.conf
+      source: ./dic-3/proxy/nginx.conf
       target: /etc/nginx/nginx.conf
       read_only: true
     networks:
       dic-3-fhir-frontend:
-        ipv4_address: 172.10.0.116
       dic-3-bpe-backend:
+      dic-3-keycloak:
       internet:
         aliases:
         - dic-3-store-proxy
+        - dic-3-keycloak-proxy
     environment:
       TZ: Europe/Berlin
     depends_on:
@@ -739,22 +749,27 @@ services:
 
   # ---- DIC-3 - FHIR Data Store ----------------------------------------------
   dic-3-store:
-    image: samply/blaze:0.24
+    image: samply/blaze:0.30.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/health" ]
       interval: 10s
       timeout: 15s
       retries: 5
+    secrets:
+    - dic_3_store_proxy_self_signed_ca.p12
     ports:
     - "8072:8080"
     environment:
-      BASE_URL: http://localhost:8072
+      BASE_URL: https://dic-3-store-proxy
       LOG_LEVEL: debug
+      OPENID_PROVIDER_URL: "https://dic-3-keycloak-proxy/realms/test"
+      OPENID_CLIENT_TRUST_STORE: "/run/secrets/dic_3_store_proxy_self_signed_ca.p12"
+      OPENID_CLIENT_TRUST_STORE_PASS: "testpw"
     networks:
       dic-3-fhir-frontend:
-        ipv4_address: 172.10.0.117
       dic-3-bpe-backend:
+      internet:
     volumes:
     - type: volume
       source: dic-3-store-data
@@ -762,7 +777,7 @@ services:
 
   # ---- DIC-4 - FHIR ---------------------------------------------------------
   dic-4-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.3.1
+    image: ghcr.io/datasharingframework/fhir:1.5.2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -816,7 +831,6 @@ services:
               - PERMANENT_DELETE
     networks:
       dic-4-fhir-frontend:
-        ipv4_address: 172.10.0.131
       dic-4-fhir-backend:
       internet:
     depends_on:
@@ -825,7 +839,7 @@ services:
 
   # ---- DIC-4 - BPE ----------------------------------------------------------
   dic-4-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.3.1
+    image: ghcr.io/datasharingframework/bpe:1.5.2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -841,10 +855,6 @@ services:
       - app_dic_4_client_certificate_private_key.pem
       - app_client_certificate_private_key.pem.password
     volumes:
-      - type: bind
-        source: ./dic-4/bpe/plugin
-        target: /opt/bpe/plugin
-        read_only: true
       - type: bind
         source: ./dic-4/bpe/process
         target: /opt/bpe/process
@@ -871,6 +881,7 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_4_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_4_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-4/fhir
+      DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityRequest|0.0
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-4-store:8080/fhir
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
@@ -1045,67 +1056,148 @@ secrets:
 
 networks:
   internet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.0/26
   zars-fhir-frontend:
     driver: bridge
     ipam:
       driver: default
       config:
-      - subnet: 172.10.0.64/28
+      - subnet: 172.10.0.64/29
   zars-fhir-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.72/29
   zars-bpe-frontend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.80/29
   zars-bpe-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.88/29
   dic-1-fhir-frontend:
     driver: bridge
     ipam:
       driver: default
       config:
-      - subnet: 172.10.0.80/28
+      - subnet: 172.10.0.96/29
   dic-1-fhir-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.104/29
   dic-1-bpe-frontend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.112/29
   dic-1-bpe-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.120/29
   dic-2-fhir-frontend:
     driver: bridge
     ipam:
       driver: default
       config:
-      - subnet: 172.10.0.96/28
+      - subnet: 172.10.0.128/29
   dic-2-fhir-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.136/29
   dic-2-bpe-frontend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.144/29
   dic-2-bpe-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.152/29
   dic-3-fhir-frontend:
     driver: bridge
     ipam:
       driver: default
       config:
-      - subnet: 172.10.0.112/28
+      - subnet: 172.10.0.160/29
   dic-3-fhir-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.168/29
   dic-3-bpe-frontend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.176/29
   dic-3-bpe-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.184/29
+  dic-3-keycloak:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.192/29
   dic-4-fhir-frontend:
     driver: bridge
     ipam:
       driver: default
       config:
-      - subnet: 172.10.0.128/28
+      - subnet: 172.10.0.200/29
   dic-4-fhir-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.208/29
   dic-4-bpe-frontend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.216/29
   dic-4-bpe-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.224/29
 
 volumes:
   hapi-curl-binary:
-    name: "hapi-curl-binary"
 
   dic-1-store-data:
-    name: "dic-1-store-data"
 
   dic-2-store-data:
-    name: "dic-2-store-data"
 
   dic-3-store-data:
-    name: "dic-3-store-data"
 
   dic-4-store-data:
-    name: "dic-4-store-data"
 
   db-data:
     name: "db-data-mii-dsf-process-feasibility"
