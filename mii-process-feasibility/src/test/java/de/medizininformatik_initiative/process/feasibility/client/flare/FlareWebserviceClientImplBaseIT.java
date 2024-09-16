@@ -12,13 +12,13 @@ public abstract class FlareWebserviceClientImplBaseIT {
 
     protected static final Network DEFAULT_CONTAINER_NETWORK = Network.newNetwork();
 
-    public static GenericContainer<?> fhirServer = new GenericContainer<>(DockerImageName.parse("samply/blaze:0.24"))
+    public static GenericContainer<?> fhirServer = new GenericContainer<>(DockerImageName.parse("samply/blaze:0.30"))
             .withExposedPorts(8080)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("fhir-server")
             .withEnv("LOG_LEVEL", "debug");
 
-    public static GenericContainer<?> flare = new GenericContainer<>(DockerImageName.parse("ghcr.io/medizininformatik-initiative/flare:2.1.0"))
+    public static GenericContainer<?> flare = new GenericContainer<>(DockerImageName.parse("ghcr.io/medizininformatik-initiative/flare:2.3.0"))
             .withExposedPorts(8080)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("flare")

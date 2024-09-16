@@ -86,7 +86,7 @@ public class FeasibilityProcessPluginDeploymentStateListenerTest {
             listener.onProcessesDeployed(List.of(FEASIBILITY_EXECUTE_PROCESS_ID));
 
             verify(flareClient).testConnection();
-            assertThat(out.toString(), containsString("Connection test OK (flare)"));
+            assertThat(out.toString(), containsString("Feasibility plugin connection test to flare SUCCEEDED."));
     }
 
     @Test
@@ -107,7 +107,8 @@ public class FeasibilityProcessPluginDeploymentStateListenerTest {
 
             listener.onProcessesDeployed(List.of(FEASIBILITY_EXECUTE_PROCESS_ID));
             assertThat(out.toString(),
-                    containsString(format("Connection test OK (%s - %s)", softwareName, softwareVersion)));
+                    containsString(format("Feasibility plugin connection test to FHIR store (%s - %s) SUCCEEDED.",
+                            softwareName, softwareVersion)));
     }
 
     @Test
@@ -121,7 +122,8 @@ public class FeasibilityProcessPluginDeploymentStateListenerTest {
 
         listener.onProcessesDeployed(List.of(FEASIBILITY_EXECUTE_PROCESS_ID));
 
-        assertThat(out.toString(), containsString(format("Connection test FAILED (flare) - error: %s - %s",
+        assertThat(out.toString(),
+                containsString(format("Feasibility plugin connection test to flare FAILED. Error: %s - %s",
                 exception.getClass().getName(), errorMessage)));
     }
 
@@ -139,8 +141,8 @@ public class FeasibilityProcessPluginDeploymentStateListenerTest {
 
         listener.onProcessesDeployed(List.of(FEASIBILITY_EXECUTE_PROCESS_ID));
         assertThat(out.toString(),
-                containsString(format("Connection test FAILED - error: %s - %s", exception.getClass().getName(),
-                        errorMessage)));
+                containsString(format("Feasibility plugin connection test to FHIR store FAILED. Error: %s - %s",
+                        exception.getClass().getName(), errorMessage)));
 
     }
 }

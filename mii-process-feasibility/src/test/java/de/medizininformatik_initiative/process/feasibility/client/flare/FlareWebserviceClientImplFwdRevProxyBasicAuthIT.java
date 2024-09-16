@@ -35,7 +35,7 @@ public class FlareWebserviceClientImplFwdRevProxyBasicAuthIT extends FlareWebser
 
     @Container
     public static GenericContainer<?> proxy = new GenericContainer<>(
-            DockerImageName.parse("nginx:1.25.1"))
+            DockerImageName.parse("nginx:1.27.1"))
                     .withExposedPorts(8080)
                     .withFileSystemBind(nginxConf.getPath(), "/etc/nginx/nginx.conf", READ_ONLY)
                     .withFileSystemBind(indexFile.getPath(), "/usr/share/nginx/html/index.html", READ_ONLY)
@@ -48,7 +48,7 @@ public class FlareWebserviceClientImplFwdRevProxyBasicAuthIT extends FlareWebser
                     .dependsOn(flare);
     @Container
     public static GenericContainer<?> forwardProxy = new GenericContainer<>(
-            DockerImageName.parse("ubuntu/squid:6.1-23.10_edge"))
+            DockerImageName.parse("ubuntu/squid:6.6-24.04_edge"))
                     .withExposedPorts(8080)
                     .withFileSystemBind(squidProxyConf.getPath(), "/etc/squid/squid.conf", READ_ONLY)
                     .withFileSystemBind(forwardProxyPasswordFile.getPath(), "/etc/squid/passwd", READ_ONLY)

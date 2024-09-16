@@ -44,7 +44,7 @@ public class FlareWebserviceClientImplTimeoutsIT extends FlareWebserviceClientIm
     @Autowired protected FlareWebserviceClient flareClient;
 
     @Container
-    public static ToxiproxyContainer toxiproxy = new ToxiproxyContainer("ghcr.io/shopify/toxiproxy:2.7.0")
+    public static ToxiproxyContainer toxiproxy = new ToxiproxyContainer("ghcr.io/shopify/toxiproxy:2.9.0")
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .dependsOn(flare);
     private static ToxiproxyClient toxiproxyClient;
