@@ -16,7 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <compileSource>17</compileSource>
         <compileTarget>17</compileTarget>
-        <dsf.version>1.5.1</dsf.version>
+        <dsf.version>1.6.0</dsf.version>
         <hapi.fhir.version>5.1.0</hapi.fhir.version>
         <testcontainers.version>1.19.8</testcontainers.version>
     </properties>
