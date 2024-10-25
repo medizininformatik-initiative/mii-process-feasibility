@@ -55,7 +55,7 @@ services:
     image: postgres:15-alpine
     restart: on-failure
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+      test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -88,7 +88,7 @@ services:
 
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.5.2
+    image: ghcr.io/datasharingframework/fhir:1.6.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -156,7 +156,7 @@ services:
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.5.2
+    image: ghcr.io/datasharingframework/bpe:1.6.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -217,7 +217,7 @@ services:
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.5.2
+    image: ghcr.io/datasharingframework/fhir:1.6.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -282,7 +282,7 @@ services:
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.5.2
+    image: ghcr.io/datasharingframework/bpe:1.6.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -409,7 +409,7 @@ services:
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.5.2
+    image: ghcr.io/datasharingframework/fhir:1.6.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -474,7 +474,7 @@ services:
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.5.2
+    image: ghcr.io/datasharingframework/bpe:1.6.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -560,7 +560,7 @@ services:
 
   # ---- DIC-3 - FHIR ---------------------------------------------------------
   dic-3-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.5.2
+    image: ghcr.io/datasharingframework/fhir:1.6.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -622,7 +622,7 @@ services:
 
   # ---- DIC-3 - BPE ----------------------------------------------------------
   dic-3-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.5.2
+    image: ghcr.io/datasharingframework/bpe:1.6.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -777,7 +777,7 @@ services:
 
   # ---- DIC-4 - FHIR ---------------------------------------------------------
   dic-4-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.5.2
+    image: ghcr.io/datasharingframework/fhir:1.6.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -839,7 +839,7 @@ services:
 
   # ---- DIC-4 - BPE ----------------------------------------------------------
   dic-4-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.5.2
+    image: ghcr.io/datasharingframework/bpe:1.6.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
