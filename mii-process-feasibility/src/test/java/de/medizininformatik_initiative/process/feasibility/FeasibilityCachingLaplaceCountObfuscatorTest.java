@@ -11,10 +11,7 @@ import java.security.SecureRandom;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FeasibilityCachingLaplaceCountObfuscatorTest {
 
@@ -43,20 +40,24 @@ public class FeasibilityCachingLaplaceCountObfuscatorTest {
         var result = rand.nextInt(0, Integer.MAX_VALUE);
         var obfuscatedResult = obfuscator.obfuscate(result);
 
-        assertTrue(obfuscatedResult % 10 == 0, "obfuscated result is not rounded to tens");
-        assertTrue(Math.abs(result - obfuscatedResult) <= 10, "obfuscated result is not rounded to nearest tens");
+        assertThat(obfuscatedResult % 10).as("obfuscated result is not rounded to tens").isEqualTo(0);
+        assertThat(Math.abs(result - obfuscatedResult)).as("obfuscated result is not rounded to nearest tens")
+                .isLessThanOrEqualTo(10);
     }
 
     @RepeatedTest(100)
     @DisplayName("for the same result value the obfuscater always returns the same obfuscated result")
     public void obfuscatedResultStaysSameForSameInputValue() {
-        assertEquals(obfuscator.obfuscate(RESULT), obfuscator.obfuscate(RESULT));
+        Integer resultA = obfuscator.obfuscate(RESULT);
+        Integer resultB = obfuscator.obfuscate(RESULT);
+
+        assertThat(resultA).isEqualTo(resultB);
     }
 
     @ParameterizedTest
     @MethodSource("resultRange")
     @DisplayName("the obfuscated result is always >= 0 for any given result")
     public void nonNegativeObfuscatedResult(Integer result) {
-        assertThat(obfuscator.obfuscate(result), greaterThanOrEqualTo(0));
+        assertThat(obfuscator.obfuscate(result)).isGreaterThanOrEqualTo(0);
     }
 }
