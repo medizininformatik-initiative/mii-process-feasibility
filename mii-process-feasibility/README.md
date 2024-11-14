@@ -1,4 +1,4 @@
-# Feasibility DSF Process
+# Feasibility DSF Process/
 
 For information about the process flow, deployment and configuration see the [wiki][1].
 
