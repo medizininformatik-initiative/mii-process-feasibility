@@ -16,12 +16,12 @@ import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.StringType;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -32,16 +32,17 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.net.ssl.SSLContext;
@@ -65,6 +66,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Testcontainers
 public class StoreClientIT {
 
+    protected static final String STORE_ID = "foo";
     private static final Network DEFAULT_CONTAINER_NETWORK = Network.newNetwork();
 
     private static GenericContainer<?> fhirServer = new GenericContainer<>(
@@ -83,6 +85,10 @@ public class StoreClientIT {
     @AfterAll
     static void shutdown() {
         fhirServer.stop();
+    }
+
+    protected static URL getResource(final String name) {
+        return StoreClientIT.class.getResource(name);
     }
 
     private static MockWebServer createProxyServer(Dispatcher dispatcher) {
@@ -114,18 +120,22 @@ public class StoreClientIT {
     @DisplayName("No Proxy")
     class NoProxy {
 
-        @Autowired @Qualifier("store-client") protected IGenericClient storeClient;
+        @Autowired protected Map<String, IGenericClient> storeClients;
+
+        private static URL feasibilityConfig = getResource("nonProxy.yml");
 
         @DynamicPropertySource
         static void dynamicProperties(DynamicPropertyRegistry registry) {
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.base_url",
-                    () -> "http://%s:%s/fhir/".formatted(fhirServer.getHost(), fhirServer.getFirstMappedPort()));
+            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.configuration.file",
+                    () -> feasibilityConfig.getPath());
+            registry.add("STORE_ID", () -> STORE_ID);
+            registry.add("BASE_URL", () -> getTestFhirServerUrl().toString());
         }
 
         @Test
         @DisplayName("direct access without forwardProxy succeeds")
         void noProxy() throws InterruptedException {
-            var capabilities = storeClient.capabilities().ofType(CapabilityStatement.class).execute();
+            var capabilities = storeClients.get(STORE_ID).capabilities().ofType(CapabilityStatement.class).execute();
 
             assertThat(capabilities.getSoftware().getName()).containsIgnoringCase("blaze");
         }
@@ -146,17 +156,32 @@ public class StoreClientIT {
             proxy.close();
         }
 
-        @Autowired @Qualifier("store-client") protected IGenericClient storeClient;
+        @Autowired protected Map<String, IGenericClient> storeClients;
         static final String BEARER_TOKEN = "not-a-bearer-token-but-sufficient-for-test";
 
         @DynamicPropertySource
         static void dynamicProperties(DynamicPropertyRegistry registry) {
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.username",
-                    () -> BASIC_AUTH_USERNAME);
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.password",
-                    () -> BASIC_AUTH_PASSWORD);
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.base_url",
-                    () -> "http://%s:%s/fhir/".formatted(proxy.getHostName(), proxy.getPort()));
+            var config = """
+                    stores:
+                      ${STORE_ID}:
+                        baseUrl: ${BASE_URL_${STORE_ID}}
+                        evaluationStrategy: cql
+                        basicAuth:
+                          username: ${BASIC_AUTH_USERNAME}
+                          password: ${BASIC_AUTH_PASSWORD}
+
+                    networks:
+                      medizininformatik-initiative.de:
+                        obfuscate: true
+                        stores:
+                        - ${STORE_ID}
+                    """;
+
+            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.configuration", () -> config);
+            registry.add("STORE_ID", () -> STORE_ID);
+            registry.add("BASIC_AUTH_USERNAME", () -> BASIC_AUTH_USERNAME);
+            registry.add("BASIC_AUTH_PASSWORD", () -> BASIC_AUTH_PASSWORD);
+            registry.add("BASE_URL_foo", () -> "http://%s:%s/fhir/".formatted(proxy.getHostName(), proxy.getPort()));
         }
 
         @Test
@@ -165,7 +190,7 @@ public class StoreClientIT {
             var basicAuthEncoded = "Basic %s".formatted(Base64.getEncoder()
                     .encodeToString("%s:%s".formatted(BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD).getBytes()));
 
-            var capabilities = storeClient.capabilities().ofType(CapabilityStatement.class).execute();
+            var capabilities = storeClients.get(STORE_ID).capabilities().ofType(CapabilityStatement.class).execute();
             var recordedRequest = proxy.takeRequest();
             assertThat(capabilities.getSoftware().getName()).containsIgnoringCase("blaze");
             assertThat(recordedRequest.getHeader(AUTHORIZATION)).isEqualTo(basicAuthEncoded);
@@ -184,21 +209,37 @@ public class StoreClientIT {
             proxy.close();
         }
 
-        @Autowired @Qualifier("store-client") protected IGenericClient storeClient;
+        @Autowired protected Map<String, IGenericClient> storeClients;
         static final String BEARER_TOKEN = "not-a-bearer-token-but-sufficient-for-test";
 
         @DynamicPropertySource
         static void dynamicProperties(DynamicPropertyRegistry registry) {
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.bearer.token",
-                    () -> BEARER_TOKEN);
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.base_url",
+            var config = """
+                    stores:
+                      ${STORE_ID}:
+                        baseUrl: ${BASE_URL}
+                        evaluationStrategy: cql
+                        bearerAuth:
+                          token: "${BEARER_TOKEN}"
+
+                    networks:
+                      medizininformatik-initiative.de:
+                        obfuscate: true
+                        stores:
+                        - ${STORE_ID}
+                    """;
+
+            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.configuration", () -> config);
+            registry.add("STORE_ID", () -> STORE_ID);
+            registry.add("BASE_URL",
                     () -> "http://%s:%s/fhir/".formatted(proxy.getHostName(), proxy.getPort()));
+            registry.add("BEARER_TOKEN", () -> BEARER_TOKEN);
         }
 
         @Test
         @DisplayName("configured bearer token is set in request header")
         void bearerToken() throws InterruptedException {
-            var capabilities = storeClient.capabilities().ofType(CapabilityStatement.class).execute();
+            var capabilities = storeClients.get(STORE_ID).capabilities().ofType(CapabilityStatement.class).execute();
             var recordedRequest = proxy.takeRequest();
 
             assertThat(capabilities.getSoftware().getName()).containsIgnoringCase("blaze");
@@ -210,10 +251,9 @@ public class StoreClientIT {
     @DisplayName("Client Certificate")
     class RevProxyClientCert {
 
-        private static final String CLIENT_CERT_PASSWORD = "foobar";
-        private static final String SERVER_CERT_PASSWORD = "barfoo";
-        static File clientCertificateStore;
-        static File serverCertificateStore;
+        static File clientCertificateFile;
+        static File clientPrivateKeyFile;
+        static File serverCertificateFile;
         static HeldCertificate rootCertificate = new HeldCertificate.Builder().certificateAuthority(0).build();
         static HeldCertificate clientCertificate = new HeldCertificate.Builder().signedBy(rootCertificate).build();
         static HeldCertificate serverCertificate = new HeldCertificate.Builder().commonName("ingen")
@@ -228,23 +268,24 @@ public class StoreClientIT {
                 createReverseProxyDispatcher(new OkHttpClient.Builder().build(), getTestFhirServerUrl()),
                 serverCertificates.sslContext());
 
+        @Autowired protected Map<String, IGenericClient> storeClients;
+
         @BeforeAll
         static void setUp() throws Exception {
-            clientCertificateStore = createCertificateStore(clientCertificate, CLIENT_CERT_PASSWORD);
-            serverCertificateStore = createCertificateStore(serverCertificate, SERVER_CERT_PASSWORD);
+            clientCertificateFile = createCertificateFile(clientCertificate.certificatePem());
+            clientPrivateKeyFile = createCertificateFile(clientCertificate.privateKeyPkcs8Pem());
+            serverCertificateFile = createCertificateFile(serverCertificate.certificatePem());
             proxy.requestClientAuth();
         }
 
-        private static File createCertificateStore(HeldCertificate certificate, String password)
+        private static File createCertificateFile(String pem)
                 throws KeyStoreException, IOException, NoSuchAlgorithmException,
                 CertificateException, FileNotFoundException {
-            var store = KeyStore.getInstance("PKCS12");
-            var tempFile = File.createTempFile("cert", ".p12");
+            var tempFile = File.createTempFile("cert", ".pem");
             tempFile.deleteOnExit();
-            store.load(null, null);
-            store.setKeyEntry("cert", certificate.keyPair().getPrivate(), password.toCharArray(),
-                    new java.security.cert.X509Certificate[] { certificate.certificate() });
-            store.store(new FileOutputStream(tempFile), password.toCharArray());
+            try (var fileWriter = new FileWriter(tempFile)) {
+                fileWriter.write(pem);
+            }
             return tempFile;
         }
 
@@ -253,26 +294,37 @@ public class StoreClientIT {
             proxy.close();
         }
 
-        @Autowired @Qualifier("store-client") protected IGenericClient storeClient;
-
         @DynamicPropertySource
         static void dynamicProperties(DynamicPropertyRegistry registry) {
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.key_store_path",
-                    () -> clientCertificateStore.getAbsolutePath());
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.key_store_password",
-                    () -> CLIENT_CERT_PASSWORD);
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_path",
-                    () -> serverCertificateStore.getAbsolutePath());
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_password",
-                    () -> SERVER_CERT_PASSWORD);
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.base_url",
-                    () -> "https://%s:%s/fhir/".formatted(proxy.getHostName(), proxy.getPort()));
+            var config = """
+                    stores:
+                      ${STORE_ID}:
+                        baseUrl: ${BASE_URL}
+                        evaluationStrategy: cql
+                        trustedCACertificates: ${TRUSTED_CA_FILE}
+                        clientCertificate: ${CLIENT_CERTIFICATE_FILE}
+                        privateKey: ${PRIVATE_KEY_FILE}
+
+                    networks:
+                      medizininformatik-initiative.de:
+                        obfuscate: true
+                        stores:
+                        - ${STORE_ID}
+
+                    """;
+
+            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.configuration", () -> config);
+            registry.add("STORE_ID", () -> STORE_ID);
+            registry.add("BASE_URL", () -> "https://%s:%s/fhir/".formatted(proxy.getHostName(), proxy.getPort()));
+            registry.add("CLIENT_CERTIFICATE_FILE", () -> clientCertificateFile.getAbsolutePath());
+            registry.add("PRIVATE_KEY_FILE", () -> clientPrivateKeyFile.getAbsolutePath());
+            registry.add("TRUSTED_CA_FILE", () -> serverCertificateFile.getAbsolutePath());
         }
 
         @Test
         @DisplayName("configured client certificate is sent to forwardProxy")
         void clientCert() throws InterruptedException {
-            var capabilities = storeClient.capabilities().ofType(CapabilityStatement.class).execute();
+            var capabilities = storeClients.get(STORE_ID).capabilities().ofType(CapabilityStatement.class).execute();
             var recordedRequest = proxy.takeRequest();
 
             assertThat(capabilities.getSoftware().getName()).containsIgnoringCase("blaze");
@@ -290,26 +342,41 @@ public class StoreClientIT {
 
         static MockWebServer forwardProxy = createForwardProxyServer(getTestFhirServerUrl());
 
+        @Autowired protected Map<String, IGenericClient> storeClients;
+
         @AfterAll
         static void tearDown() throws IOException {
             forwardProxy.close();
         }
 
-        @Autowired @Qualifier("store-client") protected IGenericClient storeClient;
-        static final String BEARER_TOKEN = "not-a-bearer-token-but-sufficient-for-test";
-
         @DynamicPropertySource
         static void dynamicProperties(DynamicPropertyRegistry registry) {
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.host",
-                    () -> forwardProxy.getHostName());
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.port",
-                    () -> forwardProxy.getPort());
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.username",
-                    () -> BASIC_AUTH_USERNAME);
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.password",
-                    () -> BASIC_AUTH_PASSWORD);
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.base_url",
+            var config = """
+                    stores:
+                      ${STORE_ID}:
+                        baseUrl: ${BASE_URL}
+                        evaluationStrategy: cql
+                        proxy:
+                          host: ${PROXY_HOST}
+                          port: ${PROXY_PORT}
+                          username: ${PROXY_USERNAME}
+                          password: ${PROXY_PASSWORD}
+
+                    networks:
+                      medizininformatik-initiative.de:
+                        obfuscate: true
+                        stores:
+                        - ${STORE_ID}
+                    """;
+
+            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.configuration", () -> config);
+            registry.add("BASE_URL",
                     () -> "http://%s:%s/fhir/".formatted(fhirServer.getHost(), fhirServer.getFirstMappedPort()));
+            registry.add("STORE_ID", () -> STORE_ID);
+            registry.add("PROXY_HOST", () -> forwardProxy.getHostName());
+            registry.add("PROXY_PORT", () -> forwardProxy.getPort());
+            registry.add("PROXY_USERNAME", () -> BASIC_AUTH_USERNAME);
+            registry.add("PROXY_PASSWORD", () -> BASIC_AUTH_PASSWORD);
         }
 
         @Test
@@ -318,7 +385,7 @@ public class StoreClientIT {
             var basicAuthEncoded = "Basic %s".formatted(Base64.getEncoder()
                     .encodeToString("%s:%s".formatted(BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD).getBytes()));
 
-            var capabilities = storeClient.capabilities().ofType(CapabilityStatement.class).execute();
+            var capabilities = storeClients.get(STORE_ID).capabilities().ofType(CapabilityStatement.class).execute();
 
             if (forwardProxy.getRequestCount() == 2) {
                 var recordedRequest = forwardProxy.takeRequest(); // first request is the unauthorized one
@@ -338,23 +405,16 @@ public class StoreClientIT {
                 getTestFhirServerUrl());
         static MockWebServer proxy = createProxyServer(dispatcher);
 
-        @AfterAll
-        static void tearDown() throws IOException {
-            proxy.close();
-        }
-
         protected IGenericClient storeClient;
         protected String measureUrl;
 
-        @DynamicPropertySource
-        static void dynamicProperties(DynamicPropertyRegistry registry) {
-            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.base_url",
-                    () -> "http://%s:%s/fhir/".formatted(proxy.getHostName(), proxy.getPort()));
+        public AsyncRequest(@Autowired Map<String, IGenericClient> storeClients) {
+            this.storeClient = storeClients.get(STORE_ID);
         }
 
-        public AsyncRequest(@Autowired @Qualifier("store-client") IGenericClient storeClient) {
-            this.storeClient = storeClient;
-            this.measureUrl = uploadMeasure(storeClient);
+        @BeforeEach
+        void setup() {
+            measureUrl = uploadMeasure(storeClient);
         }
 
         private String uploadMeasure(IGenericClient client) throws IllegalStateException {
@@ -376,6 +436,32 @@ public class StoreClientIT {
             } catch (IOException e) {
                 throw new IllegalStateException("Could not upload measure resource.", e);
             }
+        }
+
+        @AfterAll
+        static void tearDown() throws IOException {
+            proxy.close();
+        }
+
+        @DynamicPropertySource
+        static void dynamicProperties(DynamicPropertyRegistry registry) {
+            var config = """
+                    stores:
+                      ${STORE_ID}:
+                        baseUrl: ${BASE_URL}
+                        evaluationStrategy: cql
+
+                    networks:
+                      medizininformatik-initiative.de:
+                        obfuscate: true
+                        stores:
+                        - ${STORE_ID}
+                    """;
+
+            registry.add("de.medizininformatik_initiative.feasibility_dsf_process.configuration", () -> config);
+            registry.add("BASE_URL",
+                    () -> "http://%s:%s/fhir/".formatted(proxy.getHostName(), proxy.getPort()));
+            registry.add("STORE_ID", () -> STORE_ID);
         }
 
         @Test

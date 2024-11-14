@@ -209,7 +209,10 @@ public class SelectRequestTargetsIT {
         Thread.sleep(5000); // wait before restarting the BPE container to ensure the task is stale
         var requestTimeout = "PT5S";
         hrpBpeContainer
-                .withEnv("DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_TASK_REQUEST_TIMEOUT", requestTimeout)
+                .withEnv("DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CONFIGURATION", """
+                        general:
+                          requestTaskTimeout: %s
+                        """.formatted(requestTimeout))
                 .start();
         var taskResponse = client.read().resource(Task.class).withUrl(taskId).execute();
         // wait for the task to be processed

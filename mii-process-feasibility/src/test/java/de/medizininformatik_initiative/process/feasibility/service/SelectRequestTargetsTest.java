@@ -13,12 +13,16 @@ import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Bundle.BundleEntrySearchComponent;
+import org.hl7.fhir.r4.model.Bundle.SearchEntryMode;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Endpoint;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.OrganizationAffiliation;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.TaskStatus;
@@ -53,11 +57,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class SelectRequestTargetsTest {
 
+    private static final String LOCAL_ORGANIZATION = "foo";
+    private static final String PARENT_ORGANIZATION = "foo.bar";
     private static final long TASK_REQUEST_TIMEOUT = 30L;
     private static final String BASE_URL = "foo/";
     private static final String MEASURE_ID = "measure-id-11:57:29";
 
     @Captor ArgumentCaptor<Targets> targetsValuesCaptor;
+    @Captor ArgumentCaptor<Identifier> identifierCaptor;
 
     @Mock private EndpointProvider endpointProvider;
     @Mock private OrganizationProvider organizationProvider;
@@ -70,7 +77,10 @@ public class SelectRequestTargetsTest {
     @Mock private Task task;
     @Mock private Endpoint endpointA;
     @Mock private Endpoint endpointB;
+    @Mock private Bundle historyBundle;
     @Mock private Bundle bundle;
+    @Mock private BundleEntryComponent entry;
+    @Mock private BundleEntrySearchComponent search;
     @Mock private Targets targets;
     @Mock private Target target;
     @Spy private Duration taskRequestTimeout = Duration.ofSeconds(TASK_REQUEST_TIMEOUT);
@@ -80,6 +90,8 @@ public class SelectRequestTargetsTest {
     @BeforeEach
     public void setup() {
         var measureReference = new Reference(MEASURE_ID);
+        var localOrganization = new Organization()
+                .setIdentifier(List.of(new Identifier().setValue(LOCAL_ORGANIZATION)));
         lenient().when(api.getOrganizationProvider()).thenReturn(organizationProvider);
         lenient().when(api.getTaskHelper()).thenReturn(taskHelper);
         lenient().when(variables.getStartTask()).thenReturn(task);
@@ -89,12 +101,22 @@ public class SelectRequestTargetsTest {
         lenient().when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
         lenient().when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
         lenient().when(client.getBaseUrl()).thenReturn(BASE_URL);
-        lenient().when(client.history(eq(Task.class), anyString())).thenReturn(bundle);
+        lenient().when(client.history(eq(Task.class), anyString())).thenReturn(historyBundle);
+        lenient().when(organizationProvider.getLocalOrganization()).thenReturn(Optional.of(localOrganization));
+        lenient().when(client.search(eq(OrganizationAffiliation.class), Mockito.anyMap())).thenReturn(bundle);
+        lenient().when(bundle.getEntry()).thenReturn(List.of(entry));
+        lenient().when(entry.hasSearch()).thenReturn(true);
+        lenient().when(entry.getSearch()).thenReturn(search);
+        lenient().when(search.getMode()).thenReturn(SearchEntryMode.INCLUDE);
+        lenient().when(entry.hasResource()).thenReturn(true);
+        lenient().when(entry.getResource())
+                .thenReturn(new Organization().setActive(true)
+                        .setIdentifier(List.of(new Identifier().setValue(PARENT_ORGANIZATION))));
     }
 
     @Test
     public void doExecute_NoTargets() {
-        when(bundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
+        when(historyBundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
         when(task.getStatus()).thenReturn(TaskStatus.REQUESTED);
         when(task.getIdElement()).thenReturn(new IdType("task-002124"));
         when(task.getMeta()).thenReturn(new Meta().setLastUpdated(Date.from(Instant.now())));
@@ -125,7 +147,7 @@ public class SelectRequestTargetsTest {
                 .setEndpoint(List.of(new Reference(dic_endpoint).setReference(endpointReference)))
                 .setActiveElement((BooleanType) new BooleanType().setValue(true));
 
-        when(bundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
+        when(historyBundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
         when(task.getStatus()).thenReturn(TaskStatus.REQUESTED);
         when(task.getIdElement()).thenReturn(new IdType("task-002124"));
         when(task.getMeta()).thenReturn(new Meta().setLastUpdated(Date.from(Instant.now())));
@@ -159,11 +181,11 @@ public class SelectRequestTargetsTest {
                 .setEndpoint(List.of(new Reference(dic_endpoint).setReference(endpointReference)))
                 .setActiveElement((BooleanType) new BooleanType().setValue(true));
 
-        when(bundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
+        when(historyBundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
         when(task.getStatus()).thenReturn(TaskStatus.REQUESTED);
         when(task.getIdElement()).thenReturn(new IdType("task-002124"));
         when(task.getMeta()).thenReturn(new Meta().setLastUpdated(Date.from(Instant.now())));
-        when(organizationProvider.getOrganizations(any(Identifier.class), any(Coding.class)))
+        when(organizationProvider.getOrganizations(identifierCaptor.capture(), any(Coding.class)))
                 .thenReturn(List.of(organization));
         when(client.read(Endpoint.class, endpointReferenceId)).thenReturn(dic_endpoint);
         when(variables.createTarget(eq(organizationId.getValue()), eq(endpointId.getValue()), eq(endpointAddress),
@@ -173,6 +195,7 @@ public class SelectRequestTargetsTest {
 
         service.doExecute(execution, variables);
 
+        assertThat(identifierCaptor.getValue().getValue()).isEqualTo(PARENT_ORGANIZATION);
         verify(variables).setTargets(targets);
     }
 
@@ -207,11 +230,11 @@ public class SelectRequestTargetsTest {
         var targetA = Mockito.mock(Target.class);
         var targetB = Mockito.mock(Target.class);
 
-        when(bundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
+        when(historyBundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
         when(task.getStatus()).thenReturn(TaskStatus.REQUESTED);
         when(task.getIdElement()).thenReturn(new IdType("task-002124"));
         when(task.getMeta()).thenReturn(new Meta().setLastUpdated(Date.from(Instant.now())));
-        when(organizationProvider.getOrganizations(any(Identifier.class), any(Coding.class)))
+        when(organizationProvider.getOrganizations(identifierCaptor.capture(), any(Coding.class)))
                 .thenReturn(List.of(organizationA, organizationB));
         when(client.read(Endpoint.class, dic_1_endpointReference)).thenReturn(dic_1_endpoint);
         when(client.read(Endpoint.class, dic_2_endpointReference)).thenReturn(dic_2_endpoint);
@@ -225,13 +248,14 @@ public class SelectRequestTargetsTest {
 
         service.doExecute(execution, variables);
 
+        assertThat(identifierCaptor.getValue().getValue()).isEqualTo(PARENT_ORGANIZATION);
         verify(variables).setTargets(targets);
     }
 
     @Test
     void taskCreateDateIsTooOld() throws Exception {
         var taskId = "12345";
-        when(bundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
+        when(historyBundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
         when(task.getStatus()).thenReturn(TaskStatus.REQUESTED);
         when(task.getIdElement()).thenReturn(new IdType(taskId));
         when(task.getMeta()).thenReturn(new Meta()
