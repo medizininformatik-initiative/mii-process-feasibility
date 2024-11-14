@@ -11,7 +11,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,8 +25,10 @@ import static org.testcontainers.containers.BindMode.READ_ONLY;
 @Testcontainers
 public class FlareWebserviceClientImplFwdRevProxyBasicAuthIT extends FlareWebserviceClientImplBaseIT {
 
+    private static final String STORE_ID = "foo";
+
     @Autowired
-    protected FlareWebserviceClient flareClient;
+    protected Map<String, FlareWebserviceClient> flareClients;
 
     private static URL nginxConf = getResource("nginx.conf");
     private static URL nginxTestProxyConfTemplate = getResource("reverse_proxy_basic_auth.conf.template");
@@ -32,6 +36,7 @@ public class FlareWebserviceClientImplFwdRevProxyBasicAuthIT extends FlareWebser
     private static URL reverseProxyPasswordFile = getResource("reverse_proxy.htpasswd");
     private static URL squidProxyConf = getResource("forward_proxy_basic_auth.conf");
     private static URL forwardProxyPasswordFile = getResource("forward_proxy.htpasswd");
+    private static URL feasibilityConfig = getResource("forwardProxy_basicAuth_reverseProxy_basicAuth.yml");
 
     @Container
     public static GenericContainer<?> proxy = new GenericContainer<>(
@@ -56,32 +61,22 @@ public class FlareWebserviceClientImplFwdRevProxyBasicAuthIT extends FlareWebser
                     .dependsOn(proxy);
 
     @DynamicPropertySource
-    static void dynamicProperties(DynamicPropertyRegistry registry) {
+    static void dynamicProperties(DynamicPropertyRegistry registry) throws IOException {
         var proxyHost = forwardProxy.getHost();
         var proxyPort = forwardProxy.getFirstMappedPort();
+        var config = createTempConfigFile(readFile(feasibilityConfig)
+                .replaceAll("<<proxyHost>>", proxyHost)
+                .replaceAll("<<proxyPort>>", proxyPort.toString())
+                .replaceAll("<<storeId>>", STORE_ID));
 
-        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.evaluation.strategy",
-                () -> "structured-query");
-        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url",
-                () -> "http://proxy:8080/");
-        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.host",
-                () -> proxyHost);
-        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.port",
-                () -> proxyPort);
-        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.username",
-                () -> "test");
-        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.proxy.password",
-                () -> "bar");
-        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.username",
-                () -> "test");
-        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.basic.password",
-                () -> "foo");
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.configuration.file",
+                () -> config.getAbsolutePath());
     }
 
     @Test
     void sendQuery() throws Exception {
         var rawStructuredQuery = this.getClass().getResource("valid-structured-query.json").openStream().readAllBytes();
-        var feasibility = assertDoesNotThrow(() -> flareClient.requestFeasibility(rawStructuredQuery));
+        var feasibility = assertDoesNotThrow(() -> flareClients.get(STORE_ID).requestFeasibility(rawStructuredQuery));
         assertEquals(0, feasibility);
     }
 }

@@ -1,0 +1,14 @@
+stores:
+  <<storeId>>:
+    baseUrl: <<baseUrl>>
+    evaluationStrategy: ccdl
+    trustedCACertificates: <<trustedCAFile>>
+    basicAuth:
+      username: test
+      password: foo
+
+networks:
+  medizininformatik-initiative.de:
+    obfuscate: true
+    stores:
+    - <<storeId>>

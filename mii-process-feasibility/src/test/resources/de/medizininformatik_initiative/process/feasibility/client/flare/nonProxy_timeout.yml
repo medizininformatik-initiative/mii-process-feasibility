@@ -1,0 +1,11 @@
+stores:
+  <<storeId>>:
+    baseUrl: <<baseUrl>>
+    evaluationStrategy: ccdl
+    requestTimeout: <<timeout>>
+
+networks:
+  medizininformatik-initiative.de:
+    obfuscate: true
+    stores:
+    - <<storeId>>

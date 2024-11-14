@@ -11,7 +11,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,14 +25,16 @@ import static org.testcontainers.containers.BindMode.READ_ONLY;
 @Testcontainers
 public class FlareWebserviceClientImplRevProxyBearerTokenAuthIT extends FlareWebserviceClientImplBaseIT {
 
+    private static final String STORE_ID = "foo";
+
     @Autowired
-    protected FlareWebserviceClient flareClient;
+    protected Map<String, FlareWebserviceClient> flareClients;
 
     private static URL nginxConf = getResource("nginx.conf");
     private static URL nginxTestProxyConfTemplate = getResource("reverse_proxy_bearer_token_auth.conf.template");
     private static URL indexFile = getResource("index.html");
     private static URL passwordFile = getResource("reverse_proxy.htpasswd");
-    private static String bearerToken = "1234";
+    private static URL feasibilityConfig = getResource("reverseProxy_bearerToken.yml");
 
     @Container
     public static GenericContainer<?> proxy = new GenericContainer<>(
@@ -46,22 +50,21 @@ public class FlareWebserviceClientImplRevProxyBearerTokenAuthIT extends FlareWeb
                     .dependsOn(flare);
 
     @DynamicPropertySource
-    static void dynamicProperties(DynamicPropertyRegistry registry) {
+    static void dynamicProperties(DynamicPropertyRegistry registry) throws IOException {
         var proxyHost = proxy.getHost();
         var proxyPort = proxy.getFirstMappedPort();
+        var config = createTempConfigFile(readFile(feasibilityConfig)
+                .replaceAll("<<baseUrl>>", "http://%s:%s".formatted(proxyHost, proxyPort))
+                .replaceAll("<<storeId>>", STORE_ID));
 
-        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.evaluation.strategy",
-                () -> "structured-query");
-        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url",
-                () -> String.format("http://%s:%s/", proxyHost, proxyPort));
-        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.client.store.auth.bearer.token",
-                () -> bearerToken);
+        registry.add("de.medizininformatik_initiative.feasibility_dsf_process.configuration.file",
+                () -> config.getAbsolutePath());
     }
 
     @Test
     void sendQuery() throws Exception {
         var rawStructuredQuery = this.getClass().getResource("valid-structured-query.json").openStream().readAllBytes();
-        var feasibility = assertDoesNotThrow(() -> flareClient.requestFeasibility(rawStructuredQuery));
+        var feasibility = assertDoesNotThrow(() -> flareClients.get(STORE_ID).requestFeasibility(rawStructuredQuery));
         assertEquals(0, feasibility);
     }
 }

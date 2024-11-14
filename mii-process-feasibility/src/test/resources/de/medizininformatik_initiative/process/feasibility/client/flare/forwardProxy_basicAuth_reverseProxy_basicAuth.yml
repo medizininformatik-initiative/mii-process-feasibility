@@ -1,0 +1,18 @@
+stores:
+  <<storeId>>:
+    baseUrl: http://proxy:8080
+    evaluationStrategy: ccdl
+    proxy:
+      host: <<proxyHost>>
+      port: <<proxyPort>>
+      username: test
+      password: bar
+    basicAuth:
+      username: test
+      password: foo
+
+networks:
+  medizininformatik-initiative.de:
+    obfuscate: true
+    stores:
+    - <<storeId>>

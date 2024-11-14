@@ -1,88 +1,69 @@
 package de.medizininformatik_initiative.process.feasibility.spring.config;
 
-import ca.uhn.fhir.context.FhirContext;
-import org.apache.http.ssl.SSLContexts;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import de.medizininformatik_initiative.process.feasibility.FeasibilitySettings;
+import de.medizininformatik_initiative.process.feasibility.FeasibilitySettingsError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.lang.Nullable;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-
-import javax.net.ssl.SSLContext;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Configuration
 public class BaseConfig {
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_path:#{null}}") private String trustStorePath;
+    private static final Logger logger = LoggerFactory.getLogger(BaseConfig.class);
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_password:#{null}}") private String trustStorePassword;
-
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.key_store_path:#{null}}") private String keyStorePath;
-
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.key_store_password:#{null}}") private String keyStorePassword;
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.configuration.file:#{null}}")
+    private String configurationFile;
 
     @Bean
-    @Qualifier("base")
-    FhirContext fhirContext() {
-        return FhirContext.forR4();
+    YAMLMapper buildSettingsMapper() {
+        return YAMLMapper.builder()
+                .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+                .addModule(new JavaTimeModule())
+                .build();
     }
 
     @Bean
-    @Qualifier("base-client-trust")
-    KeyStore loadTrustStore() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {
-        if (trustStorePath == null || trustStorePath.isBlank()) {
-            return DefaultTrustStoreUtils.loadDefaultTrustStore();
+    FeasibilitySettings storeSettings(YAMLMapper mapper) {
+        if (configurationFile == null || configurationFile.isBlank()) {
+            return new FeasibilitySettings(Map.of(), Map.of());
+        } else {
+            try {
+                logger.debug("Parsing configuration file '{}'.", configurationFile);
+                FeasibilitySettings settings = mapper.readValue(new FileInputStream(configurationFile),
+                        FeasibilitySettings.class);
+                List<FeasibilitySettingsError> errors = settings.validate();
+
+                if (errors.isEmpty()) {
+                    return settings;
+                } else {
+                    throw new IllegalArgumentException(
+                            "Configuration file '%s' contains errors: %s".formatted(configurationFile, errors));
+                }
+            } catch (IOException e) {
+                throw new IllegalArgumentException(
+                        "Configuration file '%s' could not be loaded.".formatted(configurationFile),
+                        e);
+            }
         }
-
-        var trustStoreInputStream = new FileInputStream(trustStorePath);
-
-        var trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        trustStore.load(trustStoreInputStream, (trustStorePassword == null) ? null : trustStorePassword.toCharArray());
-        trustStoreInputStream.close();
-
-        return trustStore;
     }
 
     @Bean
-    @Qualifier("base-client-key")
-    @Nullable
-    KeyStore loadKeyStore() throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
-        if (keyStorePath == null) {
-            return null;
-        }
-
-        var keyStoreInputStream = new FileInputStream(keyStorePath);
-
-        var keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keyStore.load(keyStoreInputStream, (keyStorePassword == null) ? null : keyStorePassword.toCharArray());
-        keyStoreInputStream.close();
-
-        return keyStore;
+    Map<String, Set<String>> networkStores(FeasibilitySettings settings) {
+        return settings.networks()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(e -> e.getKey(), e -> Set.copyOf(e.getValue().storeIds())));
     }
-
-    @Bean
-    @Qualifier("base-client")
-    SSLContext createSslContext(@Qualifier("base-client-trust") KeyStore trustStore,
-                                @Nullable @Qualifier("base-client-key") KeyStore keyStore)
-            throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, UnrecoverableKeyException {
-        var sslContextBuilder = SSLContexts.custom()
-                .loadTrustMaterial(trustStore, null);
-
-        if (keyStore != null) {
-            sslContextBuilder.loadKeyMaterial(keyStore, (keyStorePassword == null) ? null :
-                    keyStorePassword.toCharArray());
-        }
-
-        return sslContextBuilder.build();
-    }
-
 }

@@ -1,0 +1,13 @@
+stores:
+  <<storeId>>:
+    baseUrl: http://flare:8080
+    evaluationStrategy: ccdl
+    proxy:
+      host: <<proxyHost>>
+      port: <<proxyPort>>
+
+networks:
+  medizininformatik-initiative.de:
+    obfuscate: true
+    stores:
+    - <<storeId>>
