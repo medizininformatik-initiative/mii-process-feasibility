@@ -21,7 +21,7 @@ public class EvaluationConfig {
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.evaluation.obfuscation.sensitivity:1.0}")
     private double obfuscationLaplaceSensitivity;
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.evaluation.obfuscation.epsilon:0.5}")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.evaluation.obfuscation.epsilon:0.28}")
     private double obfuscationLaplaceEpsilon;
 
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.rate.limit.count:999}")
