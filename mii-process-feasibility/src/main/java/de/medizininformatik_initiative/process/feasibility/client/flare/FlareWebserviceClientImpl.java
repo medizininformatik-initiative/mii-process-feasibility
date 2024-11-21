@@ -35,7 +35,12 @@ public class FlareWebserviceClientImpl implements FlareWebserviceClient {
 
         var response = sendRequest(req);
 
-        return Integer.parseInt(response);
+        if (response != null && response.trim().matches("\\d+")) {
+            return Integer.parseInt(response.trim());
+        } else {
+            throw new IOException("Non-integer response from flare webservice (url '%s'): '%s'".formatted(req.getURI(),
+                    response == null ? "" : response));
+        }
     }
 
     @Override
