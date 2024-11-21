@@ -61,7 +61,7 @@ public class FeasibilityCachingLaplaceCountObfuscator implements Obfuscator<Inte
         var divDist = sensitivity / epsilon;
         var min = -0.5;
         var max = 0.5;
-        var random = rand.nextDouble(0.1d, 0.9d);
+        var random = rand.nextDouble();
         var uniform = min + random * (max - min);
         return meanDist - divDist * Math.signum(uniform) * Math.log(1 - 2 * Math.abs(uniform));
     }

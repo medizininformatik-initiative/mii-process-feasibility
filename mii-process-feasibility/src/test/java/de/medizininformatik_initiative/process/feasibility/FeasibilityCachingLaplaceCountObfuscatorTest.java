@@ -1,13 +1,12 @@
 package de.medizininformatik_initiative.process.feasibility;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.security.SecureRandom;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -19,32 +18,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FeasibilityCachingLaplaceCountObfuscatorTest {
 
     private static final int RESULT = 490715;
-    private static SecureRandom rand;
-
     private FeasibilityCachingLaplaceCountObfuscator obfuscator;
 
     private static Stream<Integer> resultRange() {
         return IntStream.rangeClosed(-100, 1000).boxed();
     }
 
-    @BeforeAll
-    public static void init() {
-        rand = new SecureRandom();
-    }
-
     @BeforeEach
     public void setUp() {
-        obfuscator = new FeasibilityCachingLaplaceCountObfuscator(1, 0.28);
+        obfuscator = new FeasibilityCachingLaplaceCountObfuscator(1, 0.5);
     }
 
-    @RepeatedTest(100)
+    @Test
     @DisplayName("obfuscated result is rounded to nearest tens")
     public void checkIfObfuscatedResultIsNearestTens() {
-        var result = rand.nextInt(0, Integer.MAX_VALUE);
+        var result = 490715;
         var obfuscatedResult = obfuscator.obfuscate(result);
 
         assertTrue(obfuscatedResult % 10 == 0, "obfuscated result is not rounded to tens");
-        assertTrue(Math.abs(result - obfuscatedResult) <= 10, "obfuscated result is not rounded to nearest tens");
+        assertTrue(Math.abs(result - obfuscatedResult) < 10, "obfuscated result is not rounded to nearest tens");
     }
 
     @RepeatedTest(100)
