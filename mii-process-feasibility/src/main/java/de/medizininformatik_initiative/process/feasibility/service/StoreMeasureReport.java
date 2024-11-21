@@ -7,6 +7,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Measure;
 import org.hl7.fhir.r4.model.MeasureReport;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.util.List;
 
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT_ID;
@@ -41,7 +44,14 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
         var measureReportId = storeMeasureReport(measureReport);
         logger.debug("Stored MeasureReport {}", measureReportId);
 
+        addMeasureReportReferenceToTaskOutputs(task, measureReportId.getValue());
+        variables.updateTask(task);
         variables.setString(VARIABLE_MEASURE_REPORT_ID, measureReportId.getValue());
+    }
+
+    private void addMeasureReportReferenceToTaskOutputs(Task task, String measureReportId) {
+        task.getOutput().add(api.getTaskHelper().createOutput(new Reference().setReference(measureReportId),
+                CODESYSTEM_FEASIBILITY, CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE));
     }
 
     private void addReadAccessTag(MeasureReport measureReport, Task task)
