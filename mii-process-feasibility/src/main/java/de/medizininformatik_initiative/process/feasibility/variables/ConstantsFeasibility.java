@@ -30,6 +30,7 @@ public interface ConstantsFeasibility {
 
     Date MEASURE_REPORT_PERIOD_START = new LocalDate(1900, 1, 1).toDate();
     Date MEASURE_REPORT_PERIOD_END = new LocalDate(2100, 1, 1).toDate();
+    String MEASURE_REPORT_TYPE_POPULATION = "population";
 
     int CLIENT_TIMEOUT_DEFAULT = 300000;
 }
