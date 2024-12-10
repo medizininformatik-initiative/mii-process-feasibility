@@ -16,6 +16,7 @@ import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
+import org.hl7.fhir.r4.model.Task.TaskOutputComponent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -28,12 +29,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.UUID;
 
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT_ID;
 import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,27 +54,25 @@ public class StoreMeasureReportTest
     @Spy private ReadAccessHelper readAccessHelper = new ReadAccessHelperImpl();
 
     @Captor private ArgumentCaptor<MeasureReport> measureReportCaptor;
+    @Captor private ArgumentCaptor<Reference> referenceCaptor;
 
     @InjectMocks private StoreMeasureReport service;
 
     @Test
     public void testDoExecute() throws Exception
     {
-        var initialMeasureFromZars = new Measure();
         var measureId = UUID.randomUUID();
+        var initialMeasureFromZars = new Measure();
         initialMeasureFromZars.setId(new IdType(measureId.toString()));
         initialMeasureFromZars.setUrl("http://some.domain/fhir/Measure/" + measureId);
 
-        var measureReport = new MeasureReport();
-        var patient = new Patient();
-        patient.setId("foo");
-        var patientRef = new Reference(patient);
-        measureReport = measureReport.setEvaluatedResource(List.of(patientRef));
-
+        var measureReport = new MeasureReport()
+                .setEvaluatedResource(List.of(new Reference(new Patient().setId("foo"))));
+        var taskOutput = new TaskOutputComponent();
+        var measureReportId = new IdType("id-094601");
         var task = new Task();
         var requesterId = new Identifier().setSystem("http://localhost/systems/sample-system").setValue("requester-id");
-        var requesterReference = new Reference().setIdentifier(                requesterId);
-        task.setRequester(requesterReference);
+        task.setRequester(new Reference().setIdentifier(requesterId));
 
         when(api.getVariables(execution)).thenReturn(variables);
         when(variables.getResource(VARIABLE_MEASURE)).thenReturn(initialMeasureFromZars);
@@ -81,30 +82,40 @@ public class StoreMeasureReportTest
         when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
         when(clientProvider.getLocalWebserviceClient()).thenReturn(localWebserviceClient);
         when(localWebserviceClient.withMinimalReturn()).thenReturn(returnMinimal);
-        when(returnMinimal.create(measureReportCaptor.capture())).thenReturn(new IdType("id-094601"));
+        when(returnMinimal.create(measureReportCaptor.capture())).thenReturn(measureReportId);
+        when(api.getTaskHelper()).thenReturn(taskHelper);
+        when(taskHelper.createOutput(referenceCaptor.capture(), eq(CODESYSTEM_FEASIBILITY),
+                eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE))).thenReturn(taskOutput);
 
         service.execute(execution);
 
         verify(variables).setString(VARIABLE_MEASURE_REPORT_ID, "id-094601");
         verify(readAccessHelper).addOrganization(measureReport, requesterId.getValue());
-
+        verify(variables).updateTask(task);
 
         var capturedMeasureReport = measureReportCaptor.getValue();
-        assertEquals("http://some.domain/fhir/Measure/" + measureId, capturedMeasureReport.getMeasure());
-        assertTrue(capturedMeasureReport.getEvaluatedResource().isEmpty());
+        assertThat(capturedMeasureReport.getMeasure())
+                .isEqualTo("http://some.domain/fhir/Measure/" + measureId);
+        assertThat(capturedMeasureReport.getEvaluatedResource())
+                .isEmpty();
 
         var tags = capturedMeasureReport.getMeta().getTag().stream()
                 .filter(c -> "http://dsf.dev/fhir/CodeSystem/read-access-tag".equals(c.getSystem())).collect(toList());
-        assertEquals(2, tags.size());
-        assertEquals(1 , tags.stream().filter(c -> "LOCAL".equals(c.getCode())).count());
+        assertThat(tags).hasSize(2);
+        assertThat(tags.stream().filter(c -> "LOCAL".equals(c.getCode()))).hasSize(1);
 
         var organizationTags = tags.stream().filter(c -> "ORGANIZATION".equals(c.getCode())).collect(toList());
-        assertEquals(1 , organizationTags.size());
+        assertThat(organizationTags).hasSize(1);
 
         var organizationExtensions = organizationTags.stream().flatMap(c -> c.getExtension().stream())
                 .filter(e -> "http://dsf.dev/fhir/StructureDefinition/extension-read-access-organization".equals(
                         e.getUrl())).collect(toList());
-        assertEquals(1, organizationExtensions.size());
-        assertEquals("requester-id", ((Identifier)organizationExtensions.get(0).getValue()).getValue());
+        assertThat(organizationExtensions).hasSize(1);
+        assertThat(((Identifier) organizationExtensions.get(0).getValue()).getValue()).isEqualTo("requester-id");
+
+        assertThat(referenceCaptor.getValue()).isNotNull();
+        assertThat(referenceCaptor.getValue().getReference()).isEqualTo(measureReportId.getValue());
+        assertThat(task.getOutput()).hasSize(1);
+        assertThat(task.getOutputFirstRep()).isEqualTo(taskOutput);
     }
 }
