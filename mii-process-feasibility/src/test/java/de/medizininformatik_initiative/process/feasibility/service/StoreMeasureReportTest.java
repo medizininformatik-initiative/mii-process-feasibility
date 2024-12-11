@@ -27,11 +27,12 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
-import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT_ID;
 import static java.util.stream.Collectors.toList;
@@ -75,7 +76,6 @@ public class StoreMeasureReportTest
         task.setRequester(new Reference().setIdentifier(requesterId));
 
         when(api.getVariables(execution)).thenReturn(variables);
-        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(initialMeasureFromZars);
         when(variables.getResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
         when(variables.getStartTask()).thenReturn(task);
         when(api.getReadAccessHelper()).thenReturn(readAccessHelper);
@@ -86,6 +86,9 @@ public class StoreMeasureReportTest
         when(api.getTaskHelper()).thenReturn(taskHelper);
         when(taskHelper.createOutput(referenceCaptor.capture(), eq(CODESYSTEM_FEASIBILITY),
                 eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE))).thenReturn(taskOutput);
+        when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
+                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
+                        .thenReturn(Optional.of(new Reference().setReference(measureId.toString())));
 
         service.execute(execution);
 
@@ -94,10 +97,8 @@ public class StoreMeasureReportTest
         verify(variables).updateTask(task);
 
         var capturedMeasureReport = measureReportCaptor.getValue();
-        assertThat(capturedMeasureReport.getMeasure())
-                .isEqualTo("http://some.domain/fhir/Measure/" + measureId);
-        assertThat(capturedMeasureReport.getEvaluatedResource())
-                .isEmpty();
+        assertThat(capturedMeasureReport.getMeasure()).isEqualTo(measureId.toString());
+        assertThat(capturedMeasureReport.getEvaluatedResource()).isEmpty();
 
         var tags = capturedMeasureReport.getMeta().getTag().stream()
                 .filter(c -> "http://dsf.dev/fhir/CodeSystem/read-access-tag".equals(c.getSystem())).collect(toList());
