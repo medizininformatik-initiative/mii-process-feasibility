@@ -385,10 +385,10 @@ This version of the process is compatible with the following components:
 
 | Component | Compatible Version(s) |
 |-----------|-----------------------|
-| DSF FHIR  | `>= 1.5.0`            |
-| DSF BPE   | `>= 1.5.0`            |
+| DSF FHIR  | `>= 1.6.0`            |
+| DSF BPE   | `>= 1.6.0`            |
 | Blaze     | `>= 0.28`             |
-| Flare     | `>= 1.0`              |
+| Flare     | `>= 2.4.0`            |
 
 > [!NOTE]
 > Flare got rewritten. Only the [new project][9] is supported.
