@@ -1,6 +1,7 @@
 package de.medizininformatik_initiative.process.feasibility.client.store;
 
 import dasniko.testcontainers.keycloak.KeycloakContainer;
+import de.medizininformatik_initiative.process.feasibility.client.variables.TestConstantsFeasibility;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
@@ -19,6 +20,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.Optional;
 
+import static de.medizininformatik_initiative.process.feasibility.client.variables.TestConstantsFeasibility.NGINX_VERSION;
+import static de.medizininformatik_initiative.process.feasibility.client.variables.TestConstantsFeasibility.SQUID_VERSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.testcontainers.containers.BindMode.READ_ONLY;
 
@@ -34,7 +37,8 @@ public class OAuthInterceptorIT {
     private static URL trustStoreFile = getResource("../certs/ca.p12");
 
     @Container
-    public static KeycloakContainer keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:25.0")
+    public static KeycloakContainer keycloak = new KeycloakContainer(
+            "quay.io/keycloak/keycloak:" + TestConstantsFeasibility.KEYCLOAK_VERSION)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("keycloak")
             .withAdminUsername("admin")
@@ -45,7 +49,7 @@ public class OAuthInterceptorIT {
 
     @Container
     public static GenericContainer<?> proxy = new GenericContainer<>(
-            DockerImageName.parse("nginx:1.27.1"))
+            DockerImageName.parse("nginx:" + NGINX_VERSION))
                     .withExposedPorts(8443)
                     .withFileSystemBind(nginxConf.getPath(), "/etc/nginx/nginx.conf", READ_ONLY)
                     .withFileSystemBind(indexFile.getPath(), "/usr/share/nginx/html/index.html", READ_ONLY)
@@ -59,7 +63,7 @@ public class OAuthInterceptorIT {
 
     @Container
     public static GenericContainer<?> forwardProxyNoAuth = new GenericContainer<>(
-            DockerImageName.parse("ubuntu/squid:6.6-24.04_edge"))
+            DockerImageName.parse("ubuntu/squid:" + SQUID_VERSION))
                     .withNetwork(DEFAULT_CONTAINER_NETWORK)
                     .withExposedPorts(8080)
                     .withFileSystemBind(getResource("keycloak_forward_proxy.conf").getPath(), "/etc/squid/squid.conf",
@@ -67,7 +71,7 @@ public class OAuthInterceptorIT {
 
     @Container
     public static GenericContainer<?> forwardProxyBasicAuth = new GenericContainer<>(
-            DockerImageName.parse("ubuntu/squid:6.6-24.04_edge"))
+            DockerImageName.parse("ubuntu/squid:" + SQUID_VERSION))
                     .withNetwork(DEFAULT_CONTAINER_NETWORK)
                     .withExposedPorts(8080)
                     .withFileSystemBind(getResource("keycloak_forward_proxy_basic_auth.conf").getPath(),

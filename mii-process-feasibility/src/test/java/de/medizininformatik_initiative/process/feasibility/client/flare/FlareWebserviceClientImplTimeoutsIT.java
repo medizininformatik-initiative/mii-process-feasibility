@@ -1,6 +1,7 @@
 package de.medizininformatik_initiative.process.feasibility.client.flare;
 
 import com.google.common.base.Stopwatch;
+import de.medizininformatik_initiative.process.feasibility.client.variables.TestConstantsFeasibility;
 import eu.rekawek.toxiproxy.Proxy;
 import eu.rekawek.toxiproxy.ToxiproxyClient;
 import eu.rekawek.toxiproxy.model.ToxicDirection;
@@ -44,7 +45,8 @@ public class FlareWebserviceClientImplTimeoutsIT extends FlareWebserviceClientIm
     @Autowired protected FlareWebserviceClient flareClient;
 
     @Container
-    public static ToxiproxyContainer toxiproxy = new ToxiproxyContainer("ghcr.io/shopify/toxiproxy:2.9.0")
+    public static ToxiproxyContainer toxiproxy = new ToxiproxyContainer(
+            "ghcr.io/shopify/toxiproxy:" + TestConstantsFeasibility.TOXIPROXY_VERSION)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .dependsOn(flare);
     private static ToxiproxyClient toxiproxyClient;
