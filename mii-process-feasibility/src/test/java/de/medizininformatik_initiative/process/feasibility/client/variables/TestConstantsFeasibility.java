@@ -2,7 +2,7 @@ package de.medizininformatik_initiative.process.feasibility.client.variables;
 
 public interface TestConstantsFeasibility {
 
-    // renovate: image=sampy/blaze
+    // renovate: image=samply/blaze
     public String BLAZE_VERSION = "0.30";
 
     // renovate: image=ghcr.io/medizininformatik-initiative/flare
