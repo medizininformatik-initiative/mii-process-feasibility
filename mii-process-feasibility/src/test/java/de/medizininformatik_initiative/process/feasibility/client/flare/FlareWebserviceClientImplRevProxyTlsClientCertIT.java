@@ -1,5 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.client.flare;
 
+import de.medizininformatik_initiative.process.feasibility.client.variables.TestConstantsFeasibility;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class FlareWebserviceClientImplRevProxyTlsClientCertIT extends FlareWebse
 
     @Container
     public static GenericContainer<?> proxy = new GenericContainer<>(
-            DockerImageName.parse("nginx:1.27.1"))
+            DockerImageName.parse("nginx:" + TestConstantsFeasibility.NGINX_VERSION))
                     .withExposedPorts(8443)
                     .withFileSystemBind(nginxConf.getPath(), "/etc/nginx/nginx.conf", READ_ONLY)
                     .withFileSystemBind(indexFile.getPath(), "/usr/share/nginx/html/index.html", READ_ONLY)

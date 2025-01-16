@@ -1,5 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.client.flare;
 
+import de.medizininformatik_initiative.process.feasibility.client.variables.TestConstantsFeasibility;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class FlareWebserviceClientImplFwdProxyBasicAuthRevProxyTlsIT extends Fla
 
     @Container
     public static GenericContainer<?> proxy = new GenericContainer<>(
-            DockerImageName.parse("nginx:1.27.1"))
+            DockerImageName.parse("nginx:" + TestConstantsFeasibility.NGINX_VERSION))
                     .withExposedPorts(8443)
                     .withFileSystemBind(nginxConf.getPath(), "/etc/nginx/nginx.conf", READ_ONLY)
                     .withFileSystemBind(indexFile.getPath(), "/usr/share/nginx/html/index.html", READ_ONLY)
@@ -52,7 +53,7 @@ public class FlareWebserviceClientImplFwdProxyBasicAuthRevProxyTlsIT extends Fla
 
     @Container
     public static GenericContainer<?> forwardProxy = new GenericContainer<>(
-            DockerImageName.parse("ubuntu/squid:6.6-24.04_edge"))
+            DockerImageName.parse("ubuntu/squid:" + TestConstantsFeasibility.SQUID_VERSION))
                     .withExposedPorts(8080)
                     .withFileSystemBind(squidProxyConf.getPath(), "/etc/squid/squid.conf", READ_ONLY)
                     .withFileSystemBind(passwordFile.getPath(), "/etc/squid/passwd", READ_ONLY)

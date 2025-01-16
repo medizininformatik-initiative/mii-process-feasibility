@@ -1,0 +1,36 @@
+ {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "ignorePresets": [
+    ":ignoreModulesAndTests"
+  ],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/vendor/**",
+    "**/examples/**",
+    "**/__tests__/**",
+    "**/tests/**",
+    "**/__fixtures__/**"
+  ],
+  "regexManagers": [
+    {
+      "description": "Update docker references in integration test Java files",
+      "fileMatch": ["\\.java$"],
+      "matchStrings": [
+        "\\/\\/\\s*renovate:\\s*image=(?<depName>[^\\s]+)( versioning=(?<versioning>.*?))?\\s*\\n[^\"]+\\s*=\\s*\"(?<currentValue>[^@\"]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?\""
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}docker{{/if}}"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ubuntu/squid"],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)-(?<patch>\\d+)\\.(?<revision>\\d+)(_(?<compatibility>\\w+))?$"
+    }
+  ]
+}

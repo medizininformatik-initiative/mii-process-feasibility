@@ -1,5 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.client.flare;
 
+import de.medizininformatik_initiative.process.feasibility.client.variables.TestConstantsFeasibility;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
@@ -12,13 +13,15 @@ public abstract class FlareWebserviceClientImplBaseIT {
 
     protected static final Network DEFAULT_CONTAINER_NETWORK = Network.newNetwork();
 
-    public static GenericContainer<?> fhirServer = new GenericContainer<>(DockerImageName.parse("samply/blaze:0.30"))
+    public static GenericContainer<?> fhirServer = new GenericContainer<>(
+            DockerImageName.parse("samply/blaze:" + TestConstantsFeasibility.BLAZE_VERSION))
             .withExposedPorts(8080)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("fhir-server")
             .withEnv("LOG_LEVEL", "debug");
 
-    public static GenericContainer<?> flare = new GenericContainer<>(DockerImageName.parse("ghcr.io/medizininformatik-initiative/flare:2.3.0"))
+    public static GenericContainer<?> flare = new GenericContainer<>(
+            DockerImageName.parse("ghcr.io/medizininformatik-initiative/flare:" + TestConstantsFeasibility.FLARE_VERSION))
             .withExposedPorts(8080)
             .withNetwork(DEFAULT_CONTAINER_NETWORK)
             .withNetworkAliases("flare")

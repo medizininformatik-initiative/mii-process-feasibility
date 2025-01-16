@@ -1,5 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.client.flare;
 
+import de.medizininformatik_initiative.process.feasibility.client.variables.TestConstantsFeasibility;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,8 @@ public class FlareWebserviceClientImplFwdProxyIT extends FlareWebserviceClientIm
 
     @Container
     public static GenericContainer<?> forwardProxy = new GenericContainer<>(
-            DockerImageName.parse("ubuntu/squid:6.6-24.04_edge"))
+            // renovate
+            DockerImageName.parse("ubuntu/squid:" + TestConstantsFeasibility.SQUID_VERSION))
                     .withExposedPorts(8080)
                     .withFileSystemBind(squidProxyConf.getPath(), "/etc/squid/squid.conf", READ_ONLY)
                     .withNetwork(DEFAULT_CONTAINER_NETWORK)
