@@ -12,7 +12,7 @@ public interface TestConstantsFeasibility {
     public String KEYCLOAK_VERSION = "25.0";
 
     // renovate: image=nginx
-    public String NGINX_VERSION = "1.27.1";
+    public String NGINX_VERSION = "1.27.3";
 
     // renovate: image=ubuntu/squid
     public String SQUID_VERSION = "6.6-24.04_edge";
