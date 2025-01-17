@@ -47,7 +47,7 @@
             <dependency>
                 <groupId>de.hs-heilbronn.mi</groupId>
                 <artifactId>log4j2-utils</artifactId>
-                <version>0.7.0</version>
+                <version>0.15.0</version>
             </dependency>
 
             <!-- FHIR -->
