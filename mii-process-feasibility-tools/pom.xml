@@ -35,7 +35,7 @@
             <dependency>
                 <groupId>dev.dsf</groupId>
                 <artifactId>dsf-fhir-server</artifactId>
-                <version>1.1.0</version>
+                <version>1.6.0</version>
             </dependency>
 
         </dependencies>
