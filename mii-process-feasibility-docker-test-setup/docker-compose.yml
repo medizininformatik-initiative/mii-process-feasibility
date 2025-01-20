@@ -364,7 +364,7 @@ services:
         condition: service_healthy
 
   dic-1-store-fhir-server:
-    image: hapiproject/hapi:v6.4.4
+    image: hapiproject/hapi:v6.10.1
     healthcheck:
       test: [ "CMD", "/opt/bin/curl", "http://localhost:8080"]
       interval: 30s
@@ -899,7 +899,7 @@ services:
 
   # ---- DIC-4 - FHIR Data Store ----------------------------------------------
   dic-4-store:
-    image: hapiproject/hapi:v6.4.4
+    image: hapiproject/hapi:v6.10.1
     restart: always
     ports:
     - "8082:8080"
