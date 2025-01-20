@@ -18,5 +18,5 @@ public interface TestConstantsFeasibility {
     public String SQUID_VERSION = "6.6-24.04_edge";
 
     // renovate: image=ghcr.io/shopify/toxiproxy
-    public String TOXIPROXY_VERSION = "2.9.0";
+    public String TOXIPROXY_VERSION = "2.11.0";
 }
