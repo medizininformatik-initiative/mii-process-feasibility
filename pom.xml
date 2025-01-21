@@ -17,7 +17,7 @@
         <compileSource>17</compileSource>
         <compileTarget>17</compileTarget>
         <dsf.version>1.6.0</dsf.version>
-        <hapi.fhir.version>5.7.9</hapi.fhir.version>
+        <hapi.fhir.version>7.6.1</hapi.fhir.version>
         <testcontainers.version>1.20.4</testcontainers.version>
     </properties>
 
