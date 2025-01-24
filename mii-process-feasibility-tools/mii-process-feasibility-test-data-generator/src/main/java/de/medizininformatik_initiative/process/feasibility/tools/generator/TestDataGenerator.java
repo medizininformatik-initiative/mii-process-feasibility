@@ -1,7 +1,7 @@
 package de.medizininformatik_initiative.process.feasibility.tools.generator;
 
+import de.hsheilbronn.mi.utils.crypto.CertificateAuthority;
 import de.medizininformatik_initiative.process.feasibility.tools.generator.CertificateGenerator.CertificateFiles;
-import de.rwh.utils.crypto.CertificateAuthority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
