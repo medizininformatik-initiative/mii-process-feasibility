@@ -2,7 +2,7 @@ package de.medizininformatik_initiative.process.feasibility.client.flare;
 
 import de.medizininformatik_initiative.process.feasibility.EvaluationSettingsProvider;
 import de.medizininformatik_initiative.process.feasibility.EvaluationStrategy;
-import de.medizininformatik_initiative.process.feasibility.client.store.TlsClientFactory;
+import de.medizininformatik_initiative.process.feasibility.client.store.StoreClientFactory;
 import de.medizininformatik_initiative.process.feasibility.spring.config.BaseConfig;
 import de.medizininformatik_initiative.process.feasibility.spring.config.EvaluationConfig;
 import org.apache.http.HttpHost;
@@ -107,7 +107,7 @@ public class FlareWebserviceClientSpringConfig {
             logger.info("Setting up store client for indirect access over flare using {}.",
                     EvaluationStrategy.STRUCTURED_QUERY);
 
-            var clientFactory = new TlsClientFactory(null, sslContext);
+            var clientFactory = new StoreClientFactory(null, sslContext);
             clientFactory.setConnectTimeout(connectTimeout);
             clientFactory.setConnectionRequestTimeout(connectTimeout);
             clientFactory.setSocketTimeout(connectTimeout);

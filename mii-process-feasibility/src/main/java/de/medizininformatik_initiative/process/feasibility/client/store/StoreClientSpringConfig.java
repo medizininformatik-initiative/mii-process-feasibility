@@ -147,6 +147,6 @@ public class StoreClientSpringConfig {
     @Qualifier("store-client")
     RestfulClientFactory clientFactory(@Qualifier("store-client") FhirContext fhirContext,
                                        @Qualifier("base-client") SSLContext sslContext) {
-        return new TlsClientFactory(fhirContext, sslContext);
+        return new StoreClientFactory(fhirContext, sslContext);
     }
 }
