@@ -547,7 +547,7 @@ services:
     ports:
     - "127.0.0.1:8080:8080"
     environment:
-      BASE_URL: http://127.0.0.1:8080
+      BASE_URL: http://dic-2-store:8080
       LOG_LEVEL: debug
     networks:
       dic-2-bpe-backend:
