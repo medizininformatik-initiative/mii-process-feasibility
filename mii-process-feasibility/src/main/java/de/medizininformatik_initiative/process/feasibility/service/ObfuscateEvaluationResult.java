@@ -57,7 +57,6 @@ public class ObfuscateEvaluationResult extends AbstractServiceDelegate
         var obfuscatedMeasureReport = new MeasureReport()
                 .setStatus(COMPLETE)
                 .setType(SUMMARY)
-                .setMeasure(measureReport.getMeasure())
                 .setPeriod(new Period()
                         .setStart(MEASURE_REPORT_PERIOD_START)
                         .setEnd(MEASURE_REPORT_PERIOD_END));

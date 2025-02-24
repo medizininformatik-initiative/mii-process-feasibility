@@ -8,7 +8,6 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Library;
-import org.hl7.fhir.r4.model.Measure;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
@@ -25,7 +24,6 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.MEASURE_REPORT_PERIOD_END;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.MEASURE_REPORT_PERIOD_START;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
-import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
@@ -51,11 +49,9 @@ public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate impl
     protected void doExecute(DelegateExecution execution, Variables variables)
             throws IOException, InterruptedException {
         var library = (Library) variables.getResource(VARIABLE_LIBRARY);
-        var measure = (Measure) variables.getResource(VARIABLE_MEASURE);
-
         var structuredQuery = getStructuredQuery(library);
         var feasibility = getFeasibility(structuredQuery);
-        var measureReport = buildMeasureReport(measure.getUrl(), feasibility);
+        var measureReport = buildMeasureReport(feasibility);
 
         variables.setResource(VARIABLE_MEASURE_REPORT, measureReport);
     }
@@ -72,12 +68,11 @@ public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate impl
         return flareClient.requestFeasibility(structuredQuery);
     }
 
-    private MeasureReport buildMeasureReport(String measureRef, int feasibility) {
+    private MeasureReport buildMeasureReport(int feasibility) {
         var measureReport = new MeasureReport()
                 .setStatus(COMPLETE)
                 .setType(SUMMARY)
                 .setDate(new Date())
-                .setMeasure(measureRef)
                 .setPeriod(new Period()
                         .setStart(MEASURE_REPORT_PERIOD_START)
                         .setEnd(MEASURE_REPORT_PERIOD_END));
