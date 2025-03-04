@@ -36,4 +36,6 @@ public interface ConstantsFeasibility {
 
     String HEADER_PREFER = "Prefer";
     String HEADER_PREFER_RESPOND_ASYNC = "respond-async";
+    public String MEASURE_POPULATION = "http://terminology.hl7.org/CodeSystem/measure-population";
+    public String INITIAL_POPULATION = "initial-population";
 }

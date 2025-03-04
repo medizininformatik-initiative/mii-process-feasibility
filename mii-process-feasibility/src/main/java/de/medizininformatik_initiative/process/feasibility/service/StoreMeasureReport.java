@@ -6,6 +6,8 @@ import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.MeasureReport;
+import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent;
+import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.slf4j.Logger;
@@ -18,6 +20,8 @@ import java.util.Optional;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.INITIAL_POPULATION;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.MEASURE_POPULATION;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT_ID;
 
@@ -40,13 +44,25 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
         stripEvaluatedResources(measureReport);
 
         var measureReportId = storeMeasureReport(measureReport);
-        logger.debug("Stored MeasureReport resource: {} [task: {}]",
-                api.getFhirContext().newJsonParser().encodeResourceToString(measureReport),
+        logger.debug("Stored MeasureReport '{}' (initial population count: {}) [task: {}]", measureReportId.getValue(),
+                getPopulation(measureReport),
                 api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
 
         addMeasureReportReferenceToTaskOutputs(task, measureReportId.getValue());
         variables.updateTask(task);
         variables.setString(VARIABLE_MEASURE_REPORT_ID, measureReportId.getValue());
+    }
+
+    private Integer getPopulation(MeasureReport measureReport) {
+        return measureReport.getGroup().stream()
+                .filter(MeasureReportGroupComponent::hasPopulation)
+                .map(MeasureReportGroupComponent::getPopulation)
+                .flatMap(List::stream)
+                .filter(p -> p.hasCode() && p.getCode().hasCoding(MEASURE_POPULATION, INITIAL_POPULATION))
+                .filter(MeasureReportGroupPopulationComponent::hasCount)
+                .findFirst()
+                .map(MeasureReportGroupPopulationComponent::getCount)
+                .orElse(0);
     }
 
     private void addMeasureReportReferenceToTaskOutputs(Task task, String measureReportId) {
