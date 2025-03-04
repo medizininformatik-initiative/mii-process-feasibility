@@ -19,9 +19,11 @@ public class LogReceiveTimeout extends AbstractServiceDelegate {
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) throws BpmnError, Exception {
         var target = variables.getTarget();
-        logger.warn("Timeout while waiting for result from {} (endpoint url: {}).",
+        var task = variables.getStartTask();
+        logger.warn("Timeout while waiting for result from {} (endpoint url: {}) [task: {}]",
                 target.getOrganizationIdentifierValue(),
-                target.getEndpointUrl());
+                target.getEndpointUrl(),
+                api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
     }
 
 }

@@ -40,7 +40,9 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
         stripEvaluatedResources(measureReport);
 
         var measureReportId = storeMeasureReport(measureReport);
-        logger.debug("Stored MeasureReport {}", measureReportId);
+        logger.debug("Stored MeasureReport resource: {} [task: {}]",
+                api.getFhirContext().newJsonParser().encodeResourceToString(measureReport),
+                api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
 
         addMeasureReportReferenceToTaskOutputs(task, measureReportId.getValue());
         variables.updateTask(task);
@@ -66,7 +68,8 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
         if (measureRef.isPresent()) {
             measureReport.setMeasure(measureRef.get().getReference());
         } else {
-            logger.error("Task {} is missing the measure reference.", task.getId());
+            logger.error("Task is missing the measure reference [task: {}]",
+                    api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
             throw new RuntimeException("Missing measure reference.");
         }
     }

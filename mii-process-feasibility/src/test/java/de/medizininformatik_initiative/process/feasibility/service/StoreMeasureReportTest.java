@@ -1,5 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
+import ca.uhn.fhir.context.FhirContext;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import dev.dsf.bpe.v1.service.TaskHelper;
@@ -80,6 +81,7 @@ public class StoreMeasureReportTest
         when(variables.getStartTask()).thenReturn(task);
         when(api.getReadAccessHelper()).thenReturn(readAccessHelper);
         when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
+        when(api.getFhirContext()).thenReturn(FhirContext.forR4());
         when(clientProvider.getLocalWebserviceClient()).thenReturn(localWebserviceClient);
         when(localWebserviceClient.withMinimalReturn()).thenReturn(returnMinimal);
         when(returnMinimal.create(measureReportCaptor.capture())).thenReturn(measureReportId);
