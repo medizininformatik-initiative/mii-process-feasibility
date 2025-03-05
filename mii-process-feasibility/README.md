@@ -150,6 +150,35 @@ This version of the process is compatible with the following components:
 
 **Note:** Flare got rewritten. Only the [new project][9] is supported.
 
+## Monitoring Requests and Responses
+
+The debug logs, located in the bpe logs folder, contain information about the feasibility tasks executed at your site.
+These include the url's of the Measure and MeasureReport resources along the execution time for evaluating a query
+against the data FHIR store and the result count of the MeasureReport sent back to the feasibility task requester.
+
+### Structured Query
+
+For Structured Queries, you can enable the debug logs of your Flare instance to log the evaluated query.
+
+### CQL Query
+
+For CQL queries, the bpe debug logs contain the URL to the Measure resource in your data FHIR store that is evaluated.
+You can retrieve the Measure resource by opening the URL with an HTTP client and using the configured authentication
+method, if any, of your data FHIR store. The Measure resource contains a reference to the Library resource, which may
+have to be prefixed with the data FHIR store base url and then can be opened the same way. The Library resource contains
+the base64 encoded CQL query, which can be decoded using, for example, the command line tool base64.
+
+The following code snippet shows how to retrieve the CQL query using Linux command line tools and basic authentication
+for accessing the data FHIR store:
+
+```sh
+MEASURE_URL="https://fhir-store.foo/fhir/Measure/AABBCCDDEE" # retrieved from debug log
+BASE_URL="$(echo "$MEASURE_URL" | sed -E 's#Measure/.*$##')"
+LIBRARY_REF="$(curl -sL -H "Accept: application/fhir+json" -u "login:password" "$MEASURE_URL" | jq -r '.library[0]')"
+LIBRARY_URL="$BASE_URL$(echo "$LIBRARY_REF" | sed -E 's#^.*(Library/.*)$#\1#')"
+curl -sL -H "Accept: application/fhir+json" -u "login:password" "$LIBRARY_URL" | jq -r '.content[0].data' | base64 --decode
+```
+
 
 [1]: <https://www.hl7.org/FHIR/task.html>
 [2]: <https://www.hl7.org/fhir/measure.html>
