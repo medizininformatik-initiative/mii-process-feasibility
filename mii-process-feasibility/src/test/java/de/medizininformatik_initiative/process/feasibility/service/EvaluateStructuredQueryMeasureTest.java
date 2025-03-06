@@ -2,11 +2,14 @@ package de.medizininformatik_initiative.process.feasibility.service;
 
 import de.medizininformatik_initiative.process.feasibility.client.flare.FlareWebserviceClient;
 import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.service.TaskHelper;
 import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.Library;
+import org.hl7.fhir.r4.model.Measure;
 import org.hl7.fhir.r4.model.MeasureReport;
+import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -19,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
@@ -37,6 +41,8 @@ public class EvaluateStructuredQueryMeasureTest {
     @Mock private DelegateExecution execution;
     @Mock private ProcessPluginApi api;
     @Mock private Variables variables;
+    @Mock private TaskHelper taskHelper;
+    @Mock private Task task;
 
     @InjectMocks private EvaluateStructuredQueryMeasure service;
 
@@ -52,11 +58,16 @@ public class EvaluateStructuredQueryMeasureTest {
     @Test
     public void testDoExecute_FailsIfFeasibilityCannotBeRequested() throws IOException, InterruptedException {
         var structuredQuery = "foo".getBytes();
+        var measure = new Measure();
         var library = new Library();
         library.setContent(List.of(new Attachment()
                 .setContentType("application/json")
                 .setData(structuredQuery)));
 
+        when(api.getTaskHelper()).thenReturn(taskHelper);
+        when(variables.getStartTask()).thenReturn(task);
+        when(taskHelper.getLocalVersionlessAbsoluteUrl(task)).thenReturn("task-url");
+        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(measure);
         when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
         when(flareWebserviceClient.requestFeasibility(structuredQuery)).thenThrow(IOException.class);
 
@@ -79,12 +90,17 @@ public class EvaluateStructuredQueryMeasureTest {
     @Test
     public void testDoExecute() throws IOException, InterruptedException {
         var structuredQuery = "foo".getBytes();
+        var measure = new Measure();
         var library = new Library();
         library.setContent(List.of(new Attachment()
                 .setContentType("application/json")
                 .setData(structuredQuery)));
         var feasibility = 10;
 
+        when(api.getTaskHelper()).thenReturn(taskHelper);
+        when(variables.getStartTask()).thenReturn(task);
+        when(taskHelper.getLocalVersionlessAbsoluteUrl(task)).thenReturn("task-url");
+        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(measure);
         when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
         when(flareWebserviceClient.requestFeasibility(structuredQuery)).thenReturn(feasibility);
 

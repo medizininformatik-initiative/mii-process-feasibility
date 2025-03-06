@@ -9,6 +9,7 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Library;
 import org.hl7.fhir.r4.model.Measure;
+import org.hl7.fhir.r4.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,7 +18,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.*;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_ID;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hl7.fhir.r4.model.Bundle.BundleType.TRANSACTION;
 import static org.hl7.fhir.r4.model.Bundle.HTTPVerb.POST;
@@ -50,13 +53,14 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
     protected void doExecute(DelegateExecution execution, Variables variables) {
         Measure measure = variables.getResource(VARIABLE_MEASURE);
         Library library = variables.getResource(VARIABLE_LIBRARY);
+        var task = variables.getStartTask();
 
         cleaner.cleanLibrary(library);
         cleaner.cleanMeasure(measure);
 
         fixCanonical(measure, library);
 
-        var transactionResponse = storeResources(measure, library);
+        var transactionResponse = storeResources(measure, library, task);
 
         variables.setString(VARIABLE_MEASURE_ID, extractMeasureId(transactionResponse));
     }
@@ -81,9 +85,9 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
         }
     }
 
-    private Bundle storeResources(Measure measure, Library library) {
-        logger.info("Store Measure `{}` and Library `{}`", measure.getId(), library.getUrl());
-
+    private Bundle storeResources(Measure measure, Library library, Task task) {
+        logger.info("Store Measure '{}' and Library '{}' [task: {}]", measure.getId(), library.getId(),
+                api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
         Bundle bundle = new Bundle().setType(TRANSACTION);
         bundle.addEntry().setResource(measure).getRequest().setMethod(POST).setUrl("Measure");
         bundle.addEntry().setResource(library).getRequest().setMethod(POST).setUrl("Library");
@@ -91,6 +95,6 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
     }
 
     private String extractMeasureId(Bundle transactionResponse) {
-        return new IdType(transactionResponse.getEntryFirstRep().getResponse().getLocation()).getIdPart();
+        return new IdType(transactionResponse.getEntryFirstRep().getResponse().getLocation()).getValue();
     }
 }

@@ -2,6 +2,8 @@ package de.medizininformatik_initiative.process.feasibility.service;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.IOperationUntypedWithInput;
+import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.service.TaskHelper;
 import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.Bundle;
@@ -52,6 +54,8 @@ public class EvaluateCqlMeasureTest {
     @Mock private DelegateExecution execution;
     @Mock private Variables variables;
     @Mock private IOperationUntypedWithInput<Parameters> operation;
+    @Mock private ProcessPluginApi api;
+    @Mock private TaskHelper taskHelper;
 
     @InjectMocks private EvaluateCqlMeasure service;
 
@@ -75,6 +79,7 @@ public class EvaluateCqlMeasureTest {
                         .thenReturn(operation);
         when(operation.withAdditionalHeader(eq(HEADER_PREFER), eq(HEADER_PREFER_RESPOND_ASYNC))).thenReturn(operation);
         when(variables.getString(VARIABLE_MEASURE_ID)).thenReturn(MEASURE_ID);
+        when(api.getTaskHelper()).thenReturn(taskHelper);
     }
 
     @Test

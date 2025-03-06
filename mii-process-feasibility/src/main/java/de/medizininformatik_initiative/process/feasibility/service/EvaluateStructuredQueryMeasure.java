@@ -8,10 +8,14 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Library;
+import org.hl7.fhir.r4.model.Measure;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
 import org.hl7.fhir.r4.model.Period;
+import org.hl7.fhir.r4.model.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.io.IOException;
@@ -24,12 +28,14 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.MEASURE_REPORT_PERIOD_END;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.MEASURE_REPORT_PERIOD_START;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 
 public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate implements InitializingBean {
 
+    private static final Logger logger = LoggerFactory.getLogger(EvaluateStructuredQueryMeasure.class);
     private static final String STRUCTURED_QUERY_CONTENT_TYPE = "application/json";
 
     private final FlareWebserviceClient flareClient;
@@ -49,8 +55,11 @@ public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate impl
     protected void doExecute(DelegateExecution execution, Variables variables)
             throws IOException, InterruptedException {
         var library = (Library) variables.getResource(VARIABLE_LIBRARY);
+        var measure = (Measure) variables.getResource(VARIABLE_MEASURE);
         var structuredQuery = getStructuredQuery(library);
-        var feasibility = getFeasibility(structuredQuery);
+
+        var feasibility = getFeasibility(structuredQuery, measure, variables.getStartTask());
+
         var measureReport = buildMeasureReport(feasibility);
 
         variables.setResource(VARIABLE_MEASURE_REPORT, measureReport);
@@ -64,8 +73,20 @@ public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate impl
                 .getData();
     }
 
-    private int getFeasibility(byte[] structuredQuery) throws IOException, InterruptedException {
-        return flareClient.requestFeasibility(structuredQuery);
+    private int getFeasibility(byte[] structuredQuery, Measure measure, Task task)
+            throws IOException, InterruptedException {
+        logger.debug("Start evaluating Measure '{}' [task: {}]", measure.getId(),
+                api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
+        var startTime = System.currentTimeMillis();
+
+        var feasibilityCount = flareClient.requestFeasibility(structuredQuery);
+
+        var durationSeconds = (System.currentTimeMillis() - startTime) / 1000.0d;
+        logger.debug("Finished evaluating Measure '{}' (total execution time: {}s) [task: {}]",
+                measure.getId(), "%.3f".formatted(durationSeconds),
+                api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
+
+        return feasibilityCount;
     }
 
     private MeasureReport buildMeasureReport(int feasibility) {

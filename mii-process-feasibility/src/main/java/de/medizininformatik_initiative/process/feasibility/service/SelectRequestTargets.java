@@ -72,7 +72,8 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
         if (measureRef.isPresent()) {
             return measureRef.get().getReference();
         } else {
-            logger.error("Task {} is missing the measure reference.", task.getId());
+            logger.error("Task is missing the measure reference [task: {}]",
+                    api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
             throw new RuntimeException("Missing measure reference.");
         }
     }

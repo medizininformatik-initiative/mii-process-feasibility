@@ -48,7 +48,7 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
 
         var measureId = getMeasureId(task);
         var client = clientProvider.getWebserviceClientByReference(measureId);
-        var bundle = getMeasureAndLibrary(measureId, client);
+        var bundle = getMeasureAndLibrary(measureId, client, task);
 
         variables.setResource(ConstantsFeasibility.VARIABLE_MEASURE, bundle.getEntry().get(0).getResource());
         variables.setResource(ConstantsFeasibility.VARIABLE_LIBRARY, bundle.getEntry().get(1).getResource());
@@ -61,12 +61,13 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
         if (measureRef.isPresent()) {
             return new IdType(measureRef.get().getReference());
         } else {
-            logger.error("Task {} is missing the measure reference.", task.getId());
+            logger.error("Task is missing the measure reference [task: {}]",
+                    api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
             throw new RuntimeException("Missing measure reference.");
         }
     }
 
-    private Bundle getMeasureAndLibrary(IdType measureId, FhirWebserviceClient client) {
+    private Bundle getMeasureAndLibrary(IdType measureId, FhirWebserviceClient client, Task task) {
         try {
             var bundle = client.searchWithStrictHandling(Measure.class,
                     Map.of("_id", Collections.singletonList(measureId.getIdPart()), "_include",
@@ -84,8 +85,9 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
 
             return bundle;
         } catch (Exception e) {
-            logger.warn("Error while reading Measure with id {} including its Library from {}: {}",
-                    measureId.getIdPart(), client.getBaseUrl(), e.getMessage());
+            logger.warn("Error while reading Measure with id {} including its Library from {}: {} [task: {}]",
+                    measureId.getIdPart(), client.getBaseUrl(), e.getMessage(),
+                    api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
             throw e;
         }
     }
