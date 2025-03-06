@@ -153,12 +153,13 @@ public class FlareWebserviceClientImplTest {
     @Test
     void sendErrorGetsRethrownWithAdditionalInformation() throws Exception {
         var structuredQuery = "foo".getBytes();
-        var error = new IOException("error-151930");
+        var errorMessage = "error-151930";
+        var error = new IOException(errorMessage);
         when(httpClient.execute(any(HttpPost.class), any(BasicResponseHandler.class))).thenThrow(error);
 
         assertThatThrownBy(() -> flareWebserviceClient.requestFeasibility(structuredQuery))
-                .hasMessage("Error sending %s request to flare webservice url '%s'.", POST,
-                        flareBaseUrl.resolve("/query/execute"))
+                .hasMessage("Error sending %s request to flare webservice url '%s': %s", POST,
+                        flareBaseUrl.resolve("/query/execute"), errorMessage)
                 .hasCause(error);
     }
 }

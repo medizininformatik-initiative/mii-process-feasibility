@@ -59,7 +59,9 @@ public class FlareWebserviceClientImpl implements FlareWebserviceClient {
             return httpClient.execute(req, new BasicResponseHandler());
         } catch (IOException e) {
             throw new IOException(
-                    format("Error sending %s request to flare webservice url '%s'.", req.getMethod(), req.getURI()), e);
+                    format("Error sending %s request to flare webservice url '%s': %s", req.getMethod(), req.getURI(),
+                            e.getMessage()),
+                    e);
         }
     }
 }
