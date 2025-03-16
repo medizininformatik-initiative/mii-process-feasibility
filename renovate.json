@@ -15,6 +15,10 @@
     "**/tests/**",
     "**/__fixtures__/**"
   ],
+  "labels": ["dependencies"],
+  "vulnerabilityAlerts": {
+    "labels": ["security"]
+  },
   "customManagers": [
     {
       "customType": "regex",

@@ -97,6 +97,7 @@ jobs:
       with:
         draft: true
         generate_release_notes: true
+        body_path: .github/release-notes.md
         files: |
           mii-process-feasibility/target/mii-process-feasibility-*.jar
           mii-process-feasibility/target/mii-process-feasibility-*.jar.sha256
