@@ -400,6 +400,23 @@
                     </filesets>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>dev.dsf</groupId>
+                <artifactId>dsf-tools-documentation-generator</artifactId>
+                <version>${dsf.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <workingPackages>
+                        <workingPackage>de.medizininformatik_initiative.process.feasibility</workingPackage>
+                    </workingPackages>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
