@@ -19,10 +19,9 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 
 import static jakarta.ws.rs.HttpMethod.POST;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -43,26 +42,29 @@ public class FlareWebserviceClientImplTest {
     }
 
     @Test
-    public void testRequestFeasibility_FailsOnCommunicationError() throws IOException, InterruptedException {
+    public void failsOnCommunicationError() throws IOException, InterruptedException {
         when(httpClient.execute(any(HttpPost.class), any(BasicResponseHandler.class)))
                 .thenThrow(IOException.class);
 
         var structuredQuery = "foo".getBytes();
-        assertThrows(IOException.class, () -> flareWebserviceClient.requestFeasibility(structuredQuery));
+        assertThatThrownBy(() -> flareWebserviceClient.requestFeasibility(structuredQuery))
+                .isInstanceOf(IOException.class);
     }
 
     @Test
-    public void testRequestFeasibility_FailsOnWrongBodyContent() throws IOException, InterruptedException {
+    public void failsOnWrongBodyContent() throws IOException, InterruptedException {
         var response = "{\"invalid\": true}";
         when(httpClient.execute(any(HttpPost.class), any(BasicResponseHandler.class)))
                 .thenReturn(response);
 
         var structuredQuery = "foo".getBytes();
-        assertThrows(NumberFormatException.class, () -> flareWebserviceClient.requestFeasibility(structuredQuery));
+        assertThatThrownBy(() -> flareWebserviceClient.requestFeasibility(structuredQuery))
+                .isInstanceOf(IOException.class)
+                .hasMessageContaining(response);
     }
 
     @Test
-    public void testRequestFeasibility() throws IOException, InterruptedException {
+    public void requestFeasibility() throws IOException, InterruptedException {
         var response = "15";
         when(httpClient.execute(any(HttpPost.class), any(BasicResponseHandler.class)))
                 .thenReturn(response);
@@ -70,11 +72,23 @@ public class FlareWebserviceClientImplTest {
         var structuredQuery = "foo".getBytes();
         var feasibility = flareWebserviceClient.requestFeasibility(structuredQuery);
 
-        assertEquals(15, feasibility);
+        assertThat(feasibility).isEqualTo(15);
     }
 
     @Test
-    public void testBaseUrlPathIsKept() throws Exception {
+    public void whitespaceInResponseIsIgnored() throws IOException, InterruptedException {
+        var response = " \t  \n 15  \n  ";
+        when(httpClient.execute(any(HttpPost.class), any(BasicResponseHandler.class)))
+                .thenReturn(response);
+
+        var structuredQuery = "foo".getBytes();
+        var feasibility = flareWebserviceClient.requestFeasibility(structuredQuery);
+
+        assertThat(feasibility).isEqualTo(15);
+    }
+
+    @Test
+    public void baseUrlPathIsKept() throws Exception {
         var path = "/foo/bar/";
         flareWebserviceClient = new FlareWebserviceClientImpl(httpClient, URI.create("http://foo.bar:1234" + path));
         var structuredQuery = "foo".getBytes();
@@ -84,33 +98,32 @@ public class FlareWebserviceClientImplTest {
 
         flareWebserviceClient.requestFeasibility(structuredQuery);
 
-        assertEquals(path + "query/execute", postCaptor.getValue().getURI().getPath());
+        assertThat(postCaptor.getValue().getURI().getPath()).isEqualTo(path + "query/execute");
     }
 
     @Test
-    void testNullBaseUrlDoesNotFailAtInit() throws Exception {
+    void nullBaseUrlDoesNotFailAtInit() throws Exception {
         var config = new FlareWebserviceClientSpringConfig();
-        assertDoesNotThrow(() -> {
-            return config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
+        assertThatNoException().isThrownBy(() -> {
+            config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
                     EvaluationStrategy.STRUCTURED_QUERY, true, 0d, 0d, 0, Duration.ofMillis(1)));
         });
     }
 
     @Test
-    void testNullBaseUrlFails() throws Exception {
+    void nullBaseUrlFails() throws Exception {
         var config = new FlareWebserviceClientSpringConfig();
         var structuredQuery = "foo".getBytes();
         flareWebserviceClient = config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
                 EvaluationStrategy.STRUCTURED_QUERY, true, 0d, 0d, 0, Duration.ofMillis(1)));
 
-        var e = assertThrows(IllegalArgumentException.class,
-                () -> flareWebserviceClient.requestFeasibility(structuredQuery));
-
-        assertEquals("FLARE_BASE_URL is not set.", e.getMessage());
+        assertThatThrownBy(() -> flareWebserviceClient.requestFeasibility(structuredQuery))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("FLARE_BASE_URL is not set.");
     }
 
     @Test
-    void testIllegalBaseUrlFails() throws Exception {
+    void illegalBaseUrlFails() throws Exception {
         var config = new FlareWebserviceClientSpringConfig();
         var invalidUrl = "{ßöäü;";
         var structuredQuery = "foo".getBytes();
@@ -118,14 +131,13 @@ public class FlareWebserviceClientImplTest {
         flareWebserviceClient = config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
                 EvaluationStrategy.STRUCTURED_QUERY, true, 0d, 0d, 0, Duration.ofMillis(1)));
 
-        var e = assertThrows(IllegalArgumentException.class,
-                () -> flareWebserviceClient.requestFeasibility(structuredQuery));
-
-        assertEquals("Could not parse FLARE_BASE_URL '" + invalidUrl + "' as URI.", e.getMessage());
+        assertThatThrownBy(() -> flareWebserviceClient.requestFeasibility(structuredQuery))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Could not parse FLARE_BASE_URL '" + invalidUrl + "' as URI.");
     }
 
     @Test
-    void testOtherEvaluationStrategyFails() throws Exception {
+    void otherEvaluationStrategyFails() throws Exception {
         var config = new FlareWebserviceClientSpringConfig();
         var invalidUrl = "{ßöäü;";
         var structuredQuery = "foo".getBytes();
@@ -133,23 +145,21 @@ public class FlareWebserviceClientImplTest {
         flareWebserviceClient = config.flareWebserviceClient(httpClient, new EvaluationSettingsProviderImpl(
                 EvaluationStrategy.CQL, true, 0d, 0d, 0, Duration.ofMillis(1)));
 
-        var e = assertThrows(IllegalStateException.class,
-                () -> flareWebserviceClient.requestFeasibility(structuredQuery));
-
-        assertEquals("EVALUATION_STRATEGY is not set to 'structured-query'.", e.getMessage());
+        assertThatThrownBy(() -> flareWebserviceClient.requestFeasibility(structuredQuery))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("EVALUATION_STRATEGY is not set to 'structured-query'.");
     }
 
     @Test
     void sendErrorGetsRethrownWithAdditionalInformation() throws Exception {
         var structuredQuery = "foo".getBytes();
-        var error = new IOException("error-151930");
+        var errorMessage = "error-151930";
+        var error = new IOException(errorMessage);
         when(httpClient.execute(any(HttpPost.class), any(BasicResponseHandler.class))).thenThrow(error);
 
-        assertThatThrownBy(() -> {
-            flareWebserviceClient.requestFeasibility(structuredQuery);
-        })
-            .hasMessage("Error sending %s request to flare webservice url '%s'.", POST,
-                    flareBaseUrl.resolve("/query/execute"))
-            .hasCause(error);
+        assertThatThrownBy(() -> flareWebserviceClient.requestFeasibility(structuredQuery))
+                .hasMessage("Error sending %s request to flare webservice url '%s': %s", POST,
+                        flareBaseUrl.resolve("/query/execute"), errorMessage)
+                .hasCause(error);
     }
 }

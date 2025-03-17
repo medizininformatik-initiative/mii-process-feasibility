@@ -1,13 +1,13 @@
 package de.medizininformatik_initiative.process.feasibility.tools.generator;
 
 import com.google.common.collect.Streams;
-import de.rwh.utils.crypto.CertificateAuthority;
-import de.rwh.utils.crypto.CertificateAuthority.CertificateAuthorityBuilder;
-import de.rwh.utils.crypto.CertificateHelper;
-import de.rwh.utils.crypto.CertificationRequestBuilder;
-import de.rwh.utils.crypto.io.CertificateWriter;
-import de.rwh.utils.crypto.io.CsrIo;
-import de.rwh.utils.crypto.io.PemIo;
+import de.hsheilbronn.mi.utils.crypto.CertificateAuthority;
+import de.hsheilbronn.mi.utils.crypto.CertificateAuthority.CertificateAuthorityBuilder;
+import de.hsheilbronn.mi.utils.crypto.CertificateHelper;
+import de.hsheilbronn.mi.utils.crypto.CertificationRequestBuilder;
+import de.hsheilbronn.mi.utils.crypto.io.CertificateWriter;
+import de.hsheilbronn.mi.utils.crypto.io.CsrIo;
+import de.hsheilbronn.mi.utils.crypto.io.PemIo;
 import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;

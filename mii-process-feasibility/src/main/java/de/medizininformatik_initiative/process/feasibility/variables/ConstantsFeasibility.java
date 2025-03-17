@@ -30,6 +30,12 @@ public interface ConstantsFeasibility {
 
     Date MEASURE_REPORT_PERIOD_START = new LocalDate(1900, 1, 1).toDate();
     Date MEASURE_REPORT_PERIOD_END = new LocalDate(2100, 1, 1).toDate();
+    String MEASURE_REPORT_TYPE_POPULATION = "population";
 
     int CLIENT_TIMEOUT_DEFAULT = 300000;
+
+    String HEADER_PREFER = "Prefer";
+    String HEADER_PREFER_RESPOND_ASYNC = "respond-async";
+    public String MEASURE_POPULATION = "http://terminology.hl7.org/CodeSystem/measure-population";
+    public String INITIAL_POPULATION = "initial-population";
 }

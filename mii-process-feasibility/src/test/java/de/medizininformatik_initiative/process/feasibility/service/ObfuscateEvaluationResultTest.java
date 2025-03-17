@@ -73,11 +73,9 @@ public class ObfuscateEvaluationResultTest {
     public void doExecuteSucceedsSinglePopulationSingleCoding() throws Exception {
         var feasibilityCount = 5;
         var reportDate = new Date();
-        var measureUrl = "http://localhost/fhir/Measure/123456";
         var measureReport = new MeasureReport()
                 .setStatus(COMPLETE)
                 .setType(SUMMARY)
-                .setMeasure(measureUrl)
                 .setDate(reportDate)
                 .setPeriod(new Period()
                         .setStart(new LocalDate(1312, 4, 9).toDate())
@@ -104,7 +102,6 @@ public class ObfuscateEvaluationResultTest {
         var reportPopulation = obfuscatedMeasureReport.getGroupFirstRep().getPopulationFirstRep();
         assertThat(obfuscatedMeasureReport.getStatus()).isEqualTo(COMPLETE);
         assertThat(obfuscatedMeasureReport.getType()).isEqualTo(SUMMARY);
-        assertThat(obfuscatedMeasureReport.getMeasure()).isEqualTo(measureUrl);
         assertThat(obfuscatedMeasureReport.hasDate()).isFalse();
         assertThat(obfuscatedMeasureReport.getPeriod().getStart()).isEqualTo(MEASURE_REPORT_PERIOD_START);
         assertThat(obfuscatedMeasureReport.getPeriod().getEnd()).isEqualTo(MEASURE_REPORT_PERIOD_END);

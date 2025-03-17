@@ -1,6 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.spring.config;
 
-import ca.uhn.fhir.context.FhirContext;
+import dev.dsf.bpe.v1.documentation.ProcessDocumentation;
 import org.apache.http.ssl.SSLContexts;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,19 +22,29 @@ import javax.net.ssl.SSLContext;
 @Configuration
 public class BaseConfig {
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_path:#{null}}") private String trustStorePath;
+    @ProcessDocumentation(
+            processNames = { "medizininformatik-initiativede_feasibilityExecute" },
+            description = "File path to the trust store with one or more trusted root certificate to validate the server containing the FHIR data or the FLARE service certificate when connecting via https")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_path:#{null}}")
+    private String trustStorePath;
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_password:#{null}}") private String trustStorePassword;
+    @ProcessDocumentation(
+            processNames = { "medizininformatik-initiativede_feasibilityExecute" },
+            description = "Password for the trust store with one or more trusted root certificate to validate the server containing the FHIR data or the FLARE service certificate when connecting via https")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.trust_store_password:#{null}}")
+    private String trustStorePassword;
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.key_store_path:#{null}}") private String keyStorePath;
+    @ProcessDocumentation(
+            processNames = { "medizininformatik-initiativede_feasibilityExecute" },
+            description = "File path to the key store containing a client certificate if the server containing the FHIR data or the FLARE service requests client certificate authentication")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.key_store_path:#{null}}")
+    private String keyStorePath;
 
-    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.key_store_password:#{null}}") private String keyStorePassword;
-
-    @Bean
-    @Qualifier("base")
-    FhirContext fhirContext() {
-        return FhirContext.forR4();
-    }
+    @ProcessDocumentation(
+            processNames = { "medizininformatik-initiativede_feasibilityExecute" },
+            description = "Password for the trust store containing a client certificate if the server containing the FHIR data or the FLARE service requests client certificate authentication")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.store.key_store_password:#{null}}")
+    private String keyStorePassword;
 
     @Bean
     @Qualifier("base-client-trust")
