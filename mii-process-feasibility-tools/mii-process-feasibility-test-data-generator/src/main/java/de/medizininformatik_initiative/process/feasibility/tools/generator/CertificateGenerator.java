@@ -1,28 +1,23 @@
 package de.medizininformatik_initiative.process.feasibility.tools.generator;
 
 import com.google.common.collect.Streams;
-import de.hsheilbronn.mi.utils.crypto.CertificateAuthority;
-import de.hsheilbronn.mi.utils.crypto.CertificateAuthority.CertificateAuthorityBuilder;
-import de.hsheilbronn.mi.utils.crypto.CertificateHelper;
-import de.hsheilbronn.mi.utils.crypto.CertificationRequestBuilder;
-import de.hsheilbronn.mi.utils.crypto.io.CertificateWriter;
-import de.hsheilbronn.mi.utils.crypto.io.CsrIo;
-import de.hsheilbronn.mi.utils.crypto.io.PemIo;
+import de.hsheilbronn.mi.utils.crypto.ca.CertificateAuthority;
+import de.hsheilbronn.mi.utils.crypto.ca.CertificationRequest;
+import de.hsheilbronn.mi.utils.crypto.io.PemReader;
+import de.hsheilbronn.mi.utils.crypto.io.PemWriter;
+import de.hsheilbronn.mi.utils.crypto.keypair.KeyPairGeneratorFactory;
 import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.pkcs.PKCSException;
-import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -113,26 +108,26 @@ public class CertificateGenerator {
     }
 
     public CertificateAuthority initCA() {
-        Path caCertFile = createFolderIfNotExists(Paths.get("cert/ca/testca_certificate.pem"));
-        Path caPrivateKeyFile = createFolderIfNotExists(Paths.get("cert/ca/testca_private-key.pem"));
+        var caCertFile = createFolderIfNotExists(Paths.get("cert/ca/testca_certificate.pem"));
+        var caPrivateKeyFile = createFolderIfNotExists(Paths.get("cert/ca/testca_private-key.pem"));
 
         if (Files.isReadable(caCertFile) && Files.isReadable(caPrivateKeyFile)) {
             logger.info("Initializing CA from cert file: {}, private key {}", caCertFile,
                     caPrivateKeyFile);
 
-            X509Certificate caCertificate = readCertificate(caCertFile);
-            PrivateKey caPrivateKey = readPrivatekey(caPrivateKeyFile);
+            var caCertificate = readCertificate(caCertFile);
+            var caPrivateKey = readPrivatekey(caPrivateKeyFile);
 
-            return CertificateAuthorityBuilder.create(caCertificate, caPrivateKey).initialize();
+            return CertificateAuthority.existingCa(caCertificate, caPrivateKey);
         } else {
             logger.info("Initializing CA with new cert file: {}, private key {}", caCertFile,
                     caPrivateKeyFile);
 
-            CertificateAuthority ca = CertificateAuthorityBuilder.create("DE", null, null, null, null, "Test")
-                    .initialize();
+            var ca = CertificateAuthority.builderSha512Rsa4096("DE", null, null, null, null, "Test")
+                    .build();
 
             writeCertificate(caCertFile, ca.getCertificate());
-            writePrivateKeyEncrypted(caPrivateKeyFile, ca.getCaKeyPair().getPrivate());
+            writePrivateKeyEncrypted(caPrivateKeyFile, ca.getKeyPair().getPrivate());
 
             return ca;
         }
@@ -140,8 +135,8 @@ public class CertificateGenerator {
 
     private void writePrivateKeyEncrypted(Path privateKeyFile, PrivateKey privateKey) {
         try {
-            PemIo.writeAes128EncryptedPrivateKeyToPkcs8(PROVIDER, privateKeyFile, privateKey, CERT_PASSWORD);
-        } catch (IOException | OperatorCreationException e) {
+            PemWriter.writePrivateKey(privateKey).asPkcs8().encryptedAes128(CERT_PASSWORD).toFile(privateKeyFile);
+        } catch (IOException e) {
             logger.error("Error while writing encrypted private-key to " + privateKeyFile, e);
             throw new RuntimeException(e);
         }
@@ -149,8 +144,8 @@ public class CertificateGenerator {
 
     private void writePrivateKeyNotEncrypted(Path privateKeyFile, PrivateKey privateKey) {
         try {
-            PemIo.writeNotEncryptedPrivateKeyToPkcs8(PROVIDER, privateKeyFile, privateKey);
-        } catch (IOException | OperatorCreationException e) {
+            PemWriter.writePrivateKey(privateKey).asPkcs8().notEncrypted().toFile(privateKeyFile);
+        } catch (IOException e) {
             logger.error("Error while writing not-encrypted private-key to " + privateKeyFile, e);
             throw new RuntimeException(e);
         }
@@ -158,8 +153,8 @@ public class CertificateGenerator {
 
     private void writeCertificate(Path certificateFile, X509Certificate certificate) {
         try {
-            PemIo.writeX509CertificateToPem(certificate, certificateFile);
-        } catch (CertificateEncodingException | IllegalStateException | IOException e) {
+            PemWriter.writeCertificate(certificate, certificateFile);
+        } catch (IllegalStateException | IOException e) {
             logger.error("Error while writing certificate to " + certificateFile.toString(), e);
             throw new RuntimeException(e);
         }
@@ -167,8 +162,8 @@ public class CertificateGenerator {
 
     private PrivateKey readPrivatekey(Path privateKeyFile) {
         try {
-            return PemIo.readPrivateKeyFromPem(PROVIDER, privateKeyFile, CERT_PASSWORD);
-        } catch (IOException | PKCSException e) {
+            return PemReader.readPrivateKey(privateKeyFile, CERT_PASSWORD);
+        } catch (IOException e) {
             logger.error("Error while reading private-key from " + privateKeyFile, e);
             throw new RuntimeException(e);
         }
@@ -176,8 +171,8 @@ public class CertificateGenerator {
 
     private X509Certificate readCertificate(Path certFile) {
         try {
-            return PemIo.readX509CertificateFromPem(certFile);
-        } catch (CertificateException | IOException e) {
+            return PemReader.readCertificate(certFile);
+        } catch (IOException e) {
             logger.error("Error while reading certificate from " + certFile.toString(), e);
             throw new RuntimeException(e);
         }
@@ -201,11 +196,12 @@ public class CertificateGenerator {
     }
 
     public CertificateFiles createCert(CertificateType certificateType, String commonName, List<String> dnsNames) {
-        Path privateKeyFile = createFolderIfNotExists(getPrivateKeyPath(commonName));
-        KeyPair keyPair = createOrReadKeyPair(privateKeyFile, commonName);
+        var privateKeyFile = createFolderIfNotExists(getPrivateKeyPath(commonName));
+        var keyPair = createOrReadKeyPair(privateKeyFile, commonName);
+
 
         Path certificateRequestFile = createFolderIfNotExists(getCertReqPath(commonName));
-        JcaPKCS10CertificationRequest certificateRequest = createOrReadCertificateRequest(certificateRequestFile,
+        CertificationRequest certificateRequest = createOrReadCertificateRequest(certificateRequestFile,
                 certificateType, keyPair, commonName, dnsNames);
 
         Path certificatePemFile = createFolderIfNotExists(getCertPemPath(commonName));
@@ -216,7 +212,7 @@ public class CertificateGenerator {
                 calculateSha512CertificateThumbprint(certificate));
     }
 
-    private X509Certificate signOrReadCertificate(Path certificateFile, JcaPKCS10CertificationRequest certificateRequest,
+    private X509Certificate signOrReadCertificate(Path certificateFile, CertificationRequest certificateRequest,
                                                   String commonName, CertificateType certificateType) {
         if (Files.isReadable(certificateFile)) {
             logger.info("Reading certificate (pem) from {} [{}]", certificateFile, commonName);
@@ -232,26 +228,27 @@ public class CertificateGenerator {
         }
     }
 
-    private X509Certificate signCertificateRequest(JcaPKCS10CertificationRequest certificateRequest,
+    private X509Certificate signCertificateRequest(CertificationRequest certificateRequest,
                                                    CertificateType certificateType) {
         try {
             switch (certificateType) {
                 case CLIENT:
-                    return ca.signWebClientCertificate(certificateRequest);
+                    return ca.signClientCertificate(certificateRequest);
                 case SERVER:
-                    return ca.signWebServerCertificate(certificateRequest);
+                    return ca.signServerCertificate(certificateRequest);
                 default:
                     throw new RuntimeException("Unknown certificate type " + certificateType);
             }
-        } catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | OperatorCreationException
-                 | CertificateException | IllegalStateException | IOException e) {
+        } catch (IllegalStateException e) {
             logger.error("Error while signing " + certificateType.toString().toLowerCase() + " certificate", e);
             throw new RuntimeException(e);
         }
     }
 
-    private JcaPKCS10CertificationRequest createOrReadCertificateRequest(Path certificateRequestFile,
-                                                                         CertificateType certificateType, KeyPair keyPair, String commonName, List<String> dnsNames) {
+    private CertificationRequest createOrReadCertificateRequest(Path certificateRequestFile,
+                                                                         CertificateType certificateType,
+                                                                         KeyPair keyPair, String commonName,
+                                                                         List<String> dnsNames) {
         if (!dnsNames.contains(commonName) && CertificateType.SERVER.equals(certificateType))
             throw new IllegalArgumentException("dnsNames must contain commonName if certificateType is SERVER");
 
@@ -260,8 +257,8 @@ public class CertificateGenerator {
                     commonName);
             return readCertificateRequest(certificateRequestFile);
         } else {
-            X500Name subject = CertificationRequestBuilder.createSubject("DE", null, null, null, null, commonName);
-            JcaPKCS10CertificationRequest certificateRequest = createCertificateRequest(certificateType, subject,
+            X500Name subject = CertificationRequest.createName("DE", null, null, null, null, commonName);
+            CertificationRequest certificateRequest = createCertificateRequest(certificateType, subject,
                     keyPair, dnsNames);
 
             logger.info("Saving certificate request (csr) to {} [{}]", certificateRequestFile, commonName);
@@ -271,37 +268,28 @@ public class CertificateGenerator {
         }
     }
 
-    private JcaPKCS10CertificationRequest createCertificateRequest(CertificateType certificateType, X500Name subject,
+    private CertificationRequest createCertificateRequest(CertificateType certificateType, X500Name subject,
                                                                    KeyPair keyPair, List<String> dnsNames) {
-        try {
-            switch (certificateType) {
-                case CLIENT:
-                    return CertificationRequestBuilder.createClientCertificationRequest(subject, keyPair);
-                case SERVER:
-                    return CertificationRequestBuilder.createServerCertificationRequest(subject, keyPair, null,
-                            dnsNames);
-                default:
-                    throw new RuntimeException("Unknown certificate type " + certificateType);
-            }
-        } catch (NoSuchAlgorithmException | OperatorCreationException | IllegalStateException | IOException e) {
-            logger.error("Error while creating certificate-request", e);
-            throw new RuntimeException(e);
-        }
+                    return CertificationRequest.builder(ca.getContentSignerBuilder(), subject)
+                            .forKeyPair(keyPair)
+                            .setDnsNames(dnsNames)
+                            .build();
     }
 
-    private void writeCertificateRequest(Path certificateRequestFile, JcaPKCS10CertificationRequest certificateRequest) {
+    private void writeCertificateRequest(Path certificateRequestFile, CertificationRequest certificateRequest) {
         try {
-            CsrIo.writeJcaPKCS10CertificationRequestToCsr(certificateRequest, certificateRequestFile);
+            PemWriter.writeCertificationRequest(certificateRequest, certificateRequestFile);
         } catch (IOException e) {
             logger.error("Error while reading certificate-request from " + certificateRequestFile.toString(), e);
             throw new RuntimeException(e);
         }
     }
 
-    private JcaPKCS10CertificationRequest readCertificateRequest(Path certificateRequestFile) {
+    private CertificationRequest readCertificateRequest(Path certificateRequestFile) {
         try {
-            return CsrIo.readJcaPKCS10CertificationRequestFromCsr(certificateRequestFile);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e) {
+            var request = PemReader.readCertificationRequest(certificateRequestFile);
+            return request;
+        } catch (IOException e) {
             logger.error("Error while reading certificate-request from " + certificateRequestFile.toString(), e);
             throw new RuntimeException(e);
         }
@@ -346,12 +334,7 @@ public class CertificateGenerator {
     }
 
     private KeyPair createKeyPair() {
-        try {
-            return CertificationRequestBuilder.createRsaKeyPair4096Bit();
-        } catch (NoSuchAlgorithmException e) {
-            logger.error("Error while creating RSA key pair", e);
-            throw new RuntimeException(e);
-        }
+        return KeyPairGeneratorFactory.rsa4096().initialize().generateKeyPair();
     }
 
     private Path createFolderIfNotExists(Path file) {
@@ -450,11 +433,11 @@ public class CertificateGenerator {
                 b.append("subject= ");
                 b.append(cert.getSubjectX500Principal().getName());
                 b.append("\n");
-                b.append(PemIo.writeX509Certificate(cert));
+                b.append(PemWriter.writeCertificate(cert));
             }
 
             Files.writeString(certificateFile, b.toString());
-        } catch (CertificateEncodingException | IllegalStateException | IOException e) {
+        } catch (IllegalStateException | IOException e) {
             logger.error("Error while writing certificate to " + certificateFile.toString(), e);
             throw new RuntimeException(e);
         }
@@ -473,8 +456,10 @@ public class CertificateGenerator {
 
     private KeyStore createP12KeyStore(PrivateKey privateKey, String commonName, X509Certificate certificate) {
         try {
-            return CertificateHelper.toPkcs12KeyStore(privateKey,
-                    new Certificate[]{certificate, ca.getCertificate()}, commonName, CERT_PASSWORD);
+            var keystore = KeyStore.getInstance("pkcs12");
+            keystore.load(null, null);
+            keystore.setKeyEntry(commonName, privateKey, CERT_PASSWORD, new Certificate[] { certificate });
+            return keystore;
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IllegalStateException
                  | IOException e) {
             logger.error("Error while creating P12 key-store", e);
@@ -484,7 +469,8 @@ public class CertificateGenerator {
 
     private void writeP12File(Path p12File, KeyStore p12KeyStore) {
         try {
-            CertificateWriter.toPkcs12(p12File, p12KeyStore, CERT_PASSWORD);
+            var output = new FileOutputStream(p12File.toFile());
+            p12KeyStore.store(output, CERT_PASSWORD);
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
             logger.error("Error while writing certificate P12 file to " + p12File, e);
             throw new RuntimeException(e);
@@ -492,7 +478,6 @@ public class CertificateGenerator {
     }
 
     public static void main(String[] args) {
-        CertificateAuthority.registerBouncyCastleProvider();
         new CertificateGenerator().generateCertificates();
     }
 }
