@@ -5,6 +5,7 @@ import de.medizininformatik_initiative.process.feasibility.EvaluationStrategy;
 import de.medizininformatik_initiative.process.feasibility.client.store.StoreClientFactory;
 import de.medizininformatik_initiative.process.feasibility.spring.config.BaseConfig;
 import de.medizininformatik_initiative.process.feasibility.spring.config.EvaluationConfig;
+import dev.dsf.bpe.v1.documentation.ProcessDocumentation;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.auth.AuthScope;
@@ -48,9 +49,17 @@ public class FlareWebserviceClientSpringConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(FlareWebserviceClientSpringConfig.class);
 
+    @ProcessDocumentation(
+            processNames = { "medizininformatik-initiativede_feasibilityExecute" },
+            description = "The base URL of the Flare service",
+            required = true,
+            example = "https://flare.example.org")
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.base_url:}")
     private String flareBaseUrl;
 
+    @ProcessDocumentation(
+            processNames = { "medizininformatik-initiativede_feasibilityExecute" },
+            description = "The timeout in milliseconds for connecting to the Flare service and waiting for a response")
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.client.flare.timeout.connect:" + CLIENT_TIMEOUT_DEFAULT + "}")
     private int connectTimeout;
 
