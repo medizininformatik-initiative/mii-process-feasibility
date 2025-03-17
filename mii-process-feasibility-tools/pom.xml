@@ -24,7 +24,7 @@
             <dependency>
                 <groupId>de.hs-heilbronn.mi</groupId>
                 <artifactId>crypto-utils</artifactId>
-                <version>4.0.0</version>
+                <version>5.0.0</version>
             </dependency>
 
             <dependency>
