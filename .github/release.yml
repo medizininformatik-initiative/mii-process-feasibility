@@ -3,6 +3,7 @@ changelog:
     labels:
       - ignore-for-release
       - release
+      - dependencies
     authors:
       - octocat
   categories:
