@@ -129,7 +129,7 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <!-- latest version 3.0.0-M5 not working, with jetty integraiton tests -->
-                    <version>3.5.2</version>
+                    <version>3.5.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
