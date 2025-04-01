@@ -9,9 +9,7 @@ import ca.uhn.fhir.rest.client.api.IHttpClient;
 import ca.uhn.fhir.rest.client.api.IHttpRequest;
 import ca.uhn.fhir.rest.client.impl.RestfulClientFactory;
 import ca.uhn.fhir.util.DateUtils;
-import de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
@@ -60,7 +58,6 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.HEADER_PREFER_RESPOND_ASYNC;
 
 // TODO: doc
-@Slf4j
 @RequiredArgsConstructor
 public class StoreClientFactory extends RestfulClientFactory {
 
@@ -110,10 +107,10 @@ public class StoreClientFactory extends RestfulClientFactory {
                     throw new IllegalArgumentException("Store url is not set.");
                 }
                 if (clientByServerBase.containsKey(serverBase)) {
-                    log.debug("Reusing ApacheHttpClient for ServerBase {}", serverBase);
+                    logger.debug("Reusing ApacheHttpClient for ServerBase {}", serverBase);
                     return clientByServerBase.get(serverBase);
                 } else {
-                    log.debug("Returning new ApacheHttpClient for ServerBase {}", serverBase);
+                    logger.debug("Returning new ApacheHttpClient for ServerBase {}", serverBase);
                     var client = new ApacheHttpClient(getNativeHttpClient(), new StringBuilder(serverBase),
                             null, null, null, null);
                     clientByServerBase.put(serverBase, client);

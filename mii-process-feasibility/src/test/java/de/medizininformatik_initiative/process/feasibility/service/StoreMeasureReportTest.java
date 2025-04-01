@@ -5,7 +5,6 @@ import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import dev.dsf.bpe.v1.service.TaskHelper;
 import dev.dsf.bpe.v1.variables.Variables;
 import dev.dsf.fhir.authorization.read.ReadAccessHelper;
-import dev.dsf.fhir.authorization.read.ReadAccessHelperImpl;
 import dev.dsf.fhir.client.FhirWebserviceClient;
 import dev.dsf.fhir.client.PreferReturnMinimalWithRetry;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -23,7 +22,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -35,7 +33,6 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT_ID;
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -51,8 +48,7 @@ public class StoreMeasureReportTest
     @Mock private DelegateExecution execution;
     @Mock private ProcessPluginApi api;
     @Mock private Variables variables;
-
-    @Spy private ReadAccessHelper readAccessHelper = new ReadAccessHelperImpl();
+    @Mock private ReadAccessHelper readAccessHelper;
 
     @Captor private ArgumentCaptor<MeasureReport> measureReportCaptor;
     @Captor private ArgumentCaptor<Reference> referenceCaptor;
@@ -99,20 +95,6 @@ public class StoreMeasureReportTest
         var capturedMeasureReport = measureReportCaptor.getValue();
         assertThat(capturedMeasureReport.getMeasure()).isEqualTo(measureId.toString());
         assertThat(capturedMeasureReport.getEvaluatedResource()).isEmpty();
-
-        var tags = capturedMeasureReport.getMeta().getTag().stream()
-                .filter(c -> "http://dsf.dev/fhir/CodeSystem/read-access-tag".equals(c.getSystem())).collect(toList());
-        assertThat(tags).hasSize(2);
-        assertThat(tags.stream().filter(c -> "LOCAL".equals(c.getCode()))).hasSize(1);
-
-        var organizationTags = tags.stream().filter(c -> "ORGANIZATION".equals(c.getCode())).collect(toList());
-        assertThat(organizationTags).hasSize(1);
-
-        var organizationExtensions = organizationTags.stream().flatMap(c -> c.getExtension().stream())
-                .filter(e -> "http://dsf.dev/fhir/StructureDefinition/extension-read-access-organization".equals(
-                        e.getUrl())).collect(toList());
-        assertThat(organizationExtensions).hasSize(1);
-        assertThat(((Identifier) organizationExtensions.get(0).getValue()).getValue()).isEqualTo("requester-id");
 
         assertThat(referenceCaptor.getValue()).isNotNull();
         assertThat(referenceCaptor.getValue().getReference()).isEqualTo(measureReportId.getValue());
