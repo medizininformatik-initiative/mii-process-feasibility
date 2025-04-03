@@ -55,6 +55,7 @@ services:
     EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_DISTRIBUTION: true
     EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_EXECUTE_ORGANIZATION_IDENTIFIER_VALUE: "medizininformatik-initiative.de"
     EDU_UBI_MEDFAK_FEASIBILITY_DSF_PROCESS_REQUEST_ORGANIZATION_IDENTIFIER_VALUE: "distributed-org.de"
+
   networks:
     broker-bpe-frontend:
     broker-bpe-backend:

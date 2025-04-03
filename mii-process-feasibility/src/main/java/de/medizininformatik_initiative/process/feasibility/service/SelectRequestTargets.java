@@ -35,7 +35,6 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
     protected void doExecute(DelegateExecution execution, Variables variables) {
         logger.info("doExecute select request targets");
 
-        var organizationProvider = api.getOrganizationProvider();
 
         var client = api.getFhirWebserviceClientProvider().getLocalWebserviceClient();
         var parentIdentifier = new Identifier()
@@ -45,6 +44,9 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
         var memberOrganizationRole = new Coding()
                 .setSystem("http://dsf.dev/fhir/CodeSystem/organization-role")
                 .setCode("DIC");
+
+        var organizationProvider = api.getOrganizationProvider();
+
         List<Target> targets = organizationProvider
                 .getOrganizations(parentIdentifier, memberOrganizationRole)
                 .stream()

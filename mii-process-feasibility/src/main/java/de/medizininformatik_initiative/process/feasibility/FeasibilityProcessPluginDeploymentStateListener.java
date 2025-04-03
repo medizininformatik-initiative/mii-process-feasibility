@@ -31,7 +31,7 @@ public class FeasibilityProcessPluginDeploymentStateListener
     private FlareWebserviceClient flareWebserviceClient;
 
     public FeasibilityProcessPluginDeploymentStateListener(EvaluationStrategy strategy, IGenericClient storeClient,
-            FlareWebserviceClient flareWebserviceClient) {
+                                                           FlareWebserviceClient flareWebserviceClient) {
         this.strategy = strategy;
         this.storeClient = storeClient;
         this.flareWebserviceClient = flareWebserviceClient;
@@ -47,15 +47,16 @@ public class FeasibilityProcessPluginDeploymentStateListener
                     logger.info("Connection test OK ({} - {})", statement.getSoftware().getName(),
                             statement.getSoftware().getVersion());
                 } catch (Exception e) {
-                    logger.error("Connection test FAILED - error: {} - {}", e.getClass().getName(), e.getMessage());
+                    logger.error("Connection test FAILED - error: " + e.getClass().getName() + " - "
+                            + e.getMessage(), e);
                 }
             } else {
                 try {
                     flareWebserviceClient.testConnection();
                     logger.info("Connection test OK (flare)");
                 } catch (Exception e) {
-                    logger.error("Connection test FAILED (flare) - error: {} - {}", e.getClass().getName(),
-                            e.getMessage());
+                    logger.error("Connection test FAILED (flare) - error: " + e.getClass().getName() + " - "
+                            + e.getMessage(), e);
                 }
             }
         }

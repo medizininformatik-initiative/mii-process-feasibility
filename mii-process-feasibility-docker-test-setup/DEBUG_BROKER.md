@@ -5,7 +5,7 @@
 mvn -f ../pom.xml clean install -DskipTests=true
 ```
 
-# Quick restart of the debugging the broker-bpe-app and broker-dic-5-bpe-app stack
+# Quick restart of debugging for broker-bpe-app and broker-dic-5-bpe-app stack
 
 ```sh
 docker-compose down -v  
@@ -30,22 +30,8 @@ sleep 2
 
 docker-compose -f docker-compose.yml up -d broker-dic-6-bpe-app
 ```
-# Now you can start the debugger with `docker-compose up -d broker-dic-5-bpe-app`.
-
-# After that we can POST the first Task to the ZARS
-
-```sh
-curl \
-  --cacert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/ca/testca_certificate.pem \
-  --cert-type P12 \
-  --cert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
-  -H accept:application/fhir+json \
-  -H content-type:application/fhir+json \
-  -d @data/feasibility-bundle.json \
-  -s https://zars/fhir/ |\
-  jq .
-```
-# Add Testdata
+# Now you can start the debugger
+# Importing test data
 
 ```sh
 # 4 -> 0
@@ -69,6 +55,21 @@ curl -H accept:application/fhir+json  -H content-type:application/fhir+json  -d 
 curl -H accept:application/fhir+json  -H content-type:application/fhir+json  -d @data/POLAR_TestData-016.json  http://broker-dic-5-store:8085/fhir 
 curl -H accept:application/fhir+json  -H content-type:application/fhir+json  -d @data/POLAR_TestData-017.json  http://broker-dic-5-store:8085/fhir 
 ```
+
+# After that we can POST the first Task to the ZARS
+
+```sh
+curl \
+  --cacert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/ca/testca_certificate.pem \
+  --cert-type P12 \
+  --cert ../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/cert/Webbrowser_Test_User/Webbrowser_Test_User_certificate.p12:password \
+  -H accept:application/fhir+json \
+  -H content-type:application/fhir+json \
+  -d @data/feasibility-bundle.json \
+  -s https://zars/fhir/ |\
+  jq .
+```
+
 # Some CURLs
 
 ```sh
