@@ -68,7 +68,7 @@ public class EvaluateCqlMeasureTest {
         coding.setSystem(MEASURE_POPULATION);
         coding.setCode(INITIAL_POPULATION);
         report.getGroupFirstRep().getPopulationFirstRep().setCode(code);
-        service = new EvaluateCqlMeasure(storeId);
+        service = new EvaluateCqlMeasure(true, storeId);
         when(storeClient.operation()
                 .onInstance("Measure/" + MEASURE_ID)
                 .named("evaluate-measure")

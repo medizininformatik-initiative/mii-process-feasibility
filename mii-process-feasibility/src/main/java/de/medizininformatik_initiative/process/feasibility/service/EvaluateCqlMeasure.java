@@ -36,9 +36,11 @@ public class EvaluateCqlMeasure implements ServiceTask {
     private static final Logger logger = LoggerFactory.getLogger(EvaluateCqlMeasure.class);
 
     private String taskId;
+    private boolean asyncRequestEnabled;
     private String connectionId;
 
-    public EvaluateCqlMeasure(String connectionId) {
+    public EvaluateCqlMeasure(boolean asyncRequestEnabled, String connectionId) {
+        this.asyncRequestEnabled = asyncRequestEnabled;
         this.connectionId = connectionId;
     }
 
@@ -109,16 +111,18 @@ public class EvaluateCqlMeasure implements ServiceTask {
     }
 
     private Optional<Parameters> executeEvaluateMeasure(IGenericClient storeClient, IdType measureId) {
-        return Optional.ofNullable(storeClient.operation()
-                .onInstance("Measure/" + measureId.getIdPart())
-                .named("evaluate-measure")
-                .withParameter(Parameters.class, "periodStart", new DateType(MEASURE_REPORT_PERIOD_START))
-                .andParameter("periodEnd", new DateType(MEASURE_REPORT_PERIOD_END))
-                .andParameter("reportType", new StringType(MEASURE_REPORT_TYPE_POPULATION))
-                .useHttpGet()
-                .preferResponseTypes(List.of(MeasureReport.class, Bundle.class, OperationOutcome.class))
-                .withAdditionalHeader(HEADER_PREFER, HEADER_PREFER_RESPOND_ASYNC)
-                .execute());
+        return Optional.ofNullable(
+                storeClient.operation()
+                        .onInstance("Measure/" + measureId.getIdPart())
+                        .named("evaluate-measure")
+                        .withParameter(Parameters.class, "periodStart", new DateType(MEASURE_REPORT_PERIOD_START))
+                        .andParameter("periodEnd", new DateType(MEASURE_REPORT_PERIOD_END))
+                        .andParameter("reportType", new StringType(MEASURE_REPORT_TYPE_POPULATION))
+                        .useHttpGet()
+                        .preferResponseTypes(List.of(MeasureReport.class, Bundle.class, OperationOutcome.class)))
+                .map(o -> asyncRequestEnabled
+                        ? o.withAdditionalHeader(HEADER_PREFER, HEADER_PREFER_RESPOND_ASYNC).execute()
+                        : o.execute());
     }
 
     private void validateMeasureReport(MeasureReport report) {

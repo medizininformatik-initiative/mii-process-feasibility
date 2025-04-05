@@ -43,6 +43,12 @@ public class FeasibilityConfig {
     @Value("${de.medizininformatik_initiative.feasibility_dsf_process.store.connection.id:#{null}}")
     private String connectionId;
     
+    @ProcessDocumentation(
+            processNames = { "medizininformatik-initiativede_feasibilityExecute" },
+            description = "To enable asynchronous request pattern when executing measure set to `true`")
+    @Value("${de.medizininformatik.initiative.feasibility_dsf_process.store.request.async.enabled:false}")
+    private boolean asyncRequestEnabled;
+    
     public FeasibilityConfig(EvaluationSettingsProvider evaluationSettingsProvider,
                              FlareWebserviceClient flareWebserviceClient) {
         this.evaluationSettingsProvider = evaluationSettingsProvider;
@@ -134,7 +140,7 @@ public class FeasibilityConfig {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public EvaluateCqlMeasure evaluateCqlMeasure() {
-        return new EvaluateCqlMeasure(connectionId);
+        return new EvaluateCqlMeasure(asyncRequestEnabled, connectionId);
     }
 
     @Bean
