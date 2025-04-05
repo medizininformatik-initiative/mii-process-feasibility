@@ -14,10 +14,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <compileSource>17</compileSource>
-        <compileTarget>17</compileTarget>
-        <dsf.version>1.7.1</dsf.version>
-        <hapi.fhir.version>5.1.0</hapi.fhir.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
+        <dsf.version>2.0.0-M2</dsf.version>
         <testcontainers.version>1.20.6</testcontainers.version>
     </properties>
 
@@ -43,25 +43,6 @@
     <dependencyManagement>
         <dependencies>
 
-            <!-- hhn rwh -->
-            <dependency>
-                <groupId>de.hs-heilbronn.mi</groupId>
-                <artifactId>log4j2-utils</artifactId>
-                <version>0.15.0</version>
-            </dependency>
-
-            <!-- FHIR -->
-            <dependency>
-                <groupId>ca.uhn.hapi.fhir</groupId>
-                <artifactId>hapi-fhir-client</artifactId>
-                <version>${hapi.fhir.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>ca.uhn.hapi.fhir</groupId>
-                <artifactId>hapi-fhir-structures-r4</artifactId>
-                <version>${hapi.fhir.version}</version>
-            </dependency>
-
             <!-- testing -->
             <dependency>
                 <groupId>junit</groupId>
@@ -84,15 +65,6 @@
     <build>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.0</version>
-                    <configuration>
-                        <source>${compileSource}</source>
-                        <target>${compileTarget}</target>
-                    </configuration>
-                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>

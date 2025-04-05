@@ -1,10 +1,9 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
-import dev.dsf.bpe.v1.variables.Variables;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.activity.ServiceTask;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Library;
@@ -25,42 +24,40 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hl7.fhir.r4.model.Bundle.BundleType.TRANSACTION;
 import static org.hl7.fhir.r4.model.Bundle.HTTPVerb.POST;
 
-public class StoreFeasibilityResources extends AbstractServiceDelegate implements InitializingBean {
+public class StoreFeasibilityResources implements ServiceTask, InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(StoreFeasibilityResources.class);
     private static final Pattern MEASURE_URL_PATTERN = Pattern.compile("(.+)/Measure/(.+)");
     private static final Pattern LIBRARY_URL_PATTERN = Pattern.compile("urn:uuid:(.+)");
 
-    private final IGenericClient storeClient;
     private final FeasibilityResourceCleaner cleaner;
+    private String connectionId;
 
-    public StoreFeasibilityResources(IGenericClient storeClient, ProcessPluginApi api, FeasibilityResourceCleaner cleaner) {
-        super(api);
-
-        this.storeClient = storeClient;
+    public StoreFeasibilityResources(FeasibilityResourceCleaner cleaner, String connectionId) {
         this.cleaner = cleaner;
+        this.connectionId = connectionId;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
-
-        Objects.requireNonNull(storeClient, "storeClient");
         Objects.requireNonNull(cleaner, "cleaner");
     }
 
     @Override
-    protected void doExecute(DelegateExecution execution, Variables variables) {
-        Measure measure = variables.getResource(VARIABLE_MEASURE);
-        Library library = variables.getResource(VARIABLE_LIBRARY);
+    public void execute(ProcessPluginApi api, Variables variables) {
+        Measure measure = variables.getFhirResource(VARIABLE_MEASURE);
+        Library library = variables.getFhirResource(VARIABLE_LIBRARY);
         var task = variables.getStartTask();
+        var storeClient = api.getFhirClientProvider().getClient(connectionId).orElseThrow(
+                () -> new IllegalStateException(
+                        "No store client configured for store id '%s'.".formatted(connectionId)));
 
         cleaner.cleanLibrary(library);
         cleaner.cleanMeasure(measure);
 
         fixCanonical(measure, library);
 
-        var transactionResponse = storeResources(measure, library, task);
+        var transactionResponse = storeResources(api, storeClient, measure, library, task);
 
         variables.setString(VARIABLE_MEASURE_ID, extractMeasureId(transactionResponse));
     }
@@ -70,7 +67,6 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
         var libraryUrlMatcher = LIBRARY_URL_PATTERN.matcher(library.getUrl());
         if (measureUrlMatcher.find() && libraryUrlMatcher.find()) {
             var base = measureUrlMatcher.group(1);
-            var measureId = measureUrlMatcher.group(2);
             var libraryId = libraryUrlMatcher.group(1);
             var libraryUrl = base + "/Library/" + libraryId;
             measure.setLibrary(new ArrayList<>());
@@ -85,7 +81,8 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
         }
     }
 
-    private Bundle storeResources(Measure measure, Library library, Task task) {
+    private Bundle storeResources(ProcessPluginApi api, IGenericClient storeClient, Measure measure,
+                                  Library library, Task task) {
         logger.info("Store Measure '{}' and Library '{}' [task: {}]", measure.getId(), library.getId(),
                 api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
         Bundle bundle = new Bundle().setType(TRANSACTION);

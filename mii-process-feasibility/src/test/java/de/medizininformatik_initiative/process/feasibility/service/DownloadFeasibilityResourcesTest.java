@@ -1,12 +1,11 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProvider;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.service.TaskHelper;
-import dev.dsf.bpe.v1.variables.Variables;
-import dev.dsf.fhir.client.FhirWebserviceClient;
-import dev.dsf.fhir.client.PreferReturnMinimalWithRetry;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.client.dsf.DsfClient;
+import dev.dsf.bpe.v2.client.dsf.PreferReturnMinimalWithRetry;
+import dev.dsf.bpe.v2.service.DsfClientProvider;
+import dev.dsf.bpe.v2.service.TaskHelper;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Library;
@@ -14,7 +13,6 @@ import org.hl7.fhir.r4.model.Measure;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
-import org.hl7.fhir.r4.model.Task.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,22 +46,18 @@ public class DownloadFeasibilityResourcesTest {
 
     private static final String MEASURE_ID = "id-142416";
 
-    @Mock private EnhancedFhirWebserviceClientProvider clientProvider;
-    @Mock private FhirWebserviceClient webserviceClient;
+    @Mock private DsfClient client;
     @Mock private PreferReturnMinimalWithRetry minimalReturn;
     @Mock private TaskHelper taskHelper;
-    @Mock private DelegateExecution execution;
     @Mock private ProcessPluginApi api;
     @Mock private Variables variables;
     @Mock private Task task;
+    @Mock private DsfClientProvider clientProvider;
 
     @InjectMocks private DownloadFeasibilityResources service;
 
-
-
     @BeforeEach
     public void setUp() {
-        when(api.getVariables(execution)).thenReturn(variables);
         when(api.getTaskHelper()).thenReturn(taskHelper);
         when(variables.getStartTask()).thenReturn(task);
     }
@@ -74,113 +68,89 @@ public class DownloadFeasibilityResourcesTest {
     }
 
     @Test
-    public void doExecute_NoMeasureReference(CapturedOutput output) {
-        when(variables.getTasks()).thenReturn(List.of(task));
-        when(task.getStatus()).thenReturn(TaskStatus.INPROGRESS);
+    public void execute_NoMeasureReference(CapturedOutput output) {
+        when(variables.getStartTask()).thenReturn(task);
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
                 .thenReturn(Optional.empty());
         when(taskHelper.getLocalVersionlessAbsoluteUrl(task)).thenReturn(TASK_ID);
-        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
-        when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
-        when(webserviceClient.withMinimalReturn()).thenReturn(minimalReturn);
-        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
-        when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
-        when(webserviceClient.withMinimalReturn()).thenReturn(minimalReturn);
 
-        assertThrows(RuntimeException.class, () -> service.execute(execution));
+        assertThrows(RuntimeException.class, () -> service.execute(api, variables));
         assertThat(output.getOut(),
                 containsString(format("Task is missing the measure reference [task: %s]", TASK_ID)));
-        verify(task).setStatus(TaskStatus.FAILED);
-        verify(minimalReturn).update(task);
     }
 
     @Test
     public void testDoExecute_BundleWithTooFewResultEntries(CapturedOutput output) {
-        var measureRefId = new IdType("Measure/" + MEASURE_ID);
+        var measureRefId = new IdType("http://foo.bar/fhir/Measure/" + MEASURE_ID);
         var measureRef = new Reference(measureRefId);
 
-        when(variables.getTasks()).thenReturn(List.of(task));
-        when(task.getStatus()).thenReturn(TaskStatus.INPROGRESS);
+        when(variables.getStartTask()).thenReturn(task);
         when(api.getTaskHelper()).thenReturn(taskHelper);
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
                 .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClientByReference(measureRefId))
-                .thenReturn(webserviceClient);
-        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
+        when(api.getDsfClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getDsfClient(measureRefId.getBaseUrl()))
+                .thenReturn(client);
+        when(client.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(new Bundle());
-        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
-        when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
-        when(webserviceClient.withMinimalReturn()).thenReturn(minimalReturn);
 
-        assertThrows(RuntimeException.class, () -> service.execute(execution));
+        assertThrows(RuntimeException.class, () -> service.execute(api, variables));
         assertThat(output.getOut(), containsString("Returned search-set contained less then two entries"));
-        verify(task).setStatus(TaskStatus.FAILED);
-        verify(minimalReturn).update(task);
     }
 
     @Test
     public void testDoExecute_FirstBundleEntryIsNoMeasure(CapturedOutput output) {
-        var measureRefId = new IdType("Measure/" + MEASURE_ID);
+        var measureRefId = new IdType("http://foo.bar/fhir/Measure/" + MEASURE_ID);
         var measureRef = new Reference(measureRefId);
 
         var bundle = new Bundle();
         bundle.addEntry().setResource(new Patient().setId("foo"));
         bundle.addEntry().setResource(new Patient().setId("foo"));
 
-        when(variables.getTasks()).thenReturn(List.of(task));
-        when(task.getStatus()).thenReturn(TaskStatus.INPROGRESS);
+        when(variables.getStartTask()).thenReturn(task);
         when(api.getTaskHelper()).thenReturn(taskHelper);
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
                 .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClientByReference(measureRefId))
-                .thenReturn(webserviceClient);
-        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
+        when(api.getDsfClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getDsfClient(measureRefId.getBaseUrl()))
+                .thenReturn(client);
+        when(client.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);
-        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
-        when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
-        when(webserviceClient.withMinimalReturn()).thenReturn(minimalReturn);
 
-        assertThrows(RuntimeException.class, () -> service.execute(execution));
+        assertThrows(RuntimeException.class, () -> service.execute(api, variables));
         assertThat(output.getOut(), containsString("Returned search-set did not contain Measure at index 0"));
-        verify(task).setStatus(TaskStatus.FAILED);
-        verify(minimalReturn).update(task);
     }
 
     @Test
     public void testDoExecute_SecondBundleEntryIsNoLibrary(CapturedOutput output) {
-        var measureRefId = new IdType("Measure/" + MEASURE_ID);
+        var measureRefId = new IdType("http://foo.bar/fhir/Measure/" + MEASURE_ID);
         var measureRef = new Reference(measureRefId);
 
         var bundle = new Bundle();
         bundle.addEntry().setResource(new Measure().setId("foo"));
         bundle.addEntry().setResource(new Measure().setId("foo"));
 
-        when(variables.getTasks()).thenReturn(List.of(task));
-        when(task.getStatus()).thenReturn(TaskStatus.INPROGRESS);
+        when(variables.getStartTask()).thenReturn(task);
         when(api.getTaskHelper()).thenReturn(taskHelper);
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
                 .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClientByReference(measureRefId))
-                .thenReturn(webserviceClient);
-        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
+        when(api.getDsfClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getDsfClient(measureRefId.getBaseUrl()))
+                .thenReturn(client);
+        when(client.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);
-        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
-        when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
-        when(webserviceClient.withMinimalReturn()).thenReturn(minimalReturn);
 
-        assertThrows(RuntimeException.class, () -> service.execute(execution));
+        assertThrows(RuntimeException.class, () -> service.execute(api, variables));
         assertThat(output.getOut(), containsString("Returned search-set did not contain Library at index 1"));
-        verify(task).setStatus(TaskStatus.FAILED);
-        verify(minimalReturn).update(task);
     }
 
     @Test
     public void testDoExecute() throws Exception {
-        var measureRefId = new IdType("Measure/" + MEASURE_ID);
+        var measureRefId = new IdType("http://foo.bar/fhir/Measure/" + MEASURE_ID);
         var measureRef = new Reference(measureRefId);
 
         var measure = new Measure().setId("foo");
@@ -194,14 +164,15 @@ public class DownloadFeasibilityResourcesTest {
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
                 .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClientByReference(measureRefId))
-                .thenReturn(webserviceClient);
-        when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
+        when(api.getDsfClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getDsfClient(measureRefId.getBaseUrl()))
+                .thenReturn(client);
+        when(client.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);
 
-        service.execute(execution);
+        service.execute(api, variables);
 
-        verify(variables).setResource(VARIABLE_MEASURE, measure);
-        verify(variables).setResource(VARIABLE_LIBRARY, library);
+        verify(variables).setFhirResource(VARIABLE_MEASURE, measure);
+        verify(variables).setFhirResource(VARIABLE_LIBRARY, library);
     }
 }

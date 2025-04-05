@@ -88,7 +88,7 @@ services:
 
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.7.1
+    image: ghcr.io/datasharingframework/fhir:2.0.0-M2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -156,7 +156,7 @@ services:
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.7.1
+    image: ghcr.io/datasharingframework/bpe:2.0.0-M2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -217,7 +217,7 @@ services:
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.7.1
+    image: ghcr.io/datasharingframework/fhir:2.0.0-M2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -282,7 +282,7 @@ services:
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.7.1
+    image: ghcr.io/datasharingframework/bpe:2.0.0-M2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -308,7 +308,10 @@ services:
     - type: bind
       source: ./dic-1/bpe/cache
       target: /opt/bpe/cache
+    ports:
+    - 15005:5005
     environment:
+      EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       TZ: Europe/Berlin
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
@@ -329,6 +332,7 @@ services:
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_FLARE_TIMEOUT_CONNECT: 2000
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: structured-query
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
+
     networks:
       dic-1-bpe-frontend:
       dic-1-bpe-backend:
@@ -409,7 +413,7 @@ services:
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.7.1
+    image: ghcr.io/datasharingframework/fhir:2.0.0-M2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -474,7 +478,7 @@ services:
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.7.1
+    image: ghcr.io/datasharingframework/bpe:2.0.0-M2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -500,7 +504,10 @@ services:
     - type: bind
       source: ./dic-2/bpe/cache
       target: /opt/bpe/cache
+    ports:
+    - 25005:5005     
     environment:
+      EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       TZ: Europe/Berlin
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
@@ -517,9 +524,12 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_2_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-2/fhir
       DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityRequest|0.0
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-2-store:8080/fhir
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_STORE_CONNECTION_ID: dic-2-store
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "true"
+      DEV_DSF_BPE_FHIR_CLIENT_CONNECTIONS_CONFIG: |
+        dic-2-store:
+          base-url: http://dic-2-store:8080/fhir
     networks:
       dic-2-bpe-frontend:
       dic-2-bpe-backend:
@@ -560,7 +570,7 @@ services:
 
   # ---- DIC-3 - FHIR ---------------------------------------------------------
   dic-3-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.7.1
+    image: ghcr.io/datasharingframework/fhir:2.0.0-M2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -622,7 +632,7 @@ services:
 
   # ---- DIC-3 - BPE ----------------------------------------------------------
   dic-3-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.7.1
+    image: ghcr.io/datasharingframework/bpe:2.0.0-M2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -634,7 +644,7 @@ services:
       - db_dic_3_bpe_user.password
       - db_dic_3_bpe_user_camunda.password
       - app_client_trust_certificates.pem
-      - dic_3_store_proxy_self_signed_ca.p12
+      - dic_3_store_proxy_self_signed_ca.pem
       - app_dic_3_client_certificate.pem
       - app_dic_3_client_certificate_private_key.pem
       - app_client_certificate_private_key.pem.password
@@ -650,7 +660,7 @@ services:
         source: ./dic-3/bpe/cache
         target: /opt/bpe/cache
     ports:
-    - 5005:5005
+    - 35005:5005
     environment:
       EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       TZ: Europe/Berlin
@@ -669,14 +679,20 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_3_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-3/fhir
       DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityRequest|0.0
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_TRUST_STORE_PATH: /run/secrets/dic_3_store_proxy_self_signed_ca.p12
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_TRUST_STORE_PASSWORD: "testpw"
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_AUTH_OAUTH_ISSUER_URL: "https://dic-3-keycloak-proxy/realms/test"
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_AUTH_OAUTH_CLIENT_ID: "account"
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_AUTH_OAUTH_CLIENT_PASSWORD: "test"
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: https://dic-3-store-proxy/fhir
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_STORE_CONNECTION_ID: dic-3-store
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
+      DEV_DSF_BPE_FHIR_CLIENT_CONNECTIONS_CONFIG: |
+        dic-3-store:
+          base-url: https://dic-3-store-proxy
+          trusted-root-certificates-file: /run/secrets/dic_3_store_proxy_self_signed_ca.pem
+          test-connection-on-startup: yes
+          oidc-auth:
+            base-url: https://dic-3-keycloak-proxy/realms/test
+            trusted-root-certificates-file: /run/secrets/dic_3_store_proxy_self_signed_ca.pem
+            test-connection-on-startup: yes
+            client-id: account
+            client-secret: test
     networks:
       dic-3-bpe-frontend:
       dic-3-bpe-backend:
@@ -777,7 +793,7 @@ services:
 
   # ---- DIC-4 - FHIR ---------------------------------------------------------
   dic-4-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.7.1
+    image: ghcr.io/datasharingframework/fhir:2.0.0-M2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -839,7 +855,7 @@ services:
 
   # ---- DIC-4 - BPE ----------------------------------------------------------
   dic-4-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.7.1
+    image: ghcr.io/datasharingframework/bpe:2.0.0-M2
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -865,7 +881,10 @@ services:
       - type: bind
         source: ./dic-4/bpe/cache
         target: /opt/bpe/cache
+    ports:
+    - 45005:5005
     environment:
+      EXTRA_JVM_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       TZ: Europe/Berlin
       DEV_DSF_SERVER_AUTH_TRUST_CLIENT_CERTIFICATE_CAS: /run/secrets/app_client_trust_certificates.pem
       DEV_DSF_BPE_DB_LIQUIBASE_PASSWORD_FILE: /run/secrets/db_liquibase.password
@@ -882,9 +901,12 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_4_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-4/fhir
       DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityRequest|0.0
-      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CLIENT_STORE_BASE_URL: http://dic-4-store:8080/fhir
+      DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_STORE_CONNECTION_ID: dic-4-store      
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_STRATEGY: cql
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_EVALUATION_OBFUSCATE: "false"
+      DEV_DSF_BPE_FHIR_CLIENT_CONNECTIONS_CONFIG: |
+        dic-4-store:
+          base-url: http://dic-4-store:8080/fhir
     networks:
       dic-4-bpe-frontend:
       dic-4-bpe-backend:
@@ -1040,6 +1062,8 @@ secrets:
     file: ./secrets/dic_3_store_proxy_cert_key.pem
   dic_3_store_proxy_self_signed_ca.p12:
     file: ./secrets/dic_3_store_proxy_self_signed_ca.p12
+  dic_3_store_proxy_self_signed_ca.pem:
+    file: ./secrets/dic_3_store_proxy_self_signed_ca.pem
 
   db_dic_4_bpe_user.password:
     file: secrets/db_dic_4_bpe_user.password

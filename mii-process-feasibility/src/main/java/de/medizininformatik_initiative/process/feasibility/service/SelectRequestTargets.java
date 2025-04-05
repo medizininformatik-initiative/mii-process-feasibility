@@ -1,12 +1,11 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
-import dev.dsf.bpe.v1.variables.Variables;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.hl7.fhir.r4.model.Coding;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.activity.ServiceTask;
+import dev.dsf.bpe.v2.constants.CodeSystems;
+import dev.dsf.bpe.v2.constants.NamingSystems;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.hl7.fhir.r4.model.Endpoint;
-import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
@@ -20,27 +19,18 @@ import java.util.stream.Collectors;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
-import static dev.dsf.common.auth.conf.Identity.ORGANIZATION_IDENTIFIER_SYSTEM;
 
-public class SelectRequestTargets extends AbstractServiceDelegate {
+public class SelectRequestTargets implements ServiceTask {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectRequestTargets.class);
 
-    public SelectRequestTargets(ProcessPluginApi api) {
-        super(api);
-    }
-
     @Override
-    protected void doExecute(DelegateExecution execution, Variables variables) {
+    public void execute(ProcessPluginApi api, Variables variables) {
 
         var organizationProvider = api.getOrganizationProvider();
-        var client = api.getFhirWebserviceClientProvider().getLocalWebserviceClient();
-        var parentIdentifier = new Identifier()
-                .setSystem(ORGANIZATION_IDENTIFIER_SYSTEM)
-                .setValue("medizininformatik-initiative.de");
-        var memberOrganizationRole = new Coding()
-                .setSystem("http://dsf.dev/fhir/CodeSystem/organization-role")
-                .setCode("DIC");
+        var client = api.getDsfClientProvider().getLocalDsfClient();
+        var parentIdentifier = NamingSystems.OrganizationIdentifier.withValue("medizininformatik-initiative.de");
+        var memberOrganizationRole = CodeSystems.OrganizationRole.dic();
         var targets = organizationProvider
                 .getOrganizations(parentIdentifier, memberOrganizationRole)
                 .stream()
@@ -59,11 +49,11 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
         targets.forEach(t -> logger.debug(t.getOrganizationIdentifierValue()));
         variables.setTargets(variables.createTargets(targets));
         variables.setString("measure-id",
-                api.getFhirWebserviceClientProvider().getLocalWebserviceClient().getBaseUrl()
-                        + getMeasureId(variables.getStartTask()));
+                api.getDsfClientProvider().getLocalDsfClient().getBaseUrl()
+                        + getMeasureId(api, variables.getStartTask()));
     }
 
-    private String getMeasureId(Task task) {
+    private String getMeasureId(ProcessPluginApi api, Task task) {
 
         Optional<Reference> measureRef = api.getTaskHelper()
                 .getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,

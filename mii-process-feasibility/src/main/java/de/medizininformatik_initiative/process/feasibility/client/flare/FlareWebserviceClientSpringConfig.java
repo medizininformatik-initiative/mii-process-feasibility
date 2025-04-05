@@ -5,7 +5,7 @@ import de.medizininformatik_initiative.process.feasibility.EvaluationStrategy;
 import de.medizininformatik_initiative.process.feasibility.client.store.StoreClientFactory;
 import de.medizininformatik_initiative.process.feasibility.spring.config.BaseConfig;
 import de.medizininformatik_initiative.process.feasibility.spring.config.EvaluationConfig;
-import dev.dsf.bpe.v1.documentation.ProcessDocumentation;
+import dev.dsf.bpe.v2.documentation.ProcessDocumentation;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.auth.AuthScope;

@@ -1,12 +1,10 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProvider;
 import de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
-import dev.dsf.bpe.v1.variables.Variables;
-import dev.dsf.fhir.client.FhirWebserviceClient;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.activity.ServiceTask;
+import dev.dsf.bpe.v2.client.dsf.DsfClient;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Library;
@@ -15,46 +13,31 @@ import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
 
-public class DownloadFeasibilityResources extends AbstractServiceDelegate
-        implements InitializingBean {
+public class DownloadFeasibilityResources implements ServiceTask {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadFeasibilityResources.class);
-    private EnhancedFhirWebserviceClientProvider clientProvider;
-
-    public DownloadFeasibilityResources(EnhancedFhirWebserviceClientProvider clientProvider, ProcessPluginApi api) {
-        super(api);
-        this.clientProvider = clientProvider;
-    }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
-        Objects.requireNonNull(clientProvider, "clientProvider");
-    }
-
-    @Override
-    protected void doExecute(DelegateExecution execution, Variables variables) {
+    public void execute(ProcessPluginApi api, Variables variables) {
         var task = variables.getStartTask();
 
-        var measureId = getMeasureId(task);
-        var client = clientProvider.getWebserviceClientByReference(measureId);
-        var bundle = getMeasureAndLibrary(measureId, client, task);
+        var measureId = getMeasureId(api, task);
+        var client = api.getDsfClientProvider().getDsfClient(measureId.getBaseUrl());
+        var bundle = getMeasureAndLibrary(api, measureId, client, task);
 
-        variables.setResource(ConstantsFeasibility.VARIABLE_MEASURE, bundle.getEntry().get(0).getResource());
-        variables.setResource(ConstantsFeasibility.VARIABLE_LIBRARY, bundle.getEntry().get(1).getResource());
+        variables.setFhirResource(ConstantsFeasibility.VARIABLE_MEASURE, bundle.getEntry().get(0).getResource());
+        variables.setFhirResource(ConstantsFeasibility.VARIABLE_LIBRARY, bundle.getEntry().get(1).getResource());
     }
 
-    private IdType getMeasureId(Task task) {
+    private IdType getMeasureId(ProcessPluginApi api, Task task) {
         Optional<Reference> measureRef = api.getTaskHelper()
                 .getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                         CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class);
@@ -67,7 +50,7 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
         }
     }
 
-    private Bundle getMeasureAndLibrary(IdType measureId, FhirWebserviceClient client, Task task) {
+    private Bundle getMeasureAndLibrary(ProcessPluginApi api, IdType measureId, DsfClient client, Task task) {
         try {
             var bundle = client.searchWithStrictHandling(Measure.class,
                     Map.of("_id", Collections.singletonList(measureId.getIdPart()), "_include",

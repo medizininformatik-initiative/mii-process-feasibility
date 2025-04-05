@@ -1,10 +1,10 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.service.TaskHelper;
-import dev.dsf.bpe.v1.variables.Variables;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.service.FhirClientProvider;
+import dev.dsf.bpe.v2.service.TaskHelper;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Library;
 import org.hl7.fhir.r4.model.Measure;
@@ -14,9 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static de.medizininformatik_initiative.process.feasibility.Assertions.assertThat;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_LIBRARY;
@@ -31,7 +32,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class StoreFeasibilityResourcesTest {
 
-    private static final String TASK_URL = "http://foo.bar/Task/123";
     public static final String LIBRARY_ID = "library-id-173603";
     public static final String MEASURE_ID = "measure-id-173603";
 
@@ -39,16 +39,14 @@ public class StoreFeasibilityResourcesTest {
     private IGenericClient storeClient;
 
     @Mock private FeasibilityResourceCleaner cleaner;
-    @Mock private DelegateExecution execution;
     @Mock private Variables variables;
     @Mock private ProcessPluginApi api;
     @Mock private TaskHelper taskHelper;
+    @Mock private FhirClientProvider clientProvider;
 
     @Captor
     private ArgumentCaptor<Bundle> transactionBundleCaptor;
 
-
-    @InjectMocks
     private StoreFeasibilityResources service;
 
     // Creates a Measure like the Feasibility Backend will do.
@@ -97,16 +95,20 @@ public class StoreFeasibilityResourcesTest {
         var task = new Task();
         var transactionResponse = new Bundle();
         var measureLocation = "http://foo.bar/Measure/" + MEASURE_ID;
+        var storeId = "store-id-22:04:43";
         transactionResponse.addEntry().getResponse().setLocation(measureLocation);
         inputLibrary.getContentFirstRep().setContentType("text/cql");
-        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(inputMeasure);
-        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(inputLibrary);
+        service = new StoreFeasibilityResources(cleaner, storeId);
+        when(variables.getFhirResource(VARIABLE_MEASURE)).thenReturn(inputMeasure);
+        when(variables.getFhirResource(VARIABLE_LIBRARY)).thenReturn(inputLibrary);
         when(variables.getStartTask()).thenReturn(task);
+        when(api.getFhirClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getClient(storeId)).thenReturn(Optional.of(storeClient));
         when(api.getTaskHelper()).thenReturn(taskHelper);
         when(taskHelper.getLocalVersionlessAbsoluteUrl(task)).thenReturn("http://foo.bar/Task/123");
         when(storeClient.transaction().withBundle(transactionBundleCaptor.capture()).execute()).thenReturn(transactionResponse);
 
-        service.doExecute(execution, variables);
+        service.execute(api, variables);
 
         verify(cleaner).cleanLibrary(inputLibrary);
         verify(cleaner).cleanMeasure(inputMeasure);

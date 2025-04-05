@@ -3,7 +3,7 @@ package de.medizininformatik_initiative.process.feasibility.spring.config;
 import de.medizininformatik_initiative.process.feasibility.EvaluationSettingsProvider;
 import de.medizininformatik_initiative.process.feasibility.EvaluationSettingsProviderImpl;
 import de.medizininformatik_initiative.process.feasibility.EvaluationStrategy;
-import dev.dsf.bpe.v1.documentation.ProcessDocumentation;
+import dev.dsf.bpe.v2.documentation.ProcessDocumentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,6 +51,12 @@ public class EvaluationConfig {
     @Value("#{T(java.time.Duration).parse('${de.medizininformatik_initiative.feasibility_dsf_process.rate.limit.interval.duration:PT1H}')}")
     private Duration rateLimitTimeIntervalDuration;
 
+    @ProcessDocumentation(
+            processNames = { "medizininformatik-initiativede_feasibilityExecute" },
+            description = "The FHIR server connection ID to use for the store client. This has to be one of the connection id's used in the BPE setup.")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.store.connection.id:#{null}}")
+    private String connectionId;
+    
     @Bean
     public EvaluationSettingsProvider executionSettingsProvider() {
         return new EvaluationSettingsProviderImpl(
@@ -59,7 +65,6 @@ public class EvaluationConfig {
                 obfuscationLaplaceSensitivity,
                 obfuscationLaplaceEpsilon,
                 rateLimitCount,
-                rateLimitTimeIntervalDuration
-        );
+                rateLimitTimeIntervalDuration);
     }
 }

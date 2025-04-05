@@ -1,10 +1,9 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
 import de.medizininformatik_initiative.process.feasibility.client.flare.FlareWebserviceClient;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
-import dev.dsf.bpe.v1.variables.Variables;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.activity.ServiceTask;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Library;
@@ -33,36 +32,34 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 
-public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate implements InitializingBean {
+public class EvaluateStructuredQueryMeasure implements ServiceTask, InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(EvaluateStructuredQueryMeasure.class);
     private static final String STRUCTURED_QUERY_CONTENT_TYPE = "application/json";
 
     private final FlareWebserviceClient flareClient;
 
-    public EvaluateStructuredQueryMeasure(FlareWebserviceClient flareClient, ProcessPluginApi api) {
-        super(api);
+    public EvaluateStructuredQueryMeasure(FlareWebserviceClient flareClient) {
         this.flareClient = flareClient;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
         Objects.requireNonNull(flareClient, "flareClient");
     }
 
     @Override
-    protected void doExecute(DelegateExecution execution, Variables variables)
+    public void execute(ProcessPluginApi api, Variables variables)
             throws IOException, InterruptedException {
-        var library = (Library) variables.getResource(VARIABLE_LIBRARY);
-        var measure = (Measure) variables.getResource(VARIABLE_MEASURE);
+        Library library = variables.getFhirResource(VARIABLE_LIBRARY);
+        Measure measure = variables.getFhirResource(VARIABLE_MEASURE);
         var structuredQuery = getStructuredQuery(library);
 
-        var feasibility = getFeasibility(structuredQuery, measure, variables.getStartTask());
+        var feasibility = getFeasibility(api, structuredQuery, measure, variables.getStartTask());
 
         var measureReport = buildMeasureReport(feasibility);
 
-        variables.setResource(VARIABLE_MEASURE_REPORT, measureReport);
+        variables.setFhirResource(VARIABLE_MEASURE_REPORT, measureReport);
     }
 
     private byte[] getStructuredQuery(Library library) {
@@ -73,7 +70,7 @@ public class EvaluateStructuredQueryMeasure extends AbstractServiceDelegate impl
                 .getData();
     }
 
-    private int getFeasibility(byte[] structuredQuery, Measure measure, Task task)
+    private int getFeasibility(ProcessPluginApi api, byte[] structuredQuery, Measure measure, Task task)
             throws IOException, InterruptedException {
         logger.debug("Start evaluating Measure '{}' [task: {}]", measure.getId(),
                 api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));

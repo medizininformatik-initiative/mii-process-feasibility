@@ -1,14 +1,10 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
 import de.medizininformatik_initiative.process.feasibility.Obfuscator;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
-import dev.dsf.bpe.v1.service.TaskHelper;
-import dev.dsf.bpe.v1.variables.Variables;
-import dev.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.service.DsfClientProvider;
+import dev.dsf.bpe.v2.service.TaskHelper;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MeasureReport;
@@ -16,7 +12,6 @@ import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
 import org.hl7.fhir.r4.model.Period;
 import org.hl7.fhir.r4.model.Task;
-import org.joda.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +21,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -34,6 +30,7 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.MEASURE_REPORT_PERIOD_END;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.MEASURE_REPORT_PERIOD_START;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
+import static java.time.ZoneOffset.UTC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
@@ -49,12 +46,8 @@ public class ObfuscateEvaluationResultTest {
 
     @Captor private ArgumentCaptor<MeasureReport> measureReportCaptor;
 
-    @Mock private FhirWebserviceClientProvider clientProvider;
+    @Mock private DsfClientProvider clientProvider;
     @Mock private TaskHelper taskHelper;
-    @Mock private ProcessEngine processEngine;
-    @Mock private RuntimeService runtimeService;
-    @Mock private ReadAccessHelper readAccessHelper;
-    @Mock private DelegateExecution execution;
     @Mock private ProcessPluginApi api;
     @Mock private Variables variables;
     @Mock private Task task;
@@ -64,7 +57,7 @@ public class ObfuscateEvaluationResultTest {
     @BeforeEach
     public void setUp() {
         var incrementFeasibilityCountObfuscator = (Obfuscator<Integer>) value -> value + 1;
-        service = new ObfuscateEvaluationResult(incrementFeasibilityCountObfuscator, api);
+        service = new ObfuscateEvaluationResult(incrementFeasibilityCountObfuscator);
     }
 
     @Test
@@ -78,8 +71,8 @@ public class ObfuscateEvaluationResultTest {
                 .setType(SUMMARY)
                 .setDate(reportDate)
                 .setPeriod(new Period()
-                        .setStart(new LocalDate(1312, 4, 9).toDate())
-                        .setEnd(new LocalDate(1314, 1, 8).toDate()));
+                        .setStart(Date.from(LocalDate.of(1316, 4, 9).atStartOfDay().toInstant(UTC)))
+                        .setEnd(Date.from(LocalDate.of(1317, 11, 18).atStartOfDay().toInstant(UTC))));
         var populationGroup = new MeasureReportGroupPopulationComponent()
                 .setCode(new CodeableConcept()
                         .addCoding(new Coding()
@@ -90,11 +83,10 @@ public class ObfuscateEvaluationResultTest {
                 .add(new MeasureReportGroupComponent()
                         .setPopulation(List.of(populationGroup)));
 
-        when(api.getVariables(execution)).thenReturn(variables);
-        when(variables.getResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
+        when(variables.getFhirResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
 
-        service.execute(execution);
-        verify(variables).setResource(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
+        service.execute(api, variables);
+        verify(variables).setFhirResource(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
 
         var expectedFeasibilityCount = feasibilityCount + 1;
 
@@ -125,8 +117,8 @@ public class ObfuscateEvaluationResultTest {
                 .setMeasure(measureUrl)
                 .setDate(reportDate)
                 .setPeriod(new Period()
-                        .setStart(new LocalDate(1316, 4, 9).toDate())
-                        .setEnd(new LocalDate(1317, 11, 18).toDate()));
+                        .setStart(Date.from(LocalDate.of(1316, 4, 9).atStartOfDay().toInstant(UTC)))
+                        .setEnd(Date.from(LocalDate.of(1317, 11, 18).atStartOfDay().toInstant(UTC))));
         var fooPopulationGroup = new MeasureReportGroupPopulationComponent()
                 .setCode(new CodeableConcept()
                         .addCoding(new Coding()
@@ -142,12 +134,11 @@ public class ObfuscateEvaluationResultTest {
         measureReport.getGroup()
                 .add(new MeasureReportGroupComponent()
                         .setPopulation(List.of(fooPopulationGroup, initialPopulationGroup)));
-        when(api.getVariables(execution)).thenReturn(variables);
-        when(variables.getResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
+        when(variables.getFhirResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
 
-        service.execute(execution);
+        service.execute(api, variables);
 
-        verify(variables).setResource(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
+        verify(variables).setFhirResource(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
         assertThat(measureReportCaptor.getValue().getGroupFirstRep().getPopulationFirstRep().getCount())
                 .isEqualTo(feasibilityCount + 1);
     }
@@ -165,8 +156,8 @@ public class ObfuscateEvaluationResultTest {
                 .setMeasure(measureUrl)
                 .setDate(reportDate)
                 .setPeriod(new Period()
-                        .setStart(new LocalDate(1312, 4, 9).toDate())
-                        .setEnd(new LocalDate(1314, 1, 8).toDate()));
+                        .setStart(Date.from(LocalDate.of(1316, 4, 9).atStartOfDay().toInstant(UTC)))
+                        .setEnd(Date.from(LocalDate.of(1317, 11, 18).atStartOfDay().toInstant(UTC))));
         var initialPopulationGroup = new MeasureReportGroupPopulationComponent()
                 .setCode(new CodeableConcept()
                         .addCoding(new Coding()
@@ -180,12 +171,11 @@ public class ObfuscateEvaluationResultTest {
                 .add(new MeasureReportGroupComponent()
                         .setPopulation(List.of(initialPopulationGroup)));
 
-        when(api.getVariables(execution)).thenReturn(variables);
-        when(variables.getResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
+        when(variables.getFhirResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
 
-        service.execute(execution);
+        service.execute(api, variables);
 
-        verify(variables).setResource(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
+        verify(variables).setFhirResource(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
         assertThat(measureReportCaptor.getValue().getGroupFirstRep().getPopulationFirstRep().getCount())
                 .isEqualTo(feasibilityCount + 1);
     }
@@ -203,8 +193,8 @@ public class ObfuscateEvaluationResultTest {
                 .setMeasure(measureUrl)
                 .setDate(reportDate)
                 .setPeriod(new Period()
-                        .setStart(new LocalDate(1312, 4, 9).toDate())
-                        .setEnd(new LocalDate(1314, 1, 8).toDate()));
+                        .setStart(Date.from(LocalDate.of(1316, 4, 9).atStartOfDay().toInstant(UTC)))
+                        .setEnd(Date.from(LocalDate.of(1317, 11, 18).atStartOfDay().toInstant(UTC))));
         var reportId = "id-205925";
         measureReport.setId(reportId);
         var populationGroup = new MeasureReportGroupPopulationComponent()
@@ -216,10 +206,10 @@ public class ObfuscateEvaluationResultTest {
         measureReport.getGroup()
                 .add(new MeasureReportGroupComponent()
                         .setPopulation(List.of(populationGroup)));
-        when(variables.getResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
+        when(variables.getFhirResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
 
         assertThatThrownBy(() -> {
-            service.doExecute(execution, variables);
+            service.execute(api, variables);
         }).hasMessage("Missing population with coding '%s' in measure report (id '%s').",
                         CODESYSTEM_MEASURE_POPULATION_VALUE_INITIAL_POPULATION, reportId);
     }
@@ -236,13 +226,13 @@ public class ObfuscateEvaluationResultTest {
                 .setMeasure(measureUrl)
                 .setDate(reportDate)
                 .setPeriod(new Period()
-                        .setStart(new LocalDate(1312, 4, 9).toDate())
-                        .setEnd(new LocalDate(1314, 1, 8).toDate()))
+                        .setStart(Date.from(LocalDate.of(1316, 4, 9).atStartOfDay().toInstant(UTC)))
+                        .setEnd(Date.from(LocalDate.of(1317, 11, 18).atStartOfDay().toInstant(UTC))))
                 .setId(reportId);
-        when(variables.getResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
+        when(variables.getFhirResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
 
         assertThatThrownBy(() -> {
-            service.doExecute(execution, variables);
+            service.execute(api, variables);
         }).hasMessage("Missing population with coding '%s' in measure report (id '%s').",
                         CODESYSTEM_MEASURE_POPULATION_VALUE_INITIAL_POPULATION, reportId);
     }
@@ -259,13 +249,13 @@ public class ObfuscateEvaluationResultTest {
                 .setMeasure(measureUrl)
                 .setDate(reportDate)
                 .setPeriod(new Period()
-                        .setStart(new LocalDate(1312, 4, 9).toDate())
-                        .setEnd(new LocalDate(1314, 1, 8).toDate()))
+                        .setStart(Date.from(LocalDate.of(1316, 4, 9).atStartOfDay().toInstant(UTC)))
+                        .setEnd(Date.from(LocalDate.of(1317, 11, 18).atStartOfDay().toInstant(UTC))))
                 .setId(reportId);
-        when(variables.getResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
+        when(variables.getFhirResource(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
 
         assertThatThrownBy(() -> {
-            service.doExecute(execution, variables);
+            service.execute(api, variables);
         }).hasMessage("Expected status '%s' but actually is '%s' for measure report (id '%s').",
                 COMPLETE, PENDING, reportId);
     }

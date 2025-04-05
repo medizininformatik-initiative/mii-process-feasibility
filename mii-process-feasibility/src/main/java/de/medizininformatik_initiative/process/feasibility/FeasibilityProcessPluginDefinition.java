@@ -1,12 +1,10 @@
 package de.medizininformatik_initiative.process.feasibility;
 
 import de.medizininformatik_initiative.process.feasibility.client.flare.FlareWebserviceClientSpringConfig;
-import de.medizininformatik_initiative.process.feasibility.client.store.StoreClientSpringConfig;
 import de.medizininformatik_initiative.process.feasibility.spring.config.BaseConfig;
-import de.medizininformatik_initiative.process.feasibility.spring.config.EnhancedFhirWebserviceClientProviderConfig;
 import de.medizininformatik_initiative.process.feasibility.spring.config.EvaluationConfig;
 import de.medizininformatik_initiative.process.feasibility.spring.config.FeasibilityConfig;
-import dev.dsf.bpe.v1.ProcessPluginDefinition;
+import dev.dsf.bpe.v2.ProcessPluginDefinition;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -60,8 +58,7 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
 
     @Override
     public List<Class<?>> getSpringConfigurations() {
-        return List.of(BaseConfig.class, StoreClientSpringConfig.class, FeasibilityConfig.class,
-                EnhancedFhirWebserviceClientProviderConfig.class, EvaluationConfig.class,
+        return List.of(BaseConfig.class, FeasibilityConfig.class, EvaluationConfig.class,
                 FlareWebserviceClientSpringConfig.class);
     }
 

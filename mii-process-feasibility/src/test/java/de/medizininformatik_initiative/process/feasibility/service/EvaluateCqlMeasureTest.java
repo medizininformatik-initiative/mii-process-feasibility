@@ -2,10 +2,10 @@ package de.medizininformatik_initiative.process.feasibility.service;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.IOperationUntypedWithInput;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.service.TaskHelper;
-import dev.dsf.bpe.v1.variables.Variables;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.service.FhirClientProvider;
+import dev.dsf.bpe.v2.service.TaskHelper;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.DateType;
@@ -23,11 +23,11 @@ import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.HEADER_PREFER;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.HEADER_PREFER_RESPOND_ASYNC;
@@ -51,22 +51,24 @@ public class EvaluateCqlMeasureTest {
     @Captor ArgumentCaptor<StringType> stringTypeCaptor;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) private IGenericClient storeClient;
-    @Mock private DelegateExecution execution;
     @Mock private Variables variables;
     @Mock private IOperationUntypedWithInput<Parameters> operation;
     @Mock private ProcessPluginApi api;
     @Mock private TaskHelper taskHelper;
+    @Mock private FhirClientProvider clientProvider;
 
-    @InjectMocks private EvaluateCqlMeasure service;
+    private EvaluateCqlMeasure service;
 
     @BeforeEach
     public void setUp() {
         var report = new MeasureReport();
         var code = new CodeableConcept();
         var coding = code.getCodingFirstRep();
+        var storeId = "store-id-220027";
         coding.setSystem(MEASURE_POPULATION);
         coding.setCode(INITIAL_POPULATION);
         report.getGroupFirstRep().getPopulationFirstRep().setCode(code);
+        service = new EvaluateCqlMeasure(storeId);
         when(storeClient.operation()
                 .onInstance("Measure/" + MEASURE_ID)
                 .named("evaluate-measure")
@@ -79,6 +81,8 @@ public class EvaluateCqlMeasureTest {
                         .thenReturn(operation);
         when(operation.withAdditionalHeader(eq(HEADER_PREFER), eq(HEADER_PREFER_RESPOND_ASYNC))).thenReturn(operation);
         when(variables.getString(VARIABLE_MEASURE_ID)).thenReturn(MEASURE_ID);
+        when(api.getFhirClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getClient(storeId)).thenReturn(Optional.of(storeClient));
         when(api.getTaskHelper()).thenReturn(taskHelper);
     }
 
@@ -93,9 +97,9 @@ public class EvaluateCqlMeasureTest {
         when(operation.execute())
                 .thenReturn(new Parameters().addParameter(new ParametersParameterComponent().setResource(report)));
 
-        service.doExecute(execution, variables);
+        service.execute(api, variables);
 
-        verify(variables).setResource(VARIABLE_MEASURE_REPORT, report);
+        verify(variables).setFhirResource(VARIABLE_MEASURE_REPORT, report);
         assertThat(stringTypeCaptor.getValue()).isNotNull();
         assertThat(stringTypeCaptor.getValue().getValue()).isEqualTo(MEASURE_REPORT_TYPE_POPULATION);
     }
@@ -109,7 +113,7 @@ public class EvaluateCqlMeasureTest {
                                 .setName("foo")
                                 .setResource(report)));
 
-        assertThatThrownBy(() -> service.doExecute(execution, variables))
+        assertThatThrownBy(() -> service.execute(api, variables))
                 .hasMessage("Missing MeasureReport group");
     }
 
@@ -120,7 +124,7 @@ public class EvaluateCqlMeasureTest {
         when(operation.execute())
                 .thenReturn(new Parameters().addParameter(new ParametersParameterComponent().setResource(report)));
 
-        assertThatThrownBy(() -> service.doExecute(execution, variables))
+        assertThatThrownBy(() -> service.execute(api, variables))
                 .hasMessage("Missing MeasureReport population");
     }
 
@@ -131,7 +135,7 @@ public class EvaluateCqlMeasureTest {
         when(operation.execute())
                 .thenReturn(new Parameters().addParameter(new ParametersParameterComponent().setResource(report)));
 
-        assertThatThrownBy(() -> service.doExecute(execution, variables))
+        assertThatThrownBy(() -> service.execute(api, variables))
                 .hasMessage("Missing MeasureReport population code");
     }
 
@@ -142,7 +146,7 @@ public class EvaluateCqlMeasureTest {
         when(operation.execute())
                 .thenReturn(new Parameters().addParameter(new ParametersParameterComponent().setResource(report)));
 
-        assertThatThrownBy(() -> service.doExecute(execution, variables))
+        assertThatThrownBy(() -> service.execute(api, variables))
                 .hasMessage("Missing MeasureReport initial-population code");
     }
 
@@ -157,7 +161,7 @@ public class EvaluateCqlMeasureTest {
         when(operation.execute())
                 .thenReturn(new Parameters().addParameter(new ParametersParameterComponent().setResource(report)));
 
-        assertThatThrownBy(() -> service.doExecute(execution, variables))
+        assertThatThrownBy(() -> service.execute(api, variables))
                 .hasMessage("Missing MeasureReport population count");
     }
 
@@ -173,9 +177,9 @@ public class EvaluateCqlMeasureTest {
         when(operation.execute())
                 .thenReturn(new Parameters().addParameter(new ParametersParameterComponent().setResource(bundle)));
 
-        service.doExecute(execution, variables);
+        service.execute(api, variables);
 
-        verify(variables).setResource(VARIABLE_MEASURE_REPORT, report);
+        verify(variables).setFhirResource(VARIABLE_MEASURE_REPORT, report);
         assertThat(stringTypeCaptor.getValue()).isNotNull();
         assertThat(stringTypeCaptor.getValue().getValue()).isEqualTo(MEASURE_REPORT_TYPE_POPULATION);
     }
@@ -186,7 +190,7 @@ public class EvaluateCqlMeasureTest {
         when(operation.execute())
                 .thenReturn(new Parameters().addParameter(new ParametersParameterComponent().setResource(bundle)));
 
-        assertThatThrownBy(() -> service.doExecute(execution, variables))
+        assertThatThrownBy(() -> service.execute(api, variables))
                 .hasMessage("Failed to extract MeasureReport from response");
     }
 
@@ -197,7 +201,7 @@ public class EvaluateCqlMeasureTest {
         when(operation.execute())
                 .thenReturn(new Parameters().addParameter(new ParametersParameterComponent().setResource(bundle)));
 
-        assertThatThrownBy(() -> service.doExecute(execution, variables))
+        assertThatThrownBy(() -> service.execute(api, variables))
                 .hasMessage("Failed to extract MeasureReport from response");
     }
 
@@ -208,7 +212,7 @@ public class EvaluateCqlMeasureTest {
                 .thenReturn(new Parameters()
                         .addParameter(new ParametersParameterComponent().setResource(resource)));
 
-        assertThatThrownBy(() -> service.doExecute(execution, variables))
+        assertThatThrownBy(() -> service.execute(api, variables))
                 .hasMessage("Failed to extract MeasureReport from response");
     }
 }

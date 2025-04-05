@@ -1,8 +1,9 @@
 package de.medizininformatik_initiative.process.feasibility.variables;
 
-import org.joda.time.LocalDate;
-
+import java.time.LocalDate;
 import java.util.Date;
+
+import static java.time.ZoneOffset.UTC;
 
 public interface ConstantsFeasibility {
     String VARIABLE_MEASURE = "measure";
@@ -28,8 +29,8 @@ public interface ConstantsFeasibility {
     String FEASIBILITY_REQUEST_PROCESS_ID = "medizininformatik-initiativede_feasibilityRequest";
     String FEASIBILITY_EXECUTE_PROCESS_ID = "medizininformatik-initiativede_feasibilityExecute";
 
-    Date MEASURE_REPORT_PERIOD_START = new LocalDate(1900, 1, 1).toDate();
-    Date MEASURE_REPORT_PERIOD_END = new LocalDate(2100, 1, 1).toDate();
+    Date MEASURE_REPORT_PERIOD_START = Date.from(LocalDate.of(1900, 1, 1).atStartOfDay().toInstant(UTC));
+    Date MEASURE_REPORT_PERIOD_END = Date.from(LocalDate.of(2200, 1, 1).atStartOfDay().toInstant(UTC));
     String MEASURE_REPORT_TYPE_POPULATION = "population";
 
     int CLIENT_TIMEOUT_DEFAULT = 300000;

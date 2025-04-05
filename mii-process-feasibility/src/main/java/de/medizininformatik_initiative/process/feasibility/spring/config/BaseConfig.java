@@ -1,6 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.spring.config;
 
-import dev.dsf.bpe.v1.documentation.ProcessDocumentation;
+import dev.dsf.bpe.v2.documentation.ProcessDocumentation;
 import org.apache.http.ssl.SSLContexts;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;

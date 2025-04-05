@@ -1,10 +1,9 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
 import de.medizininformatik_initiative.process.feasibility.Obfuscator;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
-import dev.dsf.bpe.v1.variables.Variables;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.activity.ServiceTask;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MeasureReport;
@@ -23,28 +22,25 @@ import static java.lang.String.format;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 
-public class ObfuscateEvaluationResult extends AbstractServiceDelegate
-        implements InitializingBean {
+public class ObfuscateEvaluationResult implements ServiceTask, InitializingBean {
 
     private final Obfuscator<Integer> obfuscator;
 
-    public ObfuscateEvaluationResult(Obfuscator<Integer> obfuscator, ProcessPluginApi api) {
-        super(api);
+    public ObfuscateEvaluationResult(Obfuscator<Integer> obfuscator) {
         this.obfuscator = obfuscator;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
         Objects.requireNonNull(obfuscator, "obfuscator");
     }
 
     @Override
-    protected void doExecute(DelegateExecution execution, Variables variables) {
-        var measureReport = (MeasureReport) variables.getResource(VARIABLE_MEASURE_REPORT);
+    public void execute(ProcessPluginApi api, Variables variables) {
+        MeasureReport measureReport = variables.getFhirResource(VARIABLE_MEASURE_REPORT);
 
         if (measureReport.getStatus() == COMPLETE) {
-            variables.setResource(VARIABLE_MEASURE_REPORT, obfuscateFeasibilityCount(measureReport));
+            variables.setFhirResource(VARIABLE_MEASURE_REPORT, obfuscateFeasibilityCount(measureReport));
         } else {
             throw new RuntimeException(format("Expected status '%s' but actually is '%s' for measure report (id '%s').",
                     COMPLETE, measureReport.getStatus(), measureReport.getId()));

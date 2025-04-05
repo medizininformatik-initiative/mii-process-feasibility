@@ -15,10 +15,6 @@
     <dependencies>
         <dependency>
             <groupId>de.hs-heilbronn.mi</groupId>
-            <artifactId>log4j2-utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.hs-heilbronn.mi</groupId>
             <artifactId>crypto-utils</artifactId>
         </dependency>
         <dependency>
@@ -34,10 +30,6 @@
                     <groupId>*</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>ca.uhn.hapi.fhir</groupId>
-            <artifactId>hapi-fhir-structures-r4</artifactId>
         </dependency>
     </dependencies>
 

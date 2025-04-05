@@ -1,8 +1,5 @@
 package de.medizininformatik_initiative.process.feasibility.spring.config;
 
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProvider;
-import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProviderImpl;
 import de.medizininformatik_initiative.process.feasibility.EvaluationSettingsProvider;
 import de.medizininformatik_initiative.process.feasibility.FeasibilityCachingLaplaceCountObfuscator;
 import de.medizininformatik_initiative.process.feasibility.FeasibilityProcessPluginDeploymentStateListener;
@@ -27,10 +24,8 @@ import de.medizininformatik_initiative.process.feasibility.service.SetupEvaluati
 import de.medizininformatik_initiative.process.feasibility.service.StoreFeasibilityResources;
 import de.medizininformatik_initiative.process.feasibility.service.StoreLiveResult;
 import de.medizininformatik_initiative.process.feasibility.service.StoreMeasureReport;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import dev.dsf.bpe.v2.documentation.ProcessDocumentation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,24 +34,19 @@ import org.springframework.context.annotation.Scope;
 @Configuration
 public class FeasibilityConfig {
 
-    private final IGenericClient storeClient;
-
-    @Autowired private ProcessPluginApi api;
-
     private final EvaluationSettingsProvider evaluationSettingsProvider;
     private final FlareWebserviceClient flareWebserviceClient;
 
-    public FeasibilityConfig(@Qualifier("store-client") IGenericClient storeClient,
-                             EvaluationSettingsProvider evaluationSettingsProvider,
+    @ProcessDocumentation(
+            processNames = { "medizininformatik-initiativede_feasibilityExecute" },
+            description = "The FHIR server connection ID to use for the store client. This has to be one of the connection id's used in the BPE setup.")
+    @Value("${de.medizininformatik_initiative.feasibility_dsf_process.store.connection.id:#{null}}")
+    private String connectionId;
+    
+    public FeasibilityConfig(EvaluationSettingsProvider evaluationSettingsProvider,
                              FlareWebserviceClient flareWebserviceClient) {
-        this.storeClient = storeClient;
         this.evaluationSettingsProvider = evaluationSettingsProvider;
         this.flareWebserviceClient = flareWebserviceClient;
-    }
-
-    @Bean
-    public EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider(@Qualifier("clientProvider") FhirWebserviceClientProvider fhirClientProvider) {
-        return new EnhancedFhirWebserviceClientProviderImpl(fhirClientProvider);
     }
 
     @Bean
@@ -73,37 +63,37 @@ public class FeasibilityConfig {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SelectRequestTargets selectRequestTargets() {
-        return new SelectRequestTargets(api);
+        return new SelectRequestTargets();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SendDicRequest sendDicRequests() {
-        return new SendDicRequest(api);
+        return new SendDicRequest();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public DownloadMeasureReport downloadMeasureReport(EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
-        return new DownloadMeasureReport(enhancedFhirClientProvider, api);
+    public DownloadMeasureReport downloadMeasureReport() {
+        return new DownloadMeasureReport();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public StoreLiveResult storeLiveResult() {
-        return new StoreLiveResult(api);
+        return new StoreLiveResult();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public LogReceiveTimeout logReceiveTimeout() {
-        return new LogReceiveTimeout(api);
+        return new LogReceiveTimeout();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SetCorrelationKeyListener setCorrelationKeyListener() {
-        return new SetCorrelationKeyListener(api);
+        return new SetCorrelationKeyListener();
     }
 
     //
@@ -114,74 +104,73 @@ public class FeasibilityConfig {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public EvaluateRequestRate requestRateLimiter() {
         return new EvaluateRequestRate(new RateLimit(evaluationSettingsProvider.getRateLimitCount(),
-                evaluationSettingsProvider.getRateLimitTimeIntervalDuration()), api);
+                evaluationSettingsProvider.getRateLimitTimeIntervalDuration()));
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public RateLimitExceededTaskRejecter rateLimitExceededTaskRejecter() {
-        return new RateLimitExceededTaskRejecter(api);
+        return new RateLimitExceededTaskRejecter();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SetupEvaluationSettings setupEvaluationSettings() {
-        return new SetupEvaluationSettings(evaluationSettingsProvider, api);
+        return new SetupEvaluationSettings(evaluationSettingsProvider);
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public DownloadFeasibilityResources downloadFeasibilityResources(
-            EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
-        return new DownloadFeasibilityResources(enhancedFhirClientProvider, api);
+    public DownloadFeasibilityResources downloadFeasibilityResources() {
+        return new DownloadFeasibilityResources();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public StoreFeasibilityResources storeFeasibilityResources() {
-        return new StoreFeasibilityResources(storeClient, api, new FeasibilityResourceCleaner());
+        return new StoreFeasibilityResources(new FeasibilityResourceCleaner(), connectionId);
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public EvaluateCqlMeasure evaluateCqlMeasure() {
-        return new EvaluateCqlMeasure(storeClient, api);
+        return new EvaluateCqlMeasure(connectionId);
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public EvaluateStructuredQueryMeasure evaluateStructureQueryMeasure() {
-        return new EvaluateStructuredQueryMeasure(flareWebserviceClient, api);
+        return new EvaluateStructuredQueryMeasure(flareWebserviceClient);
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public ObfuscateEvaluationResult obfuscateEvaluationResult(Obfuscator<Integer> feasibilityCountObfuscator) {
-        return new ObfuscateEvaluationResult(feasibilityCountObfuscator, api);
+        return new ObfuscateEvaluationResult(feasibilityCountObfuscator);
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public StoreMeasureReport storeMeasureReport() {
-        return new StoreMeasureReport(api);
+        return new StoreMeasureReport();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SelectResponseTarget selectResponseTarget() {
-        return new SelectResponseTarget(api);
+        return new SelectResponseTarget();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SendDicResponse sendDicResponse() {
-        return new SendDicResponse(api);
+        return new SendDicResponse();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public FeasibilityProcessPluginDeploymentStateListener deploymentStateListener() {
         return new FeasibilityProcessPluginDeploymentStateListener(evaluationSettingsProvider.evaluationStrategy(),
-                storeClient, flareWebserviceClient);
+                flareWebserviceClient);
     }
 }

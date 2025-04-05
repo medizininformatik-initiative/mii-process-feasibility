@@ -1,10 +1,10 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
 import de.medizininformatik_initiative.process.feasibility.EvaluationSettingsProvider;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
-import dev.dsf.bpe.v1.variables.Variables;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.activity.ServiceTask;
+import dev.dsf.bpe.v2.error.ErrorBoundaryEvent;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Objects;
@@ -14,24 +14,21 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_SENSITIVITY;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_EVALUATION_STRATEGY;
 
-public class SetupEvaluationSettings extends AbstractServiceDelegate
-        implements InitializingBean {
+public class SetupEvaluationSettings implements ServiceTask, InitializingBean {
 
     private final EvaluationSettingsProvider evaluationSettingsProvider;
 
-    public SetupEvaluationSettings(EvaluationSettingsProvider evaluationSettingsProvider, ProcessPluginApi api) {
-        super(api);
+    public SetupEvaluationSettings(EvaluationSettingsProvider evaluationSettingsProvider) {
         this.evaluationSettingsProvider = evaluationSettingsProvider;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
         Objects.requireNonNull(evaluationSettingsProvider, "variablesSettingsProvider");
     }
 
     @Override
-    protected void doExecute(DelegateExecution execution, Variables variables) {
+    public void execute(ProcessPluginApi api, Variables variables) throws ErrorBoundaryEvent, Exception {
         variables.setString(VARIABLE_EVALUATION_STRATEGY,
                 evaluationSettingsProvider.evaluationStrategy().toString());
         variables.setBoolean(VARIABLE_EVALUATION_OBFUSCATION,

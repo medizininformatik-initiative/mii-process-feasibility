@@ -1,15 +1,14 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.service.EndpointProvider;
-import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
-import dev.dsf.bpe.v1.service.OrganizationProvider;
-import dev.dsf.bpe.v1.service.TaskHelper;
-import dev.dsf.bpe.v1.variables.Target;
-import dev.dsf.bpe.v1.variables.Targets;
-import dev.dsf.bpe.v1.variables.Variables;
-import dev.dsf.fhir.client.FhirWebserviceClient;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.client.dsf.DsfClient;
+import dev.dsf.bpe.v2.service.DsfClientProvider;
+import dev.dsf.bpe.v2.service.EndpointProvider;
+import dev.dsf.bpe.v2.service.OrganizationProvider;
+import dev.dsf.bpe.v2.service.TaskHelper;
+import dev.dsf.bpe.v2.variables.Target;
+import dev.dsf.bpe.v2.variables.Targets;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
@@ -43,7 +42,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class SelectRequestTargetsTest {
 
-    private static final String PARENT_ORGANIZATION_ID = "medizininformatik-initiative.de";
     private static final String BASE_URL = "foo/";
     private static final String MEASURE_ID = "measure-id-11:57:29";
 
@@ -51,10 +49,9 @@ public class SelectRequestTargetsTest {
 
     @Mock private EndpointProvider endpointProvider;
     @Mock private OrganizationProvider organizationProvider;
-    @Mock private DelegateExecution execution;
     @Mock private TaskHelper taskHelper;
-    @Mock private FhirWebserviceClientProvider clientProvider;
-    @Mock private FhirWebserviceClient client;
+    @Mock private DsfClientProvider clientProvider;
+    @Mock private DsfClient client;
     @Mock private ProcessPluginApi api;
     @Mock private Variables variables;
     @Mock private Task task;
@@ -75,8 +72,8 @@ public class SelectRequestTargetsTest {
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
                         .thenReturn(Optional.of(measureReference));
-        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
-        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
+        when(api.getDsfClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getLocalDsfClient()).thenReturn(client);
         when(client.getBaseUrl()).thenReturn(BASE_URL);
     }
 
@@ -86,7 +83,7 @@ public class SelectRequestTargetsTest {
                 .thenReturn(List.of());
         when(variables.createTargets(eq(List.of()))).thenReturn(targets);
 
-        service.doExecute(execution, variables);
+        service.execute(api, variables);
 
         verify(variables).setTargets(targetsValuesCaptor.capture());
         verify(variables).setString("measure-id", BASE_URL + MEASURE_ID);
@@ -117,7 +114,7 @@ public class SelectRequestTargetsTest {
                         .thenReturn(target);
         when(variables.createTargets(eq(List.of(target)))).thenReturn(targets);
 
-        service.doExecute(execution, variables);
+        service.execute(api, variables);
 
         verify(variables).setTargets(targets);
     }
@@ -147,7 +144,7 @@ public class SelectRequestTargetsTest {
                         .thenReturn(target);
         when(variables.createTargets(eq(List.of(target)))).thenReturn(targets);
 
-        service.doExecute(execution, variables);
+        service.execute(api, variables);
 
         verify(variables).setTargets(targets);
     }
@@ -195,7 +192,7 @@ public class SelectRequestTargetsTest {
                         .thenReturn(targetB);
         when(variables.createTargets(eq(List.of(targetA, targetB)))).thenReturn(targets);
 
-        service.doExecute(execution, variables);
+        service.execute(api, variables);
 
         verify(variables).setTargets(targets);
     }

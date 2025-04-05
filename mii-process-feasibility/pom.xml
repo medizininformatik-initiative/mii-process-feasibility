@@ -21,18 +21,8 @@
     <dependencies>
         <dependency>
             <groupId>dev.dsf</groupId>
-            <artifactId>dsf-bpe-process-api-v1</artifactId>
+            <artifactId>dsf-bpe-process-api-v2</artifactId>
             <version>${dsf.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>ca.uhn.hapi.fhir</groupId>
-            <artifactId>hapi-fhir-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.38</version>
             <scope>provided</scope>
         </dependency>
 
@@ -115,12 +105,6 @@
             <groupId>com.github.dasniko</groupId>
             <artifactId>testcontainers-keycloak</artifactId>
             <version>3.6.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>dev.dsf</groupId>
-            <artifactId>dsf-fhir-validation</artifactId>
-            <version>${dsf.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -400,23 +384,23 @@
                     </filesets>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>dev.dsf</groupId>
-                <artifactId>dsf-tools-documentation-generator</artifactId>
-                <version>${dsf.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <workingPackages>
-                        <workingPackage>de.medizininformatik_initiative.process.feasibility</workingPackage>
-                    </workingPackages>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>dev.dsf</groupId>-->
+<!--                <artifactId>dsf-tools-documentation-generator</artifactId>-->
+<!--                <version>${dsf.version}</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>generate</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <workingPackages>-->
+<!--                        <workingPackage>de.medizininformatik_initiative.process.feasibility</workingPackage>-->
+<!--                    </workingPackages>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 </project>

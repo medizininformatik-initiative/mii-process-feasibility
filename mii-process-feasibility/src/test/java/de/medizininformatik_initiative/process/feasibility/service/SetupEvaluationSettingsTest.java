@@ -2,9 +2,8 @@ package de.medizininformatik_initiative.process.feasibility.service;
 
 import de.medizininformatik_initiative.process.feasibility.EvaluationSettingsProvider;
 import de.medizininformatik_initiative.process.feasibility.EvaluationStrategy;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.variables.Variables;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,7 +21,6 @@ import static org.mockito.Mockito.when;
 public class SetupEvaluationSettingsTest {
 
     @Mock private EvaluationSettingsProvider settingsProvider;
-    @Mock private DelegateExecution execution;
     @Mock private Variables variables;
     @Mock private ProcessPluginApi api;
 
@@ -34,13 +32,12 @@ public class SetupEvaluationSettingsTest {
         var sensitivity = 113045d;
         var epsilon = 113810d;
 
-        when(api.getVariables(execution)).thenReturn(variables);
         when(settingsProvider.evaluationStrategy()).thenReturn(EvaluationStrategy.CQL);
         when(settingsProvider.evaluationResultObfuscationEnabled()).thenReturn(true);
         when(settingsProvider.resultObfuscationLaplaceSensitivity()).thenReturn(sensitivity);
         when(settingsProvider.resultObfuscationLaplaceEpsilon()).thenReturn(epsilon);
 
-        service.execute(execution);
+        service.execute(api, variables);
         verify(variables).setString(VARIABLE_EVALUATION_STRATEGY, expectedEvaluationStrategy);
         verify(variables).setBoolean(VARIABLE_EVALUATION_OBFUSCATION, true);
         verify(variables).setDouble(VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_SENSITIVITY, sensitivity);

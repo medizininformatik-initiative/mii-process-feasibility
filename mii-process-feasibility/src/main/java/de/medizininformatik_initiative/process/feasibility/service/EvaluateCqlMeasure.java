@@ -1,10 +1,9 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
-import dev.dsf.bpe.v1.variables.Variables;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.activity.ServiceTask;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.IdType;
@@ -17,10 +16,8 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.HEADER_PREFER;
@@ -33,36 +30,29 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_ID;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 
-public class EvaluateCqlMeasure extends AbstractServiceDelegate implements InitializingBean {
+public class EvaluateCqlMeasure implements ServiceTask {
 
     private static final String BLAZE_EVAL_DURATION_URL = "https://samply.github.io/blaze/fhir/StructureDefinition/eval-duration";
     private static final Logger logger = LoggerFactory.getLogger(EvaluateCqlMeasure.class);
 
-    private final IGenericClient storeClient;
-
     private String taskId;
+    private String connectionId;
 
-    public EvaluateCqlMeasure(IGenericClient storeClient, ProcessPluginApi api) {
-        super(api);
-
-        this.storeClient = storeClient;
+    public EvaluateCqlMeasure(String connectionId) {
+        this.connectionId = connectionId;
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
-
-        Objects.requireNonNull(storeClient, "storeClient");
-    }
-
-    @Override
-    protected void doExecute(DelegateExecution execution, Variables variables) {
+    public void execute(ProcessPluginApi api, Variables variables) {
         var measureId = new IdType(variables.getString(VARIABLE_MEASURE_ID));
+        var storeClient = api.getFhirClientProvider().getClient(connectionId).orElseThrow(
+                () -> new IllegalStateException(
+                        "No store client configured for store id '%s'.".formatted(connectionId)));
         taskId = api.getTaskHelper().getLocalVersionlessAbsoluteUrl(variables.getStartTask());
 
         logger.debug("Start evaluating Measure '{}' [task: {}]", measureId.getValue(), taskId);
         var start = System.currentTimeMillis();
-        var response = executeEvaluateMeasure(measureId);
+        var response = executeEvaluateMeasure(storeClient, measureId);
         var duration = System.currentTimeMillis() - start;
         var report = response.filter(Parameters::hasParameter)
                 .map(Parameters::getParameterFirstRep)
@@ -76,7 +66,7 @@ public class EvaluateCqlMeasure extends AbstractServiceDelegate implements Initi
             logger.debug("Finished evaluating Measure '{}' {} [task: {}]", measureId.getValue(),
                     getFormattedExecutionTime(report.get(), duration), taskId);
             validateMeasureReport(report.get());
-            variables.setResource(VARIABLE_MEASURE_REPORT, report.get());
+            variables.setFhirResource(VARIABLE_MEASURE_REPORT, report.get());
         }
     }
 
@@ -118,7 +108,7 @@ public class EvaluateCqlMeasure extends AbstractServiceDelegate implements Initi
         }
     }
 
-    private Optional<Parameters> executeEvaluateMeasure(IdType measureId) {
+    private Optional<Parameters> executeEvaluateMeasure(IGenericClient storeClient, IdType measureId) {
         return Optional.ofNullable(storeClient.operation()
                 .onInstance("Measure/" + measureId.getIdPart())
                 .named("evaluate-measure")

@@ -1,10 +1,9 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
 import de.medizininformatik_initiative.process.feasibility.client.flare.FlareWebserviceClient;
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.service.TaskHelper;
-import dev.dsf.bpe.v1.variables.Variables;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.service.TaskHelper;
+import dev.dsf.bpe.v2.variables.Variables;
 import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.Library;
 import org.hl7.fhir.r4.model.Measure;
@@ -38,7 +37,6 @@ public class EvaluateStructuredQueryMeasureTest {
     @Captor ArgumentCaptor<MeasureReport> measureReportCaptor;
 
     @Mock private FlareWebserviceClient flareWebserviceClient;
-    @Mock private DelegateExecution execution;
     @Mock private ProcessPluginApi api;
     @Mock private Variables variables;
     @Mock private TaskHelper taskHelper;
@@ -50,9 +48,9 @@ public class EvaluateStructuredQueryMeasureTest {
     public void testDoExecute_FailsIfStructuredQueryContentIsMissing() {
         var library = new Library();
 
-        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
+        when(variables.getFhirResource(VARIABLE_LIBRARY)).thenReturn(library);
 
-        assertThrows(IllegalStateException.class, () -> service.doExecute(execution, variables));
+        assertThrows(IllegalStateException.class, () -> service.execute(api, variables));
     }
 
     @Test
@@ -67,11 +65,11 @@ public class EvaluateStructuredQueryMeasureTest {
         when(api.getTaskHelper()).thenReturn(taskHelper);
         when(variables.getStartTask()).thenReturn(task);
         when(taskHelper.getLocalVersionlessAbsoluteUrl(task)).thenReturn("task-url");
-        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(measure);
-        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
+        when(variables.getFhirResource(VARIABLE_MEASURE)).thenReturn(measure);
+        when(variables.getFhirResource(VARIABLE_LIBRARY)).thenReturn(library);
         when(flareWebserviceClient.requestFeasibility(structuredQuery)).thenThrow(IOException.class);
 
-        assertThrows(IOException.class, () -> service.doExecute(execution, variables));
+        assertThrows(IOException.class, () -> service.execute(api, variables));
     }
 
     @Test
@@ -82,9 +80,9 @@ public class EvaluateStructuredQueryMeasureTest {
                 .setContentType("text/plain")
                 .setData(structuredQuery)));
 
-        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
+        when(variables.getFhirResource(VARIABLE_LIBRARY)).thenReturn(library);
 
-        assertThrows(IllegalStateException.class, () -> service.doExecute(execution, variables));
+        assertThrows(IllegalStateException.class, () -> service.execute(api, variables));
     }
 
     @Test
@@ -100,13 +98,13 @@ public class EvaluateStructuredQueryMeasureTest {
         when(api.getTaskHelper()).thenReturn(taskHelper);
         when(variables.getStartTask()).thenReturn(task);
         when(taskHelper.getLocalVersionlessAbsoluteUrl(task)).thenReturn("task-url");
-        when(variables.getResource(VARIABLE_MEASURE)).thenReturn(measure);
-        when(variables.getResource(VARIABLE_LIBRARY)).thenReturn(library);
+        when(variables.getFhirResource(VARIABLE_MEASURE)).thenReturn(measure);
+        when(variables.getFhirResource(VARIABLE_LIBRARY)).thenReturn(library);
         when(flareWebserviceClient.requestFeasibility(structuredQuery)).thenReturn(feasibility);
 
-        service.doExecute(execution, variables);
+        service.execute(api, variables);
 
-        verify(variables).setResource(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
+        verify(variables).setFhirResource(eq(VARIABLE_MEASURE_REPORT), measureReportCaptor.capture());
         var measureReport = measureReportCaptor.getValue();
         assertEquals(COMPLETE, measureReport.getStatus());
         assertEquals(SUMMARY, measureReport.getType());

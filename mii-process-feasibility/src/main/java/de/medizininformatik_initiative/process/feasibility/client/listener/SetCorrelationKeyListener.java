@@ -1,31 +1,16 @@
 package de.medizininformatik_initiative.process.feasibility.client.listener;
 
-import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.constants.BpmnExecutionVariables;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.springframework.beans.factory.InitializingBean;
+import dev.dsf.bpe.v2.ProcessPluginApi;
+import dev.dsf.bpe.v2.constants.BpmnExecutionVariables;
+import dev.dsf.bpe.v2.variables.Variables;
 
-import java.util.Objects;
-
-public class SetCorrelationKeyListener implements ExecutionListener, InitializingBean
-{
-    private final ProcessPluginApi api;
-
-    public SetCorrelationKeyListener(ProcessPluginApi api) {
-        this.api = api;
-    }
+public class SetCorrelationKeyListener implements dev.dsf.bpe.v2.activity.ExecutionListener {
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        Objects.requireNonNull(api, "api");
-    }
-
-    @Override
-    public void notify(DelegateExecution execution) throws Exception {
-        var variables = api.getVariables(execution);
+    public void notify(ProcessPluginApi api, Variables variables) throws Exception {
+        // TODO Auto-generated method stub
         var target = variables.getTarget();
 
-        execution.setVariableLocal(BpmnExecutionVariables.CORRELATION_KEY, target.getCorrelationKey());
+        variables.setStringLocal(BpmnExecutionVariables.CORRELATION_KEY, target.getCorrelationKey());
     }
 }
