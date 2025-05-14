@@ -9,7 +9,7 @@ import de.medizininformatik_initiative.process.feasibility.FeasibilityProcessPlu
 import de.medizininformatik_initiative.process.feasibility.Obfuscator;
 import de.medizininformatik_initiative.process.feasibility.RateLimit;
 import de.medizininformatik_initiative.process.feasibility.client.flare.FlareWebserviceClient;
-import de.medizininformatik_initiative.process.feasibility.client.listener.SetCorrelationKeyListener;
+import de.medizininformatik_initiative.process.feasibility.listener.SetCorrelationKeyListener;
 import de.medizininformatik_initiative.process.feasibility.message.SendDicRequest;
 import de.medizininformatik_initiative.process.feasibility.message.SendDicResponse;
 import de.medizininformatik_initiative.process.feasibility.service.DownloadFeasibilityResources;
