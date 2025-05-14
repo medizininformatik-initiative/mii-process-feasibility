@@ -1,7 +1,5 @@
 package de.medizininformatik_initiative.process.feasibility.client.store;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -25,21 +23,24 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.apache.http.HttpHeaders.PROXY_AUTHENTICATE;
 import static org.apache.http.HttpHeaders.TRANSFER_ENCODING;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED;
 
-@RequiredArgsConstructor
 public class MockServerProxyDispatcher extends Dispatcher {
 
-    @NonNull
     private OkHttpClient client;
-    @NonNull
     private HttpUrl targetServiceUrl;
     private List<RecordedRequest> recordedRequests = new ArrayList<>();
     private List<MockResponse> recordedResponses = new ArrayList<>();
+
+    public MockServerProxyDispatcher(OkHttpClient client, HttpUrl targetServiceUrl) {
+        this.client = requireNonNull(client);
+        this.targetServiceUrl = requireNonNull(targetServiceUrl);
+    }
 
     public static MockServerProxyDispatcher createReverseProxyDispatcher(OkHttpClient client,
                                                                          HttpUrl targetServiceUrl) {
@@ -172,7 +173,7 @@ public class MockServerProxyDispatcher extends Dispatcher {
 
         private static final Pattern REQUEST_LINE_URL = Pattern.compile("^(\\w+)\\s+(https?://[^\\s]+)\\s+.*$");
 
-        public MockServerForwardProxyDispatcher(@NonNull OkHttpClient client, @NonNull HttpUrl targetServiceUrl) {
+        public MockServerForwardProxyDispatcher(OkHttpClient client, HttpUrl targetServiceUrl) {
             super(client, targetServiceUrl);
         }
 
