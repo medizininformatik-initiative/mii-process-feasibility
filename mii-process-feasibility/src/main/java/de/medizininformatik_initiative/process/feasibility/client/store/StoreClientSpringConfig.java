@@ -170,7 +170,6 @@ public class StoreClientSpringConfig {
                 clientFactory.setProxyCredentials(proxyUsername, proxyPassword);
             }
         }
-        fhirContext.setRestfulClientFactory(clientFactory);
         var client = fhirContext.newRestfulGenericClient(storeBaseUrl);
         if (bearerAuthToken != null) {
             logger.info("Setting bearer token '***' for store client.");

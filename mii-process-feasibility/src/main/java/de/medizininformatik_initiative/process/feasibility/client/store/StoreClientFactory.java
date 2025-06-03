@@ -46,7 +46,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -55,6 +54,7 @@ import javax.net.ssl.SSLContext;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.HEADER_PREFER;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.HEADER_PREFER_RESPOND_ASYNC;
+import static java.util.Objects.requireNonNull;
 
 // TODO: doc
 public class StoreClientFactory extends RestfulClientFactory {
@@ -71,7 +71,11 @@ public class StoreClientFactory extends RestfulClientFactory {
 
     public StoreClientFactory(FhirContext fhirContext, SSLContext sslContext) {
         super(fhirContext);
-        this.sslContext = Objects.requireNonNull(sslContext, "SSL Context must not be null.");
+        this.sslContext = requireNonNull(sslContext, "SSL Context must not be null.");
+
+        if (fhirContext != null) {
+            fhirContext.setRestfulClientFactory(this);
+        }
     }
 
     @Override
