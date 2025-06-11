@@ -1,5 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
+import de.medizininformatik_initiative.process.feasibility.util.StaleTaskException;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
 import dev.dsf.bpe.v1.variables.Variables;
@@ -14,6 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,14 +29,16 @@ import static dev.dsf.common.auth.conf.Identity.ORGANIZATION_IDENTIFIER_SYSTEM;
 public class SelectRequestTargets extends AbstractServiceDelegate {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectRequestTargets.class);
+    private Duration taskRequestTimeout;
 
-    public SelectRequestTargets(ProcessPluginApi api) {
+    public SelectRequestTargets(ProcessPluginApi api, Duration taskRequestTimeout) {
         super(api);
+        this.taskRequestTimeout = taskRequestTimeout;
     }
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
-
+        var startTask = checkRequestDate(variables.getStartTask());
         var organizationProvider = api.getOrganizationProvider();
         var client = api.getFhirWebserviceClientProvider().getLocalWebserviceClient();
         var parentIdentifier = new Identifier()
@@ -60,7 +66,35 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
         variables.setTargets(variables.createTargets(targets));
         variables.setString("measure-id",
                 api.getFhirWebserviceClientProvider().getLocalWebserviceClient().getBaseUrl()
-                        + getMeasureId(variables.getStartTask()));
+                        + getMeasureId(startTask));
+    }
+
+    private Task checkRequestDate(Task task) {
+        var historyBundle = api.getFhirWebserviceClientProvider().getLocalWebserviceClient().history(Task.class,
+                task.getIdElement().getIdPart());
+        var requestDate = historyBundle.getEntry().stream()
+                .filter(entry -> entry.getResource() instanceof Task)
+                .map(entry -> (Task) entry.getResource())
+                .filter(t -> t.getStatus() == Task.TaskStatus.REQUESTED)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No requested task found in history for task: %s"
+                        .formatted(task.getIdElement().toVersionless().getValue())))
+                .getMeta()
+                .getLastUpdated()
+                .toInstant();
+        var currentDate = Instant.now();
+        if (requestDate.isBefore(currentDate.minus(taskRequestTimeout))) {
+            var taskId = api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task);
+            logger.error(
+                    "Task was requested too long ago [task: {}, request date: {}, current date: {}, request timeout: {}]",
+                    taskId,
+                    DateTimeFormatter.ISO_INSTANT.format(requestDate),
+                    DateTimeFormatter.ISO_INSTANT.format(currentDate),
+                    taskRequestTimeout);
+            throw new StaleTaskException(taskId, requestDate, currentDate, taskRequestTimeout);
+        } else {
+            return task;
+        }
     }
 
     private String getMeasureId(Task task) {

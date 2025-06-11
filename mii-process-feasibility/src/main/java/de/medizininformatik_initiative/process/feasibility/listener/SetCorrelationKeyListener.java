@@ -1,4 +1,4 @@
-package de.medizininformatik_initiative.process.feasibility.client.listener;
+package de.medizininformatik_initiative.process.feasibility.listener;
 
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.constants.BpmnExecutionVariables;

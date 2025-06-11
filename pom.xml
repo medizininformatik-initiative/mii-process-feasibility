@@ -256,18 +256,4 @@
             <url>https://maven.pkg.github.com/medizininformatik-initiative/mii-process-feasibility</url>
         </repository>
     </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>highmed-dsf</id>
-            <name>GitHub HiGHmed Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/highmed/highmed-dsf</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 </project>

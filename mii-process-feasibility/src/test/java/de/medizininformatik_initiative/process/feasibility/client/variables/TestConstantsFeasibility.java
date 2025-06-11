@@ -19,4 +19,13 @@ public interface TestConstantsFeasibility {
 
     // renovate: image=ghcr.io/shopify/toxiproxy
     public String TOXIPROXY_VERSION = "2.12.0";
+
+    // renovate: image=postgres
+    public String POSTGRES_VERSION = "17-alpine";
+
+    // renovate: image=ghcr.io/datasharingframework/fhir
+    public String DSF_FHIR_VERSION = "1.7.1";
+
+    // renovate: image=ghcr.io/datasharingframework/bpe
+    public String DSF_BPE_VERSION = "1.7.1";
 }
