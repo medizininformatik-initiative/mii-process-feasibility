@@ -6,6 +6,12 @@ BASE_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 mvn -f "${BASE_DIR}/../mii-process-feasibility/pom.xml" clean package
 mvn -f "${BASE_DIR}/../mii-process-feasibility-tools/mii-process-feasibility-test-data-generator/pom.xml" clean package
 
+cp "${BASE_DIR}/../mii-process-feasibility/target/mii-process-feasibility-0.0.0.0.jar" "${BASE_DIR}/dic-1/bpe/process/"
+cp "${BASE_DIR}/../mii-process-feasibility/target/mii-process-feasibility-0.0.0.0.jar" "${BASE_DIR}/dic-2/bpe/process/"
+cp "${BASE_DIR}/../mii-process-feasibility/target/mii-process-feasibility-0.0.0.0.jar" "${BASE_DIR}/dic-3/bpe/process/"
+cp "${BASE_DIR}/../mii-process-feasibility/target/mii-process-feasibility-0.0.0.0.jar" "${BASE_DIR}/dic-4/bpe/process/"
+cp "${BASE_DIR}/../mii-process-feasibility/target/mii-process-feasibility-0.0.0.0.jar" "${BASE_DIR}/zars/bpe/process/"
+
 # Create a self signed CA
 openssl req -x509 -sha256 -days 365 -nodes -newkey rsa:2048 -keyout ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca_key.pem \
   -out ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.pem \
@@ -45,3 +51,4 @@ rm -f ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.srl
 # Bundle Proxy Certificates
 cat ${BASE_DIR}/secrets/dic_3_store_proxy_cert.pem > ${BASE_DIR}/secrets/dic_3_store_proxy_cert_bundle.pem
 cat ${BASE_DIR}/secrets/dic_3_store_proxy_self_signed_ca.pem >> ${BASE_DIR}/secrets/dic_3_store_proxy_cert_bundle.pem
+

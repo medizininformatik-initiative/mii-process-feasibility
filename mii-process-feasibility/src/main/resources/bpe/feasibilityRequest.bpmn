@@ -2,9 +2,7 @@
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0inb4ax" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0">
   <bpmn:process id="medizininformatik-initiativede_feasibilityRequest" isExecutable="true" camunda:versionTag="#{version}">
     <bpmn:startEvent id="StartEvent" name="start">
-      <bpmn:extensionElements>
-        <camunda:executionListener class="de.medizininformatik_initiative.process.feasibility.listener.TaskCreateDateCheckListener" event="start" />
-      </bpmn:extensionElements>
+      <bpmn:extensionElements />
       <bpmn:outgoing>goToSelectRequestTargets</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_10c2suu" messageRef="Message_1pq9qxp" />
     </bpmn:startEvent>

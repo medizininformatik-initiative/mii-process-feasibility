@@ -101,6 +101,12 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
@@ -110,6 +116,11 @@
             <artifactId>testcontainers-keycloak</artifactId>
             <version>3.7.0</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.5</version>
         </dependency>
         <dependency>
             <groupId>dev.dsf</groupId>
@@ -202,7 +213,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-process-plugin-to-dic-1</id>
+                        <id>copy-process-plugin-to-hrp</id>
                         <phase>package</phase>
                         <goals>
                             <goal>copy</goal>
@@ -215,79 +226,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../mii-process-feasibility-docker-test-setup/dic-1/bpe/process
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-process-plugin-to-dic-2</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>../mii-process-feasibility-docker-test-setup/dic-2/bpe/process
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-process-plugin-to-dic-3</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>../mii-process-feasibility-docker-test-setup/dic-3/bpe/process
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-process-plugin-to-dic-4</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>../mii-process-feasibility-docker-test-setup/dic-4/bpe/process
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-process-plugin-to-zars</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>../mii-process-feasibility-docker-test-setup/zars/bpe/process
+                            <outputDirectory>${project.build.testOutputDirectory}/de/medizininformatik_initiative/process/feasibility/e2e/hrp/bpe/process
                             </outputDirectory>
                         </configuration>
                     </execution>
@@ -300,84 +239,7 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>../docker/bpe/plugin</directory>
-                            <includes>
-                                <include>*.jar</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>../docker/bpe/process</directory>
-                            <includes>
-                                <include>*.jar</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>../mii-process-feasibility-docker-test-setup/dic-1/bpe/plugin</directory>
-                            <includes>
-                                <include>*.jar</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>../mii-process-feasibility-docker-test-setup/dic-1/bpe/process</directory>
-                            <includes>
-                                <include>*.jar</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>../mii-process-feasibility-docker-test-setup/dic-2/bpe/plugin</directory>
-                            <includes>
-                                <include>*.jar</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>../mii-process-feasibility-docker-test-setup/dic-2/bpe/process</directory>
-                            <includes>
-                                <include>*.jar</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>../mii-process-feasibility-docker-test-setup/dic-3/bpe/plugin</directory>
-                            <includes>
-                                <include>*.jar</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>../mii-process-feasibility-docker-test-setup/dic-3/bpe/process</directory>
-                            <includes>
-                                <include>*.jar</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>../mii-process-feasibility-docker-test-setup/dic-4/bpe/plugin</directory>
-                            <includes>
-                                <include>*.jar</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>../mii-process-feasibility-docker-test-setup/dic-4/bpe/process</directory>
-                            <includes>
-                                <include>*.jar</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>../mii-process-feasibility-docker-test-setup/zars/bpe/plugin</directory>
-                            <includes>
-                                <include>*.jar</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>../mii-process-feasibility-docker-test-setup/zars/bpe/process</directory>
+                            <directory>${project.build.testOutputDirectory}/de/medizininformatik_initiative/process/feasibility/e2e/hrp/bpe/process</directory>
                             <includes>
                                 <include>*.jar</include>
                             </includes>

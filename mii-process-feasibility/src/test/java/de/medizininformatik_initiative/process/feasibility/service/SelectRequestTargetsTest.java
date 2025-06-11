@@ -1,5 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
+import de.medizininformatik_initiative.process.feasibility.util.StaleTaskException;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.service.EndpointProvider;
 import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
@@ -14,10 +15,13 @@ import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Endpoint;
+import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
+import org.hl7.fhir.r4.model.Task.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,24 +30,30 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SelectRequestTargetsTest {
 
-    private static final String PARENT_ORGANIZATION_ID = "medizininformatik-initiative.de";
+    private static final long TASK_REQUEST_TIMEOUT = 30L;
     private static final String BASE_URL = "foo/";
     private static final String MEASURE_ID = "measure-id-11:57:29";
 
@@ -60,28 +70,34 @@ public class SelectRequestTargetsTest {
     @Mock private Task task;
     @Mock private Endpoint endpointA;
     @Mock private Endpoint endpointB;
-    @Mock Bundle bundle;
+    @Mock private Bundle bundle;
     @Mock private Targets targets;
     @Mock private Target target;
+    @Spy private Duration taskRequestTimeout = Duration.ofSeconds(TASK_REQUEST_TIMEOUT);
 
     @InjectMocks private SelectRequestTargets service;
 
     @BeforeEach
     public void setup() {
         var measureReference = new Reference(MEASURE_ID);
-        when(api.getOrganizationProvider()).thenReturn(organizationProvider);
-        when(api.getTaskHelper()).thenReturn(taskHelper);
-        when(variables.getStartTask()).thenReturn(task);
-        when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
+        lenient().when(api.getOrganizationProvider()).thenReturn(organizationProvider);
+        lenient().when(api.getTaskHelper()).thenReturn(taskHelper);
+        lenient().when(variables.getStartTask()).thenReturn(task);
+        lenient().when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
                         .thenReturn(Optional.of(measureReference));
-        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
-        when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
-        when(client.getBaseUrl()).thenReturn(BASE_URL);
+        lenient().when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
+        lenient().when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
+        lenient().when(client.getBaseUrl()).thenReturn(BASE_URL);
+        lenient().when(client.history(eq(Task.class), anyString())).thenReturn(bundle);
     }
 
     @Test
     public void doExecute_NoTargets() {
+        when(bundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
+        when(task.getStatus()).thenReturn(TaskStatus.REQUESTED);
+        when(task.getIdElement()).thenReturn(new IdType("task-002124"));
+        when(task.getMeta()).thenReturn(new Meta().setLastUpdated(Date.from(Instant.now())));
         when(organizationProvider.getOrganizations(any(Identifier.class), any(Coding.class)))
                 .thenReturn(List.of());
         when(variables.createTargets(eq(List.of()))).thenReturn(targets);
@@ -90,7 +106,7 @@ public class SelectRequestTargetsTest {
 
         verify(variables).setTargets(targetsValuesCaptor.capture());
         verify(variables).setString("measure-id", BASE_URL + MEASURE_ID);
-        assertEquals(0, targetsValuesCaptor.getValue().getEntries().size());
+        assertThat(targetsValuesCaptor.getValue().getEntries().size()).isEqualTo(0);
     }
 
     @Test
@@ -109,6 +125,10 @@ public class SelectRequestTargetsTest {
                 .setEndpoint(List.of(new Reference(dic_endpoint).setReference(endpointReference)))
                 .setActiveElement((BooleanType) new BooleanType().setValue(true));
 
+        when(bundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
+        when(task.getStatus()).thenReturn(TaskStatus.REQUESTED);
+        when(task.getIdElement()).thenReturn(new IdType("task-002124"));
+        when(task.getMeta()).thenReturn(new Meta().setLastUpdated(Date.from(Instant.now())));
         when(organizationProvider.getOrganizations(any(Identifier.class), any(Coding.class)))
                 .thenReturn(List.of(organization));
         when(client.read(Endpoint.class, endpointReference)).thenReturn(dic_endpoint);
@@ -139,6 +159,10 @@ public class SelectRequestTargetsTest {
                 .setEndpoint(List.of(new Reference(dic_endpoint).setReference(endpointReference)))
                 .setActiveElement((BooleanType) new BooleanType().setValue(true));
 
+        when(bundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
+        when(task.getStatus()).thenReturn(TaskStatus.REQUESTED);
+        when(task.getIdElement()).thenReturn(new IdType("task-002124"));
+        when(task.getMeta()).thenReturn(new Meta().setLastUpdated(Date.from(Instant.now())));
         when(organizationProvider.getOrganizations(any(Identifier.class), any(Coding.class)))
                 .thenReturn(List.of(organization));
         when(client.read(Endpoint.class, endpointReferenceId)).thenReturn(dic_endpoint);
@@ -183,6 +207,10 @@ public class SelectRequestTargetsTest {
         var targetA = Mockito.mock(Target.class);
         var targetB = Mockito.mock(Target.class);
 
+        when(bundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
+        when(task.getStatus()).thenReturn(TaskStatus.REQUESTED);
+        when(task.getIdElement()).thenReturn(new IdType("task-002124"));
+        when(task.getMeta()).thenReturn(new Meta().setLastUpdated(Date.from(Instant.now())));
         when(organizationProvider.getOrganizations(any(Identifier.class), any(Coding.class)))
                 .thenReturn(List.of(organizationA, organizationB));
         when(client.read(Endpoint.class, dic_1_endpointReference)).thenReturn(dic_1_endpoint);
@@ -198,5 +226,21 @@ public class SelectRequestTargetsTest {
         service.doExecute(execution, variables);
 
         verify(variables).setTargets(targets);
+    }
+
+    @Test
+    void taskCreateDateIsTooOld() throws Exception {
+        var taskId = "12345";
+        when(bundle.getEntry()).thenReturn(List.of(new Bundle.BundleEntryComponent().setResource(task)));
+        when(task.getStatus()).thenReturn(TaskStatus.REQUESTED);
+        when(task.getIdElement()).thenReturn(new IdType(taskId));
+        when(task.getMeta()).thenReturn(new Meta()
+                .setLastUpdated(Date.from(Instant.now().minusSeconds(TASK_REQUEST_TIMEOUT + 1))));
+        when(task.getIdElement()).thenReturn(new IdType("Task", taskId));
+        when(taskHelper.getLocalVersionlessAbsoluteUrl(task)).thenReturn("http://example.com/Task/12345");
+
+        assertThatThrownBy(() -> service.doExecute(execution, variables))
+                .isInstanceOf(StaleTaskException.class)
+                .hasMessageContainingAll(taskId);
     }
 }
