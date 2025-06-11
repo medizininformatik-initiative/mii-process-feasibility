@@ -2,7 +2,7 @@ services:
 
   # ---- Static cURL binary for health check in HAPI container
   hapi-curl-download:
-    image: alpine:3.21
+    image: alpine:3.22
     command: >
       sh -c "wget https://github.com/moparisthebest/static-curl/releases/download/v8.1.2/curl-amd64 -O /opt/bin/curl &&
              chmod +x /opt/bin/curl"
