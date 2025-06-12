@@ -27,5 +27,5 @@ public interface TestConstantsFeasibility {
     public String DSF_FHIR_VERSION = "1.8.0";
 
     // renovate: image=ghcr.io/datasharingframework/bpe
-    public String DSF_BPE_VERSION = "1.7.1";
+    public String DSF_BPE_VERSION = "1.8.0";
 }
