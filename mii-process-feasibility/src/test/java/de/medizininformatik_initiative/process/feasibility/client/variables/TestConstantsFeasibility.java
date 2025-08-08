@@ -6,7 +6,7 @@ public interface TestConstantsFeasibility {
     public String BLAZE_VERSION = "1.0";
 
     // renovate: image=ghcr.io/medizininformatik-initiative/flare
-    public String FLARE_VERSION = "2.5.0";
+    public String FLARE_VERSION = "2.6.0";
 
     // renovate: image=quay.io/keycloak/keycloak
     public String KEYCLOAK_VERSION = "26.2";

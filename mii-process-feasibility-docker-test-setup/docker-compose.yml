@@ -346,7 +346,7 @@ services:
 
   # ---- DIC-1 - FHIR Data Store ----------------------------------------------
   dic-1-store:
-    image: ghcr.io/medizininformatik-initiative/flare:2.5.0
+    image: ghcr.io/medizininformatik-initiative/flare:2.6.0
     restart: always
     ports:
     - "5000:8080"
