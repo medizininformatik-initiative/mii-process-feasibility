@@ -14,6 +14,7 @@
     <properties>
         <date>${maven.build.timestamp}</date>
         <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+        <testSetup.location>../../mii-processes-test-setup</testSetup.location>
     </properties>
 
     <name>MII Process Feasibility</name>
@@ -269,4 +270,126 @@
 
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>test-setup</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-process-plugin-to-test-setup/dic1</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>${project.artifactId}</artifactId>
+                                            <version>${project.version}</version>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${testSetup.location}/docker/dic1/bpe/process</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-process-plugin-to-test-setup/dic2</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>${project.artifactId}</artifactId>
+                                            <version>${project.version}</version>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${testSetup.location}/docker/dic2/bpe/process</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-process-plugin-to-test-setup/hrp</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>${project.artifactId}</artifactId>
+                                            <version>${project.version}</version>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${testSetup.location}/docker/hrp/bpe/process</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-feasibility-request-bundle</id>
+                                <!-- here the phase you need -->
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${testSetup.location}/bundle</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/test/resources/fhir</directory>
+                                            <includes>
+                                                <include>feasibility-request-bundle.json</include>
+                                            </includes>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>${testSetup.location}/docker/dic1/bpe/process</directory>
+                                    <includes>
+                                        <include>${project.artifactId}-*.jar</include>
+                                    </includes>
+                                    <followSymlinks>false</followSymlinks>
+                                </fileset>
+                                <fileset>
+                                    <directory>${testSetup.location}/docker/dic2/bpe/process</directory>
+                                    <includes>
+                                        <include>${project.artifactId}-*.jar</include>
+                                    </includes>
+                                    <followSymlinks>false</followSymlinks>
+                                </fileset>
+                                <fileset>
+                                    <directory>${testSetup.location}/docker/hrp/bpe/process</directory>
+                                    <includes>
+                                        <include>${project.artifactId}-*.jar</include>
+                                    </includes>
+                                    <followSymlinks>false</followSymlinks>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

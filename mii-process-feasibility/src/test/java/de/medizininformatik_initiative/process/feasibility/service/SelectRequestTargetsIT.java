@@ -181,7 +181,7 @@ public class SelectRequestTargetsIT {
         var bundle = (Bundle) client.getFhirContext()
                 .newJsonParser()
                 .parseResource(
-                        Files.readString(getResourceFilePath(TEST_RESOURCES_PATH + "/fhir/request-bundle.json")));
+                        Files.readString(getResourceFilePath("fhir/feasibility-request-bundle.json")));
         var result = client.transaction()
                 .withBundle(bundle)
                 .preferResponseTypes(List.of(Bundle.class, OperationOutcome.class))
