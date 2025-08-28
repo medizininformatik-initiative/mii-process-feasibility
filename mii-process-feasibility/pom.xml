@@ -272,7 +272,7 @@
     </build>
     <profiles>
         <profile>
-            <id>test-setup</id>
+            <id>copy-to-test-setup</id>
 
             <build>
                 <plugins>
