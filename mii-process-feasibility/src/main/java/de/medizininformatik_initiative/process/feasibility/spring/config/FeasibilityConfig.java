@@ -9,7 +9,7 @@ import de.medizininformatik_initiative.process.feasibility.FeasibilityProcessPlu
 import de.medizininformatik_initiative.process.feasibility.Obfuscator;
 import de.medizininformatik_initiative.process.feasibility.RateLimit;
 import de.medizininformatik_initiative.process.feasibility.client.flare.FlareWebserviceClient;
-import de.medizininformatik_initiative.process.feasibility.client.listener.SetCorrelationKeyListener;
+import de.medizininformatik_initiative.process.feasibility.listener.SetCorrelationKeyListener;
 import de.medizininformatik_initiative.process.feasibility.message.SendDicRequest;
 import de.medizininformatik_initiative.process.feasibility.message.SendDicResponse;
 import de.medizininformatik_initiative.process.feasibility.service.DownloadFeasibilityResources;
@@ -28,13 +28,17 @@ import de.medizininformatik_initiative.process.feasibility.service.StoreFeasibil
 import de.medizininformatik_initiative.process.feasibility.service.StoreLiveResult;
 import de.medizininformatik_initiative.process.feasibility.service.StoreMeasureReport;
 import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.documentation.ProcessDocumentation;
 import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+
+import java.time.Duration;
 
 @Configuration
 public class FeasibilityConfig {
@@ -45,6 +49,12 @@ public class FeasibilityConfig {
 
     private final EvaluationSettingsProvider evaluationSettingsProvider;
     private final FlareWebserviceClient flareWebserviceClient;
+
+    @ProcessDocumentation(
+            processNames = { "medizininformatik-initiativede_feasibilityRequest" },
+            description = "The maximum allowed time duration between creation of the initial request task for the HRP and the start of the request process after which the task execution is skipped, given in ISO 8601 format")
+    @Value("#{T(java.time.Duration).parse('${de.medizininformatik_initiative.feasibility_dsf_process.task.request.timeout:PT5M}')}")
+    private Duration taskRequestTimeout;
 
     public FeasibilityConfig(@Qualifier("store-client") IGenericClient storeClient,
                              EvaluationSettingsProvider evaluationSettingsProvider,
@@ -73,7 +83,7 @@ public class FeasibilityConfig {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SelectRequestTargets selectRequestTargets() {
-        return new SelectRequestTargets(api);
+        return new SelectRequestTargets(api, taskRequestTimeout);
     }
 
     @Bean

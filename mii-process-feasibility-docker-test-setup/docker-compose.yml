@@ -2,7 +2,7 @@ services:
 
   # ---- Static cURL binary for health check in HAPI container
   hapi-curl-download:
-    image: alpine:3.21
+    image: alpine:3.22
     command: >
       sh -c "wget https://github.com/moparisthebest/static-curl/releases/download/v8.1.2/curl-amd64 -O /opt/bin/curl &&
              chmod +x /opt/bin/curl"
@@ -13,7 +13,7 @@ services:
 
   # ---- Proxy ----------------------------------------------------------------
   proxy:
-    image: nginx:1.27.4
+    image: nginx:1.29.1
     restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "curl -ks https://localhost || exit 1"]
@@ -88,7 +88,7 @@ services:
 
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.7.0
+    image: ghcr.io/datasharingframework/fhir:1.8.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -156,7 +156,7 @@ services:
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.7.0
+    image: ghcr.io/datasharingframework/bpe:1.8.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -217,7 +217,7 @@ services:
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.7.0
+    image: ghcr.io/datasharingframework/fhir:1.8.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -282,7 +282,7 @@ services:
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.7.0
+    image: ghcr.io/datasharingframework/bpe:1.8.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -346,7 +346,7 @@ services:
 
   # ---- DIC-1 - FHIR Data Store ----------------------------------------------
   dic-1-store:
-    image: ghcr.io/medizininformatik-initiative/flare:2.5.0
+    image: ghcr.io/medizininformatik-initiative/flare:2.6.0
     restart: always
     ports:
     - "5000:8080"
@@ -409,7 +409,7 @@ services:
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.7.0
+    image: ghcr.io/datasharingframework/fhir:1.8.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -474,7 +474,7 @@ services:
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.7.0
+    image: ghcr.io/datasharingframework/bpe:1.8.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -537,7 +537,7 @@ services:
 
   # ---- DIC-2 - FHIR Data Store ----------------------------------------------
   dic-2-store:
-    image: samply/blaze:0.33
+    image: samply/blaze:1.1
     restart: on-failure
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/health" ]
@@ -560,7 +560,7 @@ services:
 
   # ---- DIC-3 - FHIR ---------------------------------------------------------
   dic-3-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.7.0
+    image: ghcr.io/datasharingframework/fhir:1.8.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -622,7 +622,7 @@ services:
 
   # ---- DIC-3 - BPE ----------------------------------------------------------
   dic-3-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.7.0
+    image: ghcr.io/datasharingframework/bpe:1.8.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -695,7 +695,7 @@ services:
 
   # ---- DIC-3 - DEDICATED PROXY WITH SELF SIGNED CERT ------------------------
   dic-3-keycloak:
-    image: "keycloak/keycloak:26.1.4"
+    image: "keycloak/keycloak:26.3.3"
     command: ["start", "--import-realm"]
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e \"GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3"]
@@ -716,7 +716,7 @@ services:
     volumes:
     - "./dic-3/keycloak/realm-test.json:/opt/keycloak/data/import/realm-test.json"
   dic-3-store-proxy:
-    image: nginx:1.27.4
+    image: nginx:1.29.1
     restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "curl -ks https://localhost || exit 1"]
@@ -749,7 +749,7 @@ services:
 
   # ---- DIC-3 - FHIR Data Store ----------------------------------------------
   dic-3-store:
-    image: samply/blaze:0.33.0
+    image: samply/blaze:1.1.0
     restart: on-failure
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/health" ]
@@ -777,7 +777,7 @@ services:
 
   # ---- DIC-4 - FHIR ---------------------------------------------------------
   dic-4-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.7.0
+    image: ghcr.io/datasharingframework/fhir:1.8.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -839,7 +839,7 @@ services:
 
   # ---- DIC-4 - BPE ----------------------------------------------------------
   dic-4-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.7.0
+    image: ghcr.io/datasharingframework/bpe:1.8.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -925,7 +925,7 @@ services:
         condition: service_healthy
 
   dic-4-store-init:
-    image: curlimages/curl:8.12.1
+    image: curlimages/curl:8.15.0
     entrypoint:
       - /bin/sh
     command:

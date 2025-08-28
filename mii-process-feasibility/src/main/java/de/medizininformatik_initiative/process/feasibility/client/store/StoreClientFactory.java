@@ -9,9 +9,6 @@ import ca.uhn.fhir.rest.client.api.IHttpClient;
 import ca.uhn.fhir.rest.client.api.IHttpRequest;
 import ca.uhn.fhir.rest.client.impl.RestfulClientFactory;
 import ca.uhn.fhir.util.DateUtils;
-import de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
@@ -49,7 +46,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -58,10 +54,9 @@ import javax.net.ssl.SSLContext;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.HEADER_PREFER;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.HEADER_PREFER_RESPOND_ASYNC;
+import static java.util.Objects.requireNonNull;
 
 // TODO: doc
-@Slf4j
-@RequiredArgsConstructor
 public class StoreClientFactory extends RestfulClientFactory {
 
     Logger logger = LoggerFactory.getLogger(StoreClientFactory.class);
@@ -76,7 +71,11 @@ public class StoreClientFactory extends RestfulClientFactory {
 
     public StoreClientFactory(FhirContext fhirContext, SSLContext sslContext) {
         super(fhirContext);
-        this.sslContext = Objects.requireNonNull(sslContext, "SSL Context must not be null.");
+        this.sslContext = requireNonNull(sslContext, "SSL Context must not be null.");
+
+        if (fhirContext != null) {
+            fhirContext.setRestfulClientFactory(this);
+        }
     }
 
     @Override
@@ -110,10 +109,10 @@ public class StoreClientFactory extends RestfulClientFactory {
                     throw new IllegalArgumentException("Store url is not set.");
                 }
                 if (clientByServerBase.containsKey(serverBase)) {
-                    log.debug("Reusing ApacheHttpClient for ServerBase {}", serverBase);
+                    logger.debug("Reusing ApacheHttpClient for ServerBase {}", serverBase);
                     return clientByServerBase.get(serverBase);
                 } else {
-                    log.debug("Returning new ApacheHttpClient for ServerBase {}", serverBase);
+                    logger.debug("Returning new ApacheHttpClient for ServerBase {}", serverBase);
                     var client = new ApacheHttpClient(getNativeHttpClient(), new StringBuilder(serverBase),
                             null, null, null, null);
                     clientByServerBase.put(serverBase, client);

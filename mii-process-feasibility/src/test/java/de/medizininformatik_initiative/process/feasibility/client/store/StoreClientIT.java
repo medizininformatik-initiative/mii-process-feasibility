@@ -1,7 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.client.store;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import lombok.NonNull;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.Dispatcher;
@@ -104,7 +103,6 @@ public class StoreClientIT {
         return mockServer;
     }
 
-    @NonNull
     private static HttpUrl getTestFhirServerUrl() {
         return Objects.requireNonNull(HttpUrl.parse(String.format("http://%s:%d/fhir/",
                         fhirServer.getHost(),

@@ -1,0 +1,176 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:87058ec4-c6f5-4dfa-9119-6b223e6e5445",
+      "resource": {
+        "resourceType": "Task",
+        "meta": {
+          "profile": [
+            "http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-request"
+          ]
+        },
+        "instantiatesCanonical": "http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest|0.0",
+        "status": "requested",
+        "intent": "order",
+        "authoredOn": "2022",
+        "requester": {
+          "type": "Organization",
+          "identifier": {
+            "system": "http://dsf.dev/sid/organization-identifier",
+            "value": "Test_HRP"
+          }
+        },
+        "restriction": {
+          "recipient": [
+            {
+              "type": "Organization",
+              "identifier": {
+                "system": "http://dsf.dev/sid/organization-identifier",
+                "value": "Test_HRP"
+              }
+            }
+          ]
+        },
+        "input": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://dsf.dev/fhir/CodeSystem/bpmn-message",
+                  "code": "message-name"
+                }
+              ]
+            },
+            "valueString": "feasibilityRequestMessage"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://dsf.dev/fhir/CodeSystem/bpmn-message",
+                  "code": "business-key"
+                }
+              ]
+            },
+            "valueString": "600db7d6-ff7c-4545-b21e-2f6a371bddc1"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://medizininformatik-initiative.de/fhir/CodeSystem/feasibility",
+                  "code": "measure-reference"
+                }
+              ]
+            },
+            "valueReference": {
+              "reference": "urn:uuid:7a142223-616f-41a1-97da-2ae726031b71"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "Task"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:7a142223-616f-41a1-97da-2ae726031b71",
+      "resource": {
+        "resourceType": "Measure",
+        "meta": {
+          "tag": [
+            {
+              "system": "http://dsf.dev/fhir/CodeSystem/read-access-tag",
+              "code": "ALL"
+            }
+          ],
+          "profile": [
+            "http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-measure"
+          ]
+        },
+        "url": "https://hrp/Measure/7a142223-616f-41a1-97da-2ae726031b71",
+        "status": "active",
+        "library": [
+          "urn:uuid:30561ba6-106f-4d52-bb8d-e49e20a40d40"
+        ],
+        "scoring": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-scoring",
+              "code": "cohort"
+            }
+          ]
+        },
+        "group": [
+          {
+            "population": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                      "code": "initial-population"
+                    }
+                  ]
+                },
+                "criteria": {
+                  "language": "text/cql",
+                  "expression": "InInitialPopulation"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "Measure"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:85bd7a06-1bff-40b3-99a9-77a624b47e6b",
+      "resource": {
+        "resourceType": "Library",
+        "meta": {
+          "tag": [
+            {
+              "system": "http://dsf.dev/fhir/CodeSystem/read-access-tag",
+              "code": "ALL"
+            }
+          ],
+          "profile": [
+            "http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-library"
+          ]
+        },
+        "url": "urn:uuid:30561ba6-106f-4d52-bb8d-e49e20a40d40",
+        "status": "active",
+        "name": "Retrieve",
+        "type": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/library-type",
+              "code": "logic-library"
+            }
+          ]
+        },
+        "content": [
+          {
+            "contentType": "text/cql",
+            "data": "bGlicmFyeSBSZXRyaWV2ZSB2ZXJzaW9uICcxLjAuMCcKdXNpbmcgRkhJUiB2ZXJzaW9uICc0LjAuMCcKaW5jbHVkZSBGSElSSGVscGVycyB2ZXJzaW9uICc0LjAuMCcKCmNvbnRleHQgUGF0aWVudAoKZGVmaW5lIEluSW5pdGlhbFBvcHVsYXRpb246CiAgUGF0aWVudC5nZW5kZXIgPSAnZmVtYWxlJwo="
+          },
+          {
+            "contentType": "application/json",
+            "data": "eyJpbmNsdXNpb25Dcml0ZXJpYSI6W1t7ImNvbnRleHQiOnsiY29kZSI6IlBhdGllbnQiLCJzeXN0ZW0iOiJmZHBnLm1paS5jZHMiLCJ2ZXJzaW9uIjoiMS4wLjAiLCJkaXNwbGF5IjoiUGF0aWVudCJ9LCJ0ZXJtQ29kZXMiOlt7ImNvZGUiOiIyNjM0OTUwMDAiLCJzeXN0ZW0iOiJodHRwOi8vc25vbWVkLmluZm8vc2N0IiwiZGlzcGxheSI6Ikdlc2NobGVjaHQifV0sInZhbHVlRmlsdGVyIjp7InR5cGUiOiJjb25jZXB0Iiwic2VsZWN0ZWRDb25jZXB0cyI6W3siY29kZSI6ImZlbWFsZSIsInN5c3RlbSI6Imh0dHA6Ly9obDcub3JnL2ZoaXIvYWRtaW5pc3RyYXRpdmUtZ2VuZGVyIiwiZGlzcGxheSI6IkZlbWFsZSJ9XX19XV0sInZlcnNpb24iOiJodHRwOi8vdG9fYmVfZGVjaWRlZC5jb20vZHJhZnQtMS9zY2hlbWEjIn0="
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "Library"
+      }
+    }
+  ]
+}
