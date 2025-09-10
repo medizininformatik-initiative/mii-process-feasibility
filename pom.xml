@@ -22,7 +22,7 @@
     </properties>
 
     <name>MII Processes Feasibility</name>
-    <description>Business processes for the MII feasibility project as plugins for the HiGHmed Data Sharing Framework.
+    <description>Business processes for the MII feasibility project as plugins for the Data Sharing Framework.
     </description>
     <url>https://github.com/medizininformatik-initiative/mii-process-feasibility</url>
 
