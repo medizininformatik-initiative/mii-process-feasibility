@@ -170,7 +170,6 @@ public class SelectRequestTargetsIT {
     @Test
     @DisplayName("Stale Task is not processed and marked as failed")
     public void staleTaskIsNotProcessed() throws Exception {
-
         dbContainer.start();
         proxyContainer.start();
         hrpFhirContainer.start();
@@ -186,6 +185,11 @@ public class SelectRequestTargetsIT {
                 .withBundle(bundle)
                 .preferResponseTypes(List.of(Bundle.class, OperationOutcome.class))
                 .execute();
+        var requestTimeout = "PT5S";
+        var config = """
+                general:
+                  requestTaskTimeout: %s
+                """.formatted(requestTimeout);
 
         assertThat(result.getType()).isEqualTo(Bundle.BundleType.TRANSACTIONRESPONSE);
         assertThat(result.getEntry())
@@ -205,11 +209,9 @@ public class SelectRequestTargetsIT {
                 .getIdElement()
                 .withServerBase(baseUrl, "Task")
                 .toVersionless();
-
         Thread.sleep(5000); // wait before restarting the BPE container to ensure the task is stale
-        var requestTimeout = "PT5S";
         hrpBpeContainer
-                .withEnv("DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_TASK_REQUEST_TIMEOUT", requestTimeout)
+                .withEnv("DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CONFIGURATION", config)
                 .start();
         var taskResponse = client.read().resource(Task.class).withUrl(taskId).execute();
         // wait for the task to be processed

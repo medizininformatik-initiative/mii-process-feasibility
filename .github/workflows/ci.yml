@@ -25,10 +25,6 @@ jobs:
       with:
         distribution: 'zulu'
         java-version: 17
-        # Set up maven repository credentials for highmed-dsf dependencies
-        server-id: highmed-dsf
-        server-username: USERNAME
-        server-password: GITHUB_TOKEN
 
     - name: Cache Local Maven Repo
       uses: actions/cache@v4
@@ -66,10 +62,6 @@ jobs:
       with:
         distribution: 'zulu'
         java-version: 17
-        # Set up maven repository credentials for highmed-dsf dependencies
-        server-id: highmed-dsf
-        server-username: USERNAME
-        server-password: GITHUB_TOKEN
 
     - name: Cache Local Maven Repo
       uses: actions/cache@v4

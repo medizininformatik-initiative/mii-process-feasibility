@@ -64,4 +64,9 @@ public class FlareWebserviceClientImpl implements FlareWebserviceClient {
                     e);
         }
     }
+
+    @Override
+    public URI getFlareBaseUrl() {
+        return flareBaseUrl;
+    }
 }

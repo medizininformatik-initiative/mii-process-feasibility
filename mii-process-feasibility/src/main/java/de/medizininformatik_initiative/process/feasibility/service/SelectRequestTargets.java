@@ -3,12 +3,15 @@ package de.medizininformatik_initiative.process.feasibility.service;
 import de.medizininformatik_initiative.process.feasibility.util.StaleTaskException;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
+import dev.dsf.bpe.v1.service.OrganizationProvider;
 import dev.dsf.bpe.v1.variables.Variables;
+import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Bundle.SearchEntryMode;
 import org.hl7.fhir.r4.model.Endpoint;
-import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.OrganizationAffiliation;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.slf4j.Logger;
@@ -18,13 +21,15 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE;
-import static dev.dsf.common.auth.conf.Identity.ORGANIZATION_IDENTIFIER_SYSTEM;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.DIC;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.HRP;
 
 public class SelectRequestTargets extends AbstractServiceDelegate {
 
@@ -41,14 +46,9 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
         var startTask = checkRequestDate(variables.getStartTask());
         var organizationProvider = api.getOrganizationProvider();
         var client = api.getFhirWebserviceClientProvider().getLocalWebserviceClient();
-        var parentIdentifier = new Identifier()
-                .setSystem(ORGANIZATION_IDENTIFIER_SYSTEM)
-                .setValue("medizininformatik-initiative.de");
-        var memberOrganizationRole = new Coding()
-                .setSystem("http://dsf.dev/fhir/CodeSystem/organization-role")
-                .setCode("DIC");
+        var parentOrganization = getLocalParentOrganization(organizationProvider, client);
         var targets = organizationProvider
-                .getOrganizations(parentIdentifier, memberOrganizationRole)
+                .getOrganizations(parentOrganization.getIdentifierFirstRep(), DIC)
                 .stream()
                 .filter(Organization::hasEndpoint)
                 .filter(Organization::hasIdentifier)
@@ -97,18 +97,47 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
         }
     }
 
-    private String getMeasureId(Task task) {
+    private Organization getLocalParentOrganization(OrganizationProvider organizationProvider,
+                                                    FhirWebserviceClient client) {
+        var localOrganization = organizationProvider.getLocalOrganization()
+                .orElseThrow(() -> new IllegalStateException("No local organization configured."));
+        var localOrganizationIdentifier = localOrganization.getIdentifierFirstRep().getValue();
 
-        Optional<Reference> measureRef = api.getTaskHelper()
-                .getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
-                        CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class);
+        var result = client.search(OrganizationAffiliation.class,
+                Map.of("active", List.of("true"),
+                        "participating-organization:identifier", List.of(localOrganizationIdentifier),
+                        "role", List.of(HRP.getCode()),
+                        "_include", List.of("OrganizationAffiliation:primary-organization")));
+        var parentOrganizations = result.getEntry().stream().filter(BundleEntryComponent::hasSearch)
+                .filter(e -> SearchEntryMode.INCLUDE.equals(e.getSearch().getMode()))
+                .filter(BundleEntryComponent::hasResource)
+                .map(BundleEntryComponent::getResource)
+                .filter(Organization.class::isInstance)
+                .map(Organization.class::cast)
+                .filter(Organization::getActive)
+                .toList();
+
+        if (parentOrganizations.size() == 1) {
+            return parentOrganizations.get(0);
+        } else {
+            throw new IllegalStateException(
+                    "Local organization '%s' has role '%s' in %d parent organizations %s, but must be exactly 1."
+                            .formatted(localOrganizationIdentifier, HRP.getCode(), parentOrganizations.size(),
+                                    parentOrganizations));
+        }
+    }
+
+
+    private String getMeasureId(Task task) {
+        var measureRef = api.getTaskHelper().getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
+                CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class);
 
         if (measureRef.isPresent()) {
             return measureRef.get().getReference();
         } else {
             logger.error("Task is missing the measure reference [task: {}]",
                     api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
-            throw new RuntimeException("Missing measure reference.");
+            throw new RuntimeException("Missing measure reference");
         }
     }
 }
