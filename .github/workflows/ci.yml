@@ -71,7 +71,7 @@ jobs:
         key: maven-repo
 
     - name: Add GitHub Server Credentials to Maven settings.xml
-      uses: s4u/maven-settings-action@v3.1.0
+      uses: s4u/maven-settings-action@v4.0.0
       with:
         servers: '[{"id": "highmed-dsf", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"}]'
 
