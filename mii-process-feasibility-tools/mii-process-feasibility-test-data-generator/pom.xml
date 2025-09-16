@@ -7,7 +7,7 @@
     <parent>
         <groupId>de.medizininformatik-initiative</groupId>
         <artifactId>mii-process-feasibility-tools</artifactId>
-        <version>0.0.0.0</version>
+        <version>1.0.0.1</version>
     </parent>
 
     <name>MII Process Feasibility Test Data Generator</name>
