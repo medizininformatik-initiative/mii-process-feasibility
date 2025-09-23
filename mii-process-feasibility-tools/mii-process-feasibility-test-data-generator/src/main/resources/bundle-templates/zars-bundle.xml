@@ -4,7 +4,6 @@
     <entry>
         <fullUrl value="urn:uuid:bb73165c-c7b9-4342-8e28-531f07fa7735"/>
         <resource>
-            <!-- Test_ZARS -->
             <Organization xmlns="http://hl7.org/fhir">
                 <meta>
                     <profile value="http://dsf.dev/fhir/StructureDefinition/organization"/>
@@ -25,6 +24,10 @@
                     <coding>
                         <system value="http://dsf.dev/fhir/CodeSystem/organization-role"/>
                         <code value="HRP"/>
+                    </coding>
+                    <coding>
+                        <system value="http://dsf.dev/fhir/CodeSystem/organization-role"/>
+                        <code value="DIC"/>
                     </coding>
                 </type>
                 <name value="Test ZARS"/>
@@ -192,6 +195,7 @@
             <ifNoneExist value="identifier=http://dsf.dev/sid/organization-identifier|Test_DIC_4"/>
         </request>
     </entry>
+
     <entry>
         <fullUrl value="urn:uuid:aa670c9a-5a6a-45ac-90e8-7e72b3c39f23"/>
         <resource>
@@ -538,6 +542,10 @@
                         <system value="http://dsf.dev/fhir/CodeSystem/organization-role"/>
                         <code value="HRP"/>
                     </coding>
+                    <coding>
+                        <system value="http://dsf.dev/fhir/CodeSystem/organization-role"/>
+                        <code value="DIC"/>
+                    </coding>
                 </code>
                 <endpoint>
                     <reference value="urn:uuid:e6af43e9-76ff-46d7-b9aa-e5ee74562ab1"/>
@@ -712,6 +720,7 @@
                     value="primary-organization:identifier=http://dsf.dev/sid/organization-identifier|medizininformatik-initiative.de&amp;participating-organization:identifier=http://dsf.dev/sid/organization-identifier|Test_DIC_4"/>
         </request>
     </entry>
+
     <entry>
         <fullUrl value="urn:uuid:045733f1-3ea2-4efc-8b53-4707b2e1f63e"/>
         <resource>

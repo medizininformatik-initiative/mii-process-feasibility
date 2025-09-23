@@ -13,7 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.*;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
 import static dev.dsf.fhir.authorization.read.ReadAccessHelper.READ_ACCESS_TAG_VALUE_LOCAL;
 
 /**
@@ -28,7 +30,7 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
      *
      * @param api
      * @param clientProvider the client provider
-     * @param taskHelper     the task helper
+     * @param taskHelper the task helper
      */
     public StoreLiveResult(ProcessPluginApi api) {
         super(api);
@@ -45,10 +47,11 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
 
         var storedMeasureReport = storeMeasureReport(measureReport);
         addMeasureReportReferenceToTaskOutput(task, storedMeasureReport.getIdElement());
-        logger.info("Added measure report {} to {}", storedMeasureReport.getId(), task.getId());
 
         variables.setResource("subMeasure_" + variables.getTarget().getCorrelationKey(),
                 storedMeasureReport);
+
+        logger.info("Added measure report {} [task: {}]", storedMeasureReport.getId(), task.getId());
     }
 
     private void addReadAccessTag(MeasureReport measureReport) {
@@ -70,11 +73,7 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
 
     private TaskOutputComponent createMeasureReportReferenceOutput(IdType measureReportId) {
         return api.getTaskHelper().createOutput(
-                new Reference().setReference(createMeasureRef(measureReportId)),
+                new Reference().setReference("MeasureReport/" + measureReportId.getIdPart()),
                 CODESYSTEM_FEASIBILITY, CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE);
-    }
-
-    private String createMeasureRef(IdType measureReportId) {
-        return "MeasureReport/" + measureReportId.getIdPart();
     }
 }

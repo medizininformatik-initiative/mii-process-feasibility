@@ -35,7 +35,12 @@ public class FlareWebserviceClientImpl implements FlareWebserviceClient {
 
         var response = sendRequest(req);
 
-        return Integer.parseInt(response);
+        if (response != null && response.trim().matches("\\d+")) {
+            return Integer.parseInt(response.trim());
+        } else {
+            throw new IOException("Non-integer response from flare webservice (url '%s'): '%s'".formatted(req.getURI(),
+                    response == null ? "" : response));
+        }
     }
 
     @Override
@@ -54,7 +59,14 @@ public class FlareWebserviceClientImpl implements FlareWebserviceClient {
             return httpClient.execute(req, new BasicResponseHandler());
         } catch (IOException e) {
             throw new IOException(
-                    format("Error sending %s request to flare webservice url '%s'.", req.getMethod(), req.getURI()), e);
+                    format("Error sending %s request to flare webservice url '%s': %s", req.getMethod(), req.getURI(),
+                            e.getMessage()),
+                    e);
         }
+    }
+
+    @Override
+    public URI getFlareBaseUrl() {
+        return flareBaseUrl;
     }
 }

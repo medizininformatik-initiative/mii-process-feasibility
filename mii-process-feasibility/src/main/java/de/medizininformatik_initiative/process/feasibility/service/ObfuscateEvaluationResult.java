@@ -1,6 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import de.medizininformatik_initiative.process.feasibility.MeasureReportGenerator;
+import de.medizininformatik_initiative.process.feasibility.InitialPopulationExtractor;
 import de.medizininformatik_initiative.process.feasibility.Obfuscator;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
@@ -26,7 +26,7 @@ import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 
 public class ObfuscateEvaluationResult extends AbstractServiceDelegate
-        implements InitializingBean, MeasureReportGenerator {
+        implements InitializingBean, InitialPopulationExtractor {
     private static final Logger logger = LoggerFactory.getLogger(ObfuscateEvaluationResult.class);
 
     private final Obfuscator<Integer> obfuscator;
@@ -62,7 +62,6 @@ public class ObfuscateEvaluationResult extends AbstractServiceDelegate
         var obfuscatedMeasureReport = new MeasureReport()
                 .setStatus(COMPLETE)
                 .setType(SUMMARY)
-                .setMeasure(measureReport.getMeasure())
                 .setPeriod(new Period()
                         .setStart(MEASURE_REPORT_PERIOD_START)
                         .setEnd(MEASURE_REPORT_PERIOD_END));
@@ -74,5 +73,4 @@ public class ObfuscateEvaluationResult extends AbstractServiceDelegate
 
         return obfuscatedMeasureReport;
     }
-
 }

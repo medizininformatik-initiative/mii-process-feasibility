@@ -1,6 +1,7 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import de.medizininformatik_initiative.process.feasibility.EvaluationSettingsProvider;
+import de.medizininformatik_initiative.process.feasibility.FeasibilitySettings;
+import de.medizininformatik_initiative.process.feasibility.ParentOrganizationSelector;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
 import dev.dsf.bpe.v1.variables.Variables;
@@ -14,36 +15,36 @@ import java.util.Objects;
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.*;
 
 public class SetupEvaluationSettings extends AbstractServiceDelegate
-        implements InitializingBean {
+        implements InitializingBean, ParentOrganizationSelector {
     private static final Logger logger = LoggerFactory.getLogger(SetupEvaluationSettings.class);
 
-    private final EvaluationSettingsProvider evaluationSettingsProvider;
+    private final FeasibilitySettings settings;
 
-    public SetupEvaluationSettings(EvaluationSettingsProvider evaluationSettingsProvider, ProcessPluginApi api) {
+    public SetupEvaluationSettings(FeasibilitySettings settings, ProcessPluginApi api) {
         super(api);
-        this.evaluationSettingsProvider = evaluationSettingsProvider;
+        this.settings = settings;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        Objects.requireNonNull(evaluationSettingsProvider, "variablesSettingsProvider");
+        Objects.requireNonNull(settings, "settings");
     }
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
         logger.info("doExecute setup evaluation settings");
 
-        variables.setString(VARIABLE_EVALUATION_STRATEGY,
-                evaluationSettingsProvider.evaluationStrategy().toString());
-        variables.setBoolean(VARIABLE_EVALUATION_OBFUSCATION,
-                evaluationSettingsProvider.evaluationResultObfuscationEnabled());
-        variables.setDouble(VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_SENSITIVITY,
-                evaluationSettingsProvider.resultObfuscationLaplaceSensitivity());
-        variables.setDouble(VARIABLE_EVALUATION_OBFUSCATION_LAPLACE_EPSILON,
-                evaluationSettingsProvider.resultObfuscationLaplaceEpsilon());
+        var requester = getRequesterOrganization(variables, api);
+        var parentId = getParentOrganizationId(requester, settings, api);
+
+        variables.setString(VARIABLE_REQUESTER_PARENT_ORGANIZATION, parentId);
+        variables.setBoolean(VARIABLE_EVALUATION_OBFUSCATION, settings.networks().get(parentId).obfuscate());
 
         variables.setBoolean(VARIABLE_FEASIBILITY_DISTRIBUTION,
-                evaluationSettingsProvider.feasibilityDistributionEnabled());
+                settings.networks().get(parentId).distributeAsBroker());
+        variables.setBoolean(VARIABLE_FEASIBILITY_DISTRIBUTION_AS_SUBSCRIBER,
+                settings.networks().get(parentId).distributeAsSubscriber());
     }
+
 }

@@ -21,7 +21,7 @@ public class RateLimitExceededTaskRejecter extends AbstractServiceDelegate imple
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) throws BpmnError, Exception {
-        logger.info("doExecute reject task");
+        logger.info("doExecute RateLimitExceededTaskRejecter");
 
         var reason = new CodeableConcept().setText("The request rate limit has been exceeded.");
         variables.getStartTask().setStatus(FAILED).setStatusReason(reason);

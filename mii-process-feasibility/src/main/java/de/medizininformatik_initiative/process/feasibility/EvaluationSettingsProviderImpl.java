@@ -17,21 +17,13 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
     private final double evaluationResultObfuscationLaplaceEpsilon;
     private final Integer rateLimitCount;
     private final Duration rateLimitTimeIntervalDuration;
-    private final boolean feasibilityDistributionEnabled;
-    private final String requestOrganizationIdentifierValue;
-    private final String executeOrganizationIdentifierValue;
-    private final boolean subDic;
 
     public EvaluationSettingsProviderImpl(EvaluationStrategy evaluationStrategy,
                                           Boolean evaluationResultObfuscationEnabled,
                                           Double evaluationResultObfuscationLaplaceSensitivity,
                                           Double evaluationResultObfuscationLaplaceEpsilon,
                                           Integer rateLimitCount,
-                                          Duration rateLimitTimeIntervalDuration,
-                                          Boolean feasibilityDistributionEnabled,
-                                          String requestOrganizationIdentifierValue,
-                                          String executeOrganizationIdentifierValue,
-                                          Boolean subDic) {
+                                          Duration rateLimitTimeIntervalDuration) {
         this.evaluationStrategy = Objects.requireNonNull(evaluationStrategy);
         this.evaluationResultObfuscationEnabled = Objects.requireNonNull(evaluationResultObfuscationEnabled);
         this.evaluationResultObfuscationLaplaceSensitivity = Objects
@@ -44,17 +36,6 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
         isTrue(this.rateLimitCount >= 0, format("given request limit '%d' is not >= 0", this.getRateLimitCount()));
         isTrue(this.rateLimitTimeIntervalDuration.compareTo(Duration.ZERO) > 0,
                 format("given request limit time interval '%s' is not > 0", this.rateLimitTimeIntervalDuration));
-
-        this.feasibilityDistributionEnabled = Objects.requireNonNull(feasibilityDistributionEnabled);
-
-        this.subDic = Objects.requireNonNull(subDic);
-
-        this.requestOrganizationIdentifierValue = requestOrganizationIdentifierValue != null ?
-                requestOrganizationIdentifierValue : "medizininformatik-initiative.de";
-
-        this.executeOrganizationIdentifierValue = executeOrganizationIdentifierValue != null ?
-                executeOrganizationIdentifierValue : "medizininformatik-initiative.de";
-
     }
 
     @Override
@@ -87,23 +68,4 @@ public class EvaluationSettingsProviderImpl implements EvaluationSettingsProvide
         return rateLimitTimeIntervalDuration;
     }
 
-    @Override
-    public boolean feasibilityDistributionEnabled() {
-        return feasibilityDistributionEnabled;
-    }
-
-    @Override
-    public String requestOrganizationIdentifierValue() {
-        return requestOrganizationIdentifierValue;
-    }
-
-    @Override
-    public String executeOrganizationIdentifierValue() {
-        return executeOrganizationIdentifierValue;
-    }
-
-    @Override
-    public boolean subDic() {
-        return subDic;
-    }
 }

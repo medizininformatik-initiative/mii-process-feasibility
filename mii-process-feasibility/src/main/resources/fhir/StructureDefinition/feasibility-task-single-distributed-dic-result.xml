@@ -1,0 +1,113 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+    <meta>
+        <tag>
+            <system value="http://dsf.dev/fhir/CodeSystem/read-access-tag"/>
+            <code value="ALL"/>
+        </tag>
+    </meta>
+    <url value="http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-single-distributed-dic-result"/>
+    <!-- version managed by bpe -->
+    <version value="#{version}"/>
+    <name value="FeasibilityTaskSingleDistributedDicResult"/>
+    <!-- status managed by bpe -->
+    <status value="unknown"/>
+    <experimental value="false"/>
+    <date value="2022-06-07"/>
+    <fhirVersion value="4.0.1"/>
+    <kind value="resource"/>
+    <abstract value="false"/>
+    <type value="Task"/>
+    <baseDefinition value="http://dsf.dev/fhir/StructureDefinition/task-base"/>
+    <derivation value="constraint"/>
+    <differential>
+        <element id="Task.instantiatesCanonical">
+            <path value="Task.instantiatesCanonical"/>
+            <fixedCanonical value="http://medizininformatik-initiative.de/bpe/Process/feasibilityExecute|#{version}"/>
+        </element>
+        <element id="Task.input">
+            <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
+                <valueString value="Parameter"/>
+            </extension>
+            <path value="Task.input"/>
+            <min value="4"/>
+            <max value="4"/>
+        </element>
+        <element id="Task.input:message-name">
+            <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
+                <valueString value="Parameter"/>
+            </extension>
+            <path value="Task.input"/>
+            <sliceName value="message-name"/>
+        </element>
+        <element id="Task.input:message-name.value[x]">
+            <path value="Task.input.value[x]"/>
+            <fixedString value="feasibilitySingleDistributedDicResultMessage"/>
+        </element>
+        <element id="Task.input:business-key">
+            <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
+                <valueString value="Parameter"/>
+            </extension>
+            <path value="Task.input"/>
+            <sliceName value="business-key"/>
+            <min value="1"/>
+        </element>
+        <element id="Task.input:correlation-key">
+            <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
+                <valueString value="Parameter"/>
+            </extension>
+            <path value="Task.input"/>
+            <sliceName value="correlation-key"/>
+            <min value="1"/>
+        </element>
+        <element id="Task.input:measure-report">
+            <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
+                <valueString value="Parameter"/>
+            </extension>
+            <path value="Task.input"/>
+            <sliceName value="measure-report"/>
+            <min value="1"/>
+            <max value="1"/>
+        </element>
+        <element id="Task.input:measure-report.type">
+            <path value="Task.input.type"/>
+            <binding>
+                <extension url="http://hl7.org/fhir/StructureDefinition/elementdefinition-bindingName">
+                    <valueString value="TaskInputParameterType"/>
+                </extension>
+                <strength value="required"/>
+                <valueSet value="http://medizininformatik-initiative.de/fhir/ValueSet/feasibility"/>
+            </binding>
+        </element>
+        <element id="Task.input:measure-report.type.coding">
+            <path value="Task.input.type.coding"/>
+            <min value="1"/>
+            <max value="1"/>
+        </element>
+        <element id="Task.input:measure-report.type.coding.system">
+            <path value="Task.input.type.coding.system"/>
+            <min value="1"/>
+            <fixedUri value="http://medizininformatik-initiative.de/fhir/CodeSystem/feasibility"/>
+        </element>
+        <element id="Task.input:measure-report.type.coding.code">
+            <path value="Task.input.type.coding.code"/>
+            <min value="1"/>
+            <fixedCode value="measure-report-reference"/>
+        </element>
+        <element id="Task.input:measure-report.value[x]">
+            <path value="Task.input.value[x]"/>
+            <type>
+                <code value="Reference"/>
+                <targetProfile
+                        value="http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-measure-report"/>
+            </type>
+        </element>
+        <element id="Task.input:measure-report.value[x].reference">
+            <path value="Task.input.value[x].reference"/>
+            <min value="1"/>
+        </element>
+        <element id="Task.input:measure-report.value[x].identifier">
+            <path value="Task.input.value[x].identifier"/>
+            <max value="0"/>
+        </element>
+    </differential>
+</StructureDefinition>

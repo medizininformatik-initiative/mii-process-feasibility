@@ -21,9 +21,11 @@ public class LogReceiveTimeout extends AbstractServiceDelegate {
         logger.info("doExecute log receive timeout");
 
         var target = variables.getTarget();
-        logger.warn("Timeout while waiting for result from {} (endpoint url: {}).",
+        var task = variables.getStartTask();
+        logger.warn("Timeout while waiting for result from {} (endpoint url: {}) [task: {}]",
                 target.getOrganizationIdentifierValue(),
-                target.getEndpointUrl());
+                target.getEndpointUrl(),
+                api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
     }
 
 }

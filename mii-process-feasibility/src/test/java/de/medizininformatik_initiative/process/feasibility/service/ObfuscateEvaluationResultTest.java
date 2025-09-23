@@ -2,12 +2,7 @@ package de.medizininformatik_initiative.process.feasibility.service;
 
 import de.medizininformatik_initiative.process.feasibility.Obfuscator;
 import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
-import dev.dsf.bpe.v1.service.TaskHelper;
 import dev.dsf.bpe.v1.variables.Variables;
-import dev.dsf.fhir.authorization.read.ReadAccessHelper;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -15,7 +10,6 @@ import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent;
 import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
 import org.hl7.fhir.r4.model.Period;
-import org.hl7.fhir.r4.model.Task;
 import org.joda.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,15 +43,9 @@ public class ObfuscateEvaluationResultTest {
 
     @Captor private ArgumentCaptor<MeasureReport> measureReportCaptor;
 
-    @Mock private FhirWebserviceClientProvider clientProvider;
-    @Mock private TaskHelper taskHelper;
-    @Mock private ProcessEngine processEngine;
-    @Mock private RuntimeService runtimeService;
-    @Mock private ReadAccessHelper readAccessHelper;
     @Mock private DelegateExecution execution;
     @Mock private ProcessPluginApi api;
     @Mock private Variables variables;
-    @Mock private Task task;
 
     private ObfuscateEvaluationResult service;
 
@@ -73,11 +61,9 @@ public class ObfuscateEvaluationResultTest {
     public void doExecuteSucceedsSinglePopulationSingleCoding() throws Exception {
         var feasibilityCount = 5;
         var reportDate = new Date();
-        var measureUrl = "http://localhost/fhir/Measure/123456";
         var measureReport = new MeasureReport()
                 .setStatus(COMPLETE)
                 .setType(SUMMARY)
-                .setMeasure(measureUrl)
                 .setDate(reportDate)
                 .setPeriod(new Period()
                         .setStart(new LocalDate(1312, 4, 9).toDate())
@@ -104,7 +90,6 @@ public class ObfuscateEvaluationResultTest {
         var reportPopulation = obfuscatedMeasureReport.getGroupFirstRep().getPopulationFirstRep();
         assertThat(obfuscatedMeasureReport.getStatus()).isEqualTo(COMPLETE);
         assertThat(obfuscatedMeasureReport.getType()).isEqualTo(SUMMARY);
-        assertThat(obfuscatedMeasureReport.getMeasure()).isEqualTo(measureUrl);
         assertThat(obfuscatedMeasureReport.hasDate()).isFalse();
         assertThat(obfuscatedMeasureReport.getPeriod().getStart()).isEqualTo(MEASURE_REPORT_PERIOD_START);
         assertThat(obfuscatedMeasureReport.getPeriod().getEnd()).isEqualTo(MEASURE_REPORT_PERIOD_END);

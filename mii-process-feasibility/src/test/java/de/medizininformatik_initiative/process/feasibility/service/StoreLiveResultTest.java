@@ -5,7 +5,6 @@ import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import dev.dsf.bpe.v1.service.TaskHelper;
 import dev.dsf.bpe.v1.variables.Variables;
 import dev.dsf.fhir.authorization.read.ReadAccessHelper;
-import dev.dsf.fhir.authorization.read.ReadAccessHelperImpl;
 import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.IdType;
@@ -21,7 +20,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
@@ -48,8 +46,7 @@ public class StoreLiveResultTest {
     @Mock private Variables variables;
     @Mock private TaskHelper taskHelper;
     @Mock private ProcessPluginApi api;
-
-    @Spy private ReadAccessHelper readAccessHelper = new ReadAccessHelperImpl();
+    @Mock private ReadAccessHelper readAccessHelper;
 
     @InjectMocks private StoreLiveResult service;
 
@@ -93,13 +90,12 @@ public class StoreLiveResultTest {
         when(execution.getVariableLocal(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
         when(taskHelper.createOutput(refCaptor.capture(), eq(CODESYSTEM_FEASIBILITY), eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE)))
                 .thenReturn(new TaskOutputComponent());
+        when(readAccessHelper.hasLocal(measureReport)).thenReturn(false);
+        when(readAccessHelper.addLocal(measureReport)).thenReturn(measureReport);
         when(client.create(measureReportCaptor.capture())).thenReturn(measureReport);
 
         service.execute(execution);
 
         assertEquals(MEASURE_REPORT_ID, measureReportCaptor.getValue().getIdElement().getIdPart());
-        assertEquals(1, measureReportCaptor.getValue().getMeta().getTag().size());
-        assertEquals("http://dsf.dev/fhir/CodeSystem/read-access-tag", measureReportCaptor.getValue().getMeta().getTagFirstRep().getSystem());
-        assertEquals("LOCAL", measureReportCaptor.getValue().getMeta().getTagFirstRep().getCode());
     }
 }

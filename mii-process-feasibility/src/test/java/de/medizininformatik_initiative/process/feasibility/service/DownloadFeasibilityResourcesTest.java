@@ -44,6 +44,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(OutputCaptureExtension.class)
 public class DownloadFeasibilityResourcesTest {
 
+    private static final String TASK_ID = "task-15:20:12";
+
     private static final String MEASURE_ID = "id-142416";
 
     @Mock private EnhancedFhirWebserviceClientProvider clientProvider;
@@ -74,17 +76,21 @@ public class DownloadFeasibilityResourcesTest {
     @Test
     public void doExecute_NoMeasureReference(CapturedOutput output) {
         when(variables.getTasks()).thenReturn(List.of(task));
-        when(task.getId()).thenReturn(MEASURE_ID);
         when(task.getStatus()).thenReturn(TaskStatus.INPROGRESS);
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
                 .thenReturn(Optional.empty());
+        when(taskHelper.getLocalVersionlessAbsoluteUrl(task)).thenReturn(TASK_ID);
+        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
+        when(webserviceClient.withMinimalReturn()).thenReturn(minimalReturn);
         when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
         when(clientProvider.getLocalWebserviceClient()).thenReturn(webserviceClient);
         when(webserviceClient.withMinimalReturn()).thenReturn(minimalReturn);
 
         assertThrows(RuntimeException.class, () -> service.execute(execution));
-        assertThat(output.getOut(), containsString(format("Task %s is missing the measure reference.", MEASURE_ID)));
+        assertThat(output.getOut(),
+                containsString(format("Task is missing the measure reference [task: %s]", TASK_ID)));
         verify(task).setStatus(TaskStatus.FAILED);
         verify(minimalReturn).update(task);
     }

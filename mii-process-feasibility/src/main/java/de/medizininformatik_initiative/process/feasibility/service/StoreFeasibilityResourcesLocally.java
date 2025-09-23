@@ -1,6 +1,7 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import de.medizininformatik_initiative.process.feasibility.StoreBundleProvider;
+import de.medizininformatik_initiative.process.feasibility.BundleRepository;
+import de.medizininformatik_initiative.process.feasibility.CanonicalFixer;
 import de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
@@ -15,7 +16,15 @@ import org.springframework.beans.factory.InitializingBean;
 import java.util.List;
 import java.util.UUID;
 
-public class StoreFeasibilityResourcesLocally extends AbstractServiceDelegate implements InitializingBean, StoreBundleProvider {
+/**
+ * Extended process step to store feasibility library and measure on the local DSF-FHIR
+ *
+ * @author <a href="mailto:dieter.busch@uni-bielefeld.de">Dieter Busch</a>
+ */
+public class StoreFeasibilityResourcesLocally extends AbstractServiceDelegate
+        implements InitializingBean, BundleRepository, CanonicalFixer {
+
+    private static final String URL_UUID_PREFIX = "urn:uuid:";
 
     private static final Logger logger = LoggerFactory.getLogger(StoreFeasibilityResourcesLocally.class);
 

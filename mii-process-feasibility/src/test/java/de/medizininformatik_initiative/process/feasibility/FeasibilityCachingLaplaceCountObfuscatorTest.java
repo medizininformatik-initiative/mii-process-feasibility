@@ -7,15 +7,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FeasibilityCachingLaplaceCountObfuscatorTest {
+
+    private record ResultPair(int originalResult, int obfuscatedResult) {
+    }
 
     private static final int RESULT = 490715;
     private FeasibilityCachingLaplaceCountObfuscator obfuscator;
@@ -30,25 +31,39 @@ public class FeasibilityCachingLaplaceCountObfuscatorTest {
     }
 
     @Test
-    @DisplayName("obfuscated result is rounded to nearest tens")
-    public void checkIfObfuscatedResultIsNearestTens() {
-        var result = 490715;
-        var obfuscatedResult = obfuscator.obfuscate(result);
+    @DisplayName("obfuscated originalResult is rounded to nearest tens")
+    public void checkIfObfuscatedResultIsRoundedToNearestTens() {
+        var tries = 10000;
+        var maxPopulation = 100000000;
+        var avgDev = 20;
+        var outlierPercentage = 3;
+        var rand = new Random();
+        var obfuscatedResults = IntStream.range(0, tries).boxed()
+                .map(i -> rand.nextInt(0, maxPopulation))
+                .map(r -> new ResultPair(r, obfuscator.obfuscate(r)))
+                .toList();
 
-        assertTrue(obfuscatedResult % 10 == 0, "obfuscated result is not rounded to tens");
-        assertTrue(Math.abs(result - obfuscatedResult) < 10, "obfuscated result is not rounded to nearest tens");
+        assertThat(obfuscatedResults).describedAs("obfuscated originalResult is rounded to tens")
+                .allMatch(rp -> rp.obfuscatedResult % 10 == 0);
+        assertThat(obfuscatedResults.stream().filter(rp -> Math.abs(rp.obfuscatedResult - rp.originalResult) >= avgDev))
+                .describedAs("Percentage of outliers deviating more than %d is less than %d%% (test size: %d)", avgDev,
+                        outlierPercentage, tries)
+                .hasSizeLessThan(Math.round(tries * outlierPercentage / 100.0f));
     }
 
     @RepeatedTest(100)
-    @DisplayName("for the same result value the obfuscater always returns the same obfuscated result")
+    @DisplayName("for the same originalResult value the obfuscater always returns the same obfuscated originalResult")
     public void obfuscatedResultStaysSameForSameInputValue() {
-        assertEquals(obfuscator.obfuscate(RESULT), obfuscator.obfuscate(RESULT));
+        Integer resultA = obfuscator.obfuscate(RESULT);
+        Integer resultB = obfuscator.obfuscate(RESULT);
+
+        assertThat(resultA).isEqualTo(resultB);
     }
 
     @ParameterizedTest
     @MethodSource("resultRange")
-    @DisplayName("the obfuscated result is always >= 0 for any given result")
+    @DisplayName("the obfuscated originalResult is always >= 0 for any given originalResult")
     public void nonNegativeObfuscatedResult(Integer result) {
-        assertThat(obfuscator.obfuscate(result), greaterThanOrEqualTo(0));
+        assertThat(obfuscator.obfuscate(result)).isGreaterThanOrEqualTo(0);
     }
 }

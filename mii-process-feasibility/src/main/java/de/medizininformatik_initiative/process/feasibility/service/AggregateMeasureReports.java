@@ -1,24 +1,28 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import de.medizininformatik_initiative.process.feasibility.MeasureReportGenerator;
+import de.medizininformatik_initiative.process.feasibility.InitialPopulationExtractor;
+import de.medizininformatik_initiative.process.feasibility.MeasureReportBuilder;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
 import dev.dsf.bpe.v1.variables.Target;
 import dev.dsf.bpe.v1.variables.Targets;
 import dev.dsf.bpe.v1.variables.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.hl7.fhir.r4.model.Measure;
-import org.hl7.fhir.r4.model.MeasureReport;
-import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
-import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.*;
 
-public class AggregateMeasureReports extends AbstractServiceDelegate implements MeasureReportGenerator {
+/**
+ * Process step for aggregating the individual results of the subscriber DIC
+ *
+ * @author <a href="mailto:dieter.busch@uni-bielefeld.de">Dieter Busch</a>
+ */
+
+public class AggregateMeasureReports extends AbstractServiceDelegate implements MeasureReportBuilder, InitialPopulationExtractor {
     private static final Logger logger = LoggerFactory.getLogger(AggregateMeasureReports.class);
 
     public AggregateMeasureReports(ProcessPluginApi api) {

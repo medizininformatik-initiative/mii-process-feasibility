@@ -7,7 +7,12 @@ import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
 import dev.dsf.bpe.v1.variables.Variables;
 import dev.dsf.fhir.client.FhirWebserviceClient;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Library;
+import org.hl7.fhir.r4.model.Measure;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -45,7 +50,7 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
 
         var measureId = getMeasureId(task);
         var client = clientProvider.getWebserviceClientByReference(measureId);
-        var bundle = getMeasureAndLibrary(measureId, client);
+        var bundle = getMeasureAndLibrary(measureId, client, task);
 
         variables.setResource(ConstantsFeasibility.VARIABLE_MEASURE, bundle.getEntry().get(0).getResource());
         variables.setResource(ConstantsFeasibility.VARIABLE_LIBRARY, bundle.getEntry().get(1).getResource());
@@ -55,19 +60,20 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
         Optional<Reference> measureRef = api.getTaskHelper()
                 .getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                         CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class);
-        if (measureRef.isPresent() && measureRef.get().getReference() != null) {
+        if (measureRef.isPresent()) {
             return new IdType(measureRef.get().getReference());
         } else {
-            logger.error("Task {} is missing the measure reference.", task.getId());
+            logger.error("Task is missing the measure reference [task: {}]",
+                    api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
             throw new RuntimeException("Missing measure reference.");
         }
     }
 
-    private Bundle getMeasureAndLibrary(IdType measureId, FhirWebserviceClient client) {
+    private Bundle getMeasureAndLibrary(IdType measureId, FhirWebserviceClient client, Task task) {
         try {
             var bundle = client.searchWithStrictHandling(Measure.class,
-                    Map.of("_id", Collections.singletonList(measureId.getIdPart()),
-                            "_include", Collections.singletonList("Measure:depends-on")));
+                    Map.of("_id", Collections.singletonList(measureId.getIdPart()), "_include",
+                            Collections.singletonList("Measure:depends-on")));
 
             if (bundle.getEntry().size() < 2) {
                 throw new RuntimeException("Returned search-set contained less then two entries");
@@ -81,8 +87,9 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
 
             return bundle;
         } catch (Exception e) {
-            logger.warn("Error while reading Measure with id {} including its Library from {}: {}",
-                    measureId.getIdPart(), client.getBaseUrl(), e.getMessage());
+            logger.warn("Error while reading Measure with id {} including its Library from {}: {} [task: {}]",
+                    measureId.getIdPart(), client.getBaseUrl(), e.getMessage(),
+                    api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
             throw e;
         }
     }

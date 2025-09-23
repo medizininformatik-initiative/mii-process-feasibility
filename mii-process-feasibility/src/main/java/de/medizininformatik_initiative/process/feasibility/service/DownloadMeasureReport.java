@@ -45,12 +45,13 @@ public class DownloadMeasureReport extends AbstractServiceDelegate implements In
         var measureReportId = getMeasureReportId(task);
         var client = clientProvider
                 .getWebserviceClientByReference(measureReportId);
-        var measureReport = downloadMeasureReport(client, measureReportId);
+        var measureReport = downloadMeasureReport(client, measureReportId, task);
         execution.setVariableLocal(VARIABLE_MEASURE_REPORT, measureReport);
     }
 
-    private MeasureReport downloadMeasureReport(FhirWebserviceClient client, IdType measureReportId) {
-        logger.debug("Download MeasureReport with ID {} from {}", measureReportId.getIdPart(), client.getBaseUrl());
+    private MeasureReport downloadMeasureReport(FhirWebserviceClient client, IdType measureReportId, Task task) {
+        logger.debug("Download MeasureReport with ID {} from {} [task: {}]", measureReportId.getIdPart(),
+                client.getBaseUrl(), api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
         return client.read(MeasureReport.class, measureReportId.getIdPart());
     }
 
@@ -61,7 +62,8 @@ public class DownloadMeasureReport extends AbstractServiceDelegate implements In
         if (measureRef.isPresent()) {
             return new IdType(measureRef.get().getReference());
         } else {
-            logger.error("Task {} is missing the measure report reference.", task.getId());
+            logger.error("Task is missing the measure report reference [task: {}]",
+                    api.getTaskHelper().getLocalVersionlessAbsoluteUrl(task));
             throw new RuntimeException("Missing measure report reference.");
         }
     }

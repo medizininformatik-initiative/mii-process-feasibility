@@ -20,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.Optional;
 
 public class BundleGenerator {
 
@@ -39,7 +38,6 @@ public class BundleGenerator {
     private Bundle brokerBundle;
     private Bundle brokerdic5Bundle;
     private Bundle brokerdic6Bundle;
-
 
     private Bundle readAndCleanBundle(Path bundleTemplateFile) {
         try (InputStream in = Files.newInputStream(bundleTemplateFile)) {
@@ -85,7 +83,6 @@ public class BundleGenerator {
 
     private void createDockerTestDic1Bundle(Map<String, CertificateGenerator.CertificateFiles> clientCertificateFilesByCommonName) {
         Path bundleTemplateFile = Paths.get("src/main/resources/bundle-templates/dic-1-bundle.xml");
-        logger.info("createDockerTestDic1Bundle: src/main/resources/bundle-templates/dic-1-bundle.xml");
 
         dic1Bundle = readAndCleanBundle(bundleTemplateFile);
 
@@ -99,7 +96,6 @@ public class BundleGenerator {
     }
 
     private void setThumbprint(Organization organization, CertificateGenerator.CertificateFiles files) {
-        logger.info("setThumbprint: " + organization.getIdentifier().get(0).getValue());
         organization
                 .getExtensionByUrl("http://dsf.dev/fhir/StructureDefinition/extension-certificate-thumbprint")
                 .setValue(new StringType(files.getCertificateSha512ThumbprintHex()));
@@ -220,6 +216,8 @@ public class BundleGenerator {
 
         writeBundle(Paths.get("bundle/broker-dic-6-bundle.xml"), brokerdic6Bundle);
     }
+
+
 
     public void copyDockerTestBundles() {
         Path dic1BundleFile = Paths.get("../../mii-process-feasibility-docker-test-setup/dic-1/fhir/conf/bundle.xml");

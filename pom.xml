@@ -4,7 +4,7 @@
 
     <groupId>de.medizininformatik-initiative</groupId>
     <artifactId>mii-process-feasibility-parent</artifactId>
-    <version>1.0.0.1</version>
+    <version>0.0.0.0</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -16,13 +16,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <compileSource>17</compileSource>
         <compileTarget>17</compileTarget>
-        <hapi.fhir.version>5.2.1</hapi.fhir.version>
-        <dsf.version>1.5.1</dsf.version>
-        <testcontainers.version>1.19.8</testcontainers.version>
+        <dsf.version>1.8.0</dsf.version>
+        <hapi.fhir.version>5.1.0</hapi.fhir.version>
+        <testcontainers.version>1.21.3</testcontainers.version>
     </properties>
 
     <name>MII Processes Feasibility</name>
-    <description>Business processes for the MII feasibility project as plugins for the HiGHmed Data Sharing Framework.
+    <description>Business processes for the MII feasibility project as plugins for the Data Sharing Framework.
     </description>
     <url>https://github.com/medizininformatik-initiative/mii-process-feasibility</url>
 
@@ -45,10 +45,39 @@
         <dependencies>
 
             <!-- hhn rwh -->
+            <!--            <dependency>-->
+            <!--                <groupId>de.hs-heilbronn.mi</groupId>-->
+            <!--                <artifactId>log4j2-utils</artifactId>-->
+            <!--                <version>0.15.0</version>-->
+            <!--            </dependency>-->
+
+
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.36</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>2.20.0</version>
+            </dependency>
+
             <dependency>
                 <groupId>de.hs-heilbronn.mi</groupId>
                 <artifactId>log4j2-utils</artifactId>
-                <version>0.7.0</version>
+                <version>0.15.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-slf4j-impl</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- FHIR -->
@@ -67,17 +96,17 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.13.1</version>
+                <version>4.13.2</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>4.11.0</version>
+                <version>5.19.0</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-junit-jupiter</artifactId>
-                <version>4.11.0</version>
+                <version>5.19.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -88,7 +117,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
+                    <version>3.14.0</version>
                     <configuration>
                         <source>${compileSource}</source>
                         <target>${compileTarget}</target>
@@ -97,7 +126,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.4.2</version>
                     <configuration>
                         <archive>
                             <manifest>
@@ -114,33 +143,33 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.11.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.5.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <!-- latest version 3.0.0-M5 not working, with jetty integraiton tests -->
-                    <version>3.1.2</version>
+                    <version>3.5.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.6.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.7.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -150,22 +179,22 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.8</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>net.nicoulaj.maven.plugins</groupId>
                     <artifactId>checksum-maven-plugin</artifactId>
-                    <version>1.10</version>
+                    <version>1.11</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -174,7 +203,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -241,55 +270,6 @@
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
-
-                        <fileset>
-                            <directory>mii-process-feasibility-docker-test-setup/broker-dic-5/fhir/app/log</directory>
-                            <includes>
-                                <include>*.log</include>
-                                <include>*.log.gz</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>mii-process-feasibility-docker-test-setup/broker-dic-5/bpe/app/log</directory>
-                            <includes>
-                                <include>*.log</include>
-                                <include>*.log.gz</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>mii-process-feasibility-docker-test-setup/broker-dic-6/fhir/app/log</directory>
-                            <includes>
-                                <include>*.log</include>
-                                <include>*.log.gz</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>mii-process-feasibility-docker-test-setup/broker-dic-6/bpe/app/log</directory>
-                            <includes>
-                                <include>*.log</include>
-                                <include>*.log.gz</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>mii-process-feasibility-docker-test-setup/broker/fhir/app/log</directory>
-                            <includes>
-                                <include>*.log</include>
-                                <include>*.log.gz</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>mii-process-feasibility-docker-test-setup/broker/bpe/app/log</directory>
-                            <includes>
-                                <include>*.log</include>
-                                <include>*.log.gz</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
                     </filesets>
                 </configuration>
             </plugin>
@@ -306,40 +286,4 @@
             <url>https://maven.pkg.github.com/medizininformatik-initiative/mii-process-feasibility</url>
         </repository>
     </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>highmed-dsf</id>
-            <name>GitHub HiGHmed Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/highmed/highmed-dsf</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>github-mii</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/medizininformatik-initiative</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>dsf-dev</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/datasharingframework/dsf</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 </project>
