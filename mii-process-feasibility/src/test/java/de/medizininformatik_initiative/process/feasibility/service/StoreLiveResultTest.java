@@ -3,6 +3,7 @@ package de.medizininformatik_initiative.process.feasibility.service;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import dev.dsf.bpe.v1.service.TaskHelper;
+import dev.dsf.bpe.v1.variables.Target;
 import dev.dsf.bpe.v1.variables.Variables;
 import dev.dsf.fhir.authorization.read.ReadAccessHelper;
 import dev.dsf.fhir.client.FhirWebserviceClient;
@@ -10,6 +11,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.MeasureReport;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.TaskOutputComponent;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,15 +30,18 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class StoreLiveResultTest {
 
     private static final String MEASURE_REPORT_ID = "4adfdef6-fc5b-4650-bdf5-80258a61e732";
+    private static final String CORRELATION_KEY = "correlationKey-134650";
 
     @Captor private ArgumentCaptor<Reference> refCaptor;
     @Captor private ArgumentCaptor<MeasureReport> measureReportCaptor;
+    @Captor private ArgumentCaptor<Resource> resourceCaptor;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private FhirWebserviceClientProvider clientProvider;
@@ -47,6 +52,7 @@ public class StoreLiveResultTest {
     @Mock private TaskHelper taskHelper;
     @Mock private ProcessPluginApi api;
     @Mock private ReadAccessHelper readAccessHelper;
+    @Mock private Target target;
 
     @InjectMocks private StoreLiveResult service;
 
@@ -66,6 +72,8 @@ public class StoreLiveResultTest {
         when(api.getReadAccessHelper()).thenReturn(readAccessHelper);
         when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
         when(clientProvider.getLocalWebserviceClient()).thenReturn(client);
+        when(variables.getTarget()).thenReturn(target);
+        when(target.getCorrelationKey()).thenReturn(CORRELATION_KEY);
     }
 
     @Test
@@ -97,5 +105,21 @@ public class StoreLiveResultTest {
         service.execute(execution);
 
         assertEquals(MEASURE_REPORT_ID, measureReportCaptor.getValue().getIdElement().getIdPart());
+    }
+
+    @Test
+    public void testDoExecute_MeasureReportIsPassedInVariables() throws Exception {
+        when(execution.getVariableLocal(VARIABLE_MEASURE_REPORT)).thenReturn(measureReport);
+        when(taskHelper.createOutput(refCaptor.capture(), eq(CODESYSTEM_FEASIBILITY),
+                eq(CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE)))
+                        .thenReturn(new TaskOutputComponent());
+        when(readAccessHelper.hasLocal(measureReport)).thenReturn(false);
+        when(readAccessHelper.addLocal(measureReport)).thenReturn(measureReport);
+        when(client.create(measureReportCaptor.capture())).thenReturn(measureReport);
+        doNothing().when(variables).setResource(eq("subMeasure_" + CORRELATION_KEY), resourceCaptor.capture());
+
+        service.execute(execution);
+
+        assertEquals(measureReport, resourceCaptor.getValue());
     }
 }
