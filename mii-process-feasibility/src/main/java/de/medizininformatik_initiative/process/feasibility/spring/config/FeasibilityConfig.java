@@ -26,8 +26,7 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 @Configuration
 public class FeasibilityConfig {
 
-    @Autowired
-    private ProcessPluginApi api;
+    @Autowired private ProcessPluginApi api;
 
     public FeasibilityConfig() {
     }

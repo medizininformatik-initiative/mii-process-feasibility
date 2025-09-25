@@ -12,7 +12,10 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Objects;
 
-import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.*;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_EVALUATION_OBFUSCATION;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_FEASIBILITY_DISTRIBUTION;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_FEASIBILITY_DISTRIBUTION_AS_SUBSCRIBER;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_REQUESTER_PARENT_ORGANIZATION;
 
 public class SetupEvaluationSettings extends AbstractServiceDelegate
         implements InitializingBean, ParentOrganizationSelector {
@@ -46,5 +49,4 @@ public class SetupEvaluationSettings extends AbstractServiceDelegate
         variables.setBoolean(VARIABLE_FEASIBILITY_DISTRIBUTION_AS_SUBSCRIBER,
                 settings.networks().get(parentId).distributeAsSubscriber());
     }
-
 }

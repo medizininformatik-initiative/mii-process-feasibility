@@ -13,7 +13,10 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Optional;
 
-import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.*;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_REPORT;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_RESULT_CCDL;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.VARIABLE_MEASURE_RESULT_CQL;
 
 public class MergeMeasureResults extends AbstractServiceDelegate implements InitializingBean, MeasureReportBuilder {
     private static final Logger logger = LoggerFactory.getLogger(MergeMeasureResults.class);
