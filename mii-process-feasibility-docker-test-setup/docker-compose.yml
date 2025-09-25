@@ -51,6 +51,9 @@ services:
         - dic-2
         - dic-3
         - dic-4
+        - broker-dic-5
+        - broker-dic-6
+        - broker
     environment:
       TZ: Europe/Berlin
 
