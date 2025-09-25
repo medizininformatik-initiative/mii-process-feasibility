@@ -1,6 +1,7 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import de.medizininformatik_initiative.process.feasibility.CanonicalFixer;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
 import dev.dsf.bpe.v1.variables.Variables;
@@ -28,12 +29,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hl7.fhir.r4.model.Bundle.BundleType.TRANSACTION;
 import static org.hl7.fhir.r4.model.Bundle.HTTPVerb.POST;
 
-public class StoreFeasibilityResources extends AbstractServiceDelegate implements InitializingBean {
+public class StoreFeasibilityResources extends AbstractServiceDelegate implements InitializingBean, CanonicalFixer {
 
     private static final Logger logger = LoggerFactory.getLogger(StoreFeasibilityResources.class);
-    private static final Pattern MEASURE_URL_PATTERN = Pattern.compile("(.+)/Measure/(.+)");
-    private static final Pattern LIBRARY_URL_PATTERN = Pattern.compile("urn:uuid:(.+)");
-
     private final Map<String, IGenericClient> storeClients;
     private final FeasibilityResourceCleaner cleaner;
     private Map<String, Set<String>> networkStores;
@@ -57,6 +55,8 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
+        logger.info("doExecute store feasibility resources");
+
         var measure = ((Measure) variables.getResource(VARIABLE_MEASURE)).copy();
         var library = ((Library) variables.getResource(VARIABLE_LIBRARY)).copy();
         var requesterParentOrganization = variables.getString(VARIABLE_REQUESTER_PARENT_ORGANIZATION);
@@ -78,25 +78,6 @@ public class StoreFeasibilityResources extends AbstractServiceDelegate implement
                                     extractMeasureId(transactionResponse));
                         }
                     });
-        }
-    }
-
-    private void fixCanonical(Measure measure, Library library) {
-        var measureUrlMatcher = MEASURE_URL_PATTERN.matcher(measure.getUrl());
-        var libraryUrlMatcher = LIBRARY_URL_PATTERN.matcher(library.getUrl());
-        if (measureUrlMatcher.find() && libraryUrlMatcher.find()) {
-            var base = measureUrlMatcher.group(1);
-            var libraryId = libraryUrlMatcher.group(1);
-            var libraryUrl = base + "/Library/" + libraryId;
-            measure.setLibrary(new ArrayList<>());
-            measure.addLibrary(libraryUrl);
-            library.setUrl(libraryUrl);
-            library.setName(libraryId);
-            library.setVersion("1.0.0");
-            var data = new String(library.getContent().get(0).getData(), UTF_8);
-            var rest = data.split("\n", 2)[1];
-            var newData = "library \"%s\" version '1.0.0'\n".formatted(libraryId) + rest;
-            library.getContent().get(0).setData(newData.getBytes(UTF_8));
         }
     }
 

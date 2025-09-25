@@ -44,6 +44,8 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
+        logger.info("doExecute download feasibility resources");
+
         var task = variables.getStartTask();
 
         var measureId = getMeasureId(task);

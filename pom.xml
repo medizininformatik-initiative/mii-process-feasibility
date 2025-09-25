@@ -28,7 +28,8 @@
 
     <scm>
         <connection>scm:git:git://github.com/nmedizininformatik-initiative/mii-process-feasibility.git</connection>
-        <developerConnection>scm:git:git@github.com:medizininformatik-initiative/mii-process-feasibility.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:medizininformatik-initiative/mii-process-feasibility.git
+        </developerConnection>
         <url>https://github.com/medizininformatik-initiative/mii-process-feasibility</url>
     </scm>
 

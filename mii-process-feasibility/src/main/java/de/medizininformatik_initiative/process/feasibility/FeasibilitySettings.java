@@ -13,13 +13,13 @@ import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
-import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.DEFAULT_RATE_LIMIT_COUNT;
-import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.DEFAULT_RATE_LIMIT_DURATION;
-import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.DEFAULT_REQUEST_TASK_TIMEOUT;
+import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.*;
 import static java.lang.String.format;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<String, StoreSettings> stores,
+public record FeasibilitySettings(
+        Map<String, NetworkSettings> networks,
+        Map<String, StoreSettings> stores,
         GeneralSettings general) {
 
     public FeasibilitySettings {
@@ -30,9 +30,9 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
 
     public List<FeasibilitySettingsError> validate() {
         return Stream.of(
-                general.validate(),
-                networks.entrySet().stream().flatMap(e -> e.getValue().validate(e.getKey(), stores)),
-                stores.entrySet().stream().flatMap(e -> e.getValue().validate(e.getKey())))
+                        general.validate(),
+                        networks.entrySet().stream().flatMap(e -> e.getValue().validate(e.getKey(), stores)),
+                        stores.entrySet().stream().flatMap(e -> e.getValue().validate(e.getKey())))
                 .flatMap(s -> s)
                 .toList();
     }
@@ -49,13 +49,19 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
         return new FeasibilitySettings(Map.of(), Map.of(), new GeneralSettings(DEFAULT_REQUEST_TASK_TIMEOUT));
     }
 
-    public static record NetworkSettings(Boolean obfuscate, RateLimitSettings rateLimit,
-            @JsonAlias("stores") List<String> storeIds) {
+    public static record NetworkSettings(
+            Boolean obfuscate,
+            RateLimitSettings rateLimit,
+            @JsonAlias("stores") List<String> storeIds,
+            Boolean distributeAsBroker,
+            Boolean distributeAsSubscriber) {
 
         public NetworkSettings {
             obfuscate = obfuscate == null ? true : obfuscate;
             rateLimit = rateLimit == null ? new RateLimitSettings(DEFAULT_RATE_LIMIT_COUNT, DEFAULT_RATE_LIMIT_DURATION)
                     : rateLimit;
+            distributeAsBroker = distributeAsBroker == null ? false : distributeAsBroker;
+            distributeAsSubscriber = distributeAsSubscriber == null ? false : distributeAsSubscriber;
         }
 
         public Stream<FeasibilitySettingsError> validate(String id, Map<String, StoreSettings> stores) {
@@ -78,9 +84,11 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
     }
 
     public static record StoreSettings(URL baseUrl, ProxySettings proxy, EvaluationStrategy evaluationStrategy,
-            String trustedCACertificates, String clientCertificate, String privateKey, String privateKeyPassword,
-            String privateKeyPasswordFile, Integer requestTimeout, BasicAuth basicAuth, BearerAuth bearerAuth,
-            @JsonAlias("oAuth") OAuth oAuth) {
+                                       String trustedCACertificates, String clientCertificate, String privateKey,
+                                       String privateKeyPassword,
+                                       String privateKeyPasswordFile, Integer requestTimeout, BasicAuth basicAuth,
+                                       BearerAuth bearerAuth,
+                                       @JsonAlias("oAuth") OAuth oAuth) {
 
         public StoreSettings {
             if ((privateKeyPassword == null || privateKeyPassword.isEmpty()) && privateKeyPasswordFile != null
@@ -100,7 +108,8 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
 
             if (baseUrl == null || baseUrl.toString().isBlank()) {
                 errors.add(new FeasibilitySettingsError("Store '%s' has no baseUrl set.".formatted(storeId)));
-            };
+            }
+            ;
             if (evaluationStrategy == null) {
                 errors.add(
                         new FeasibilitySettingsError("Store '%s' has no evaluationStrategy set.".formatted(storeId)));
@@ -169,7 +178,7 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static record ProxySettings(String host, Integer port, String username, String password,
-            String passwordFile) {
+                                       String passwordFile) {
 
         public ProxySettings {
             if ((password == null || password.isEmpty()) && passwordFile != null && !passwordFile.isBlank()) {
@@ -221,7 +230,7 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static record OAuth(URL issuerUrl, String clientId, String clientPassword, String clientPasswordFile,
-            ProxySettings proxy) {
+                               ProxySettings proxy) {
 
         public OAuth {
             if ((clientPassword == null || clientPassword.isEmpty()) && clientPasswordFile != null

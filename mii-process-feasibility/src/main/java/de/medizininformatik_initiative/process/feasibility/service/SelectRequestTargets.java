@@ -43,6 +43,8 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
+        logger.info("doExecute select request targets");
+
         var startTask = checkRequestDate(variables.getStartTask());
         var organizationProvider = api.getOrganizationProvider();
         var client = api.getFhirWebserviceClientProvider().getLocalWebserviceClient();

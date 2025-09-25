@@ -18,6 +18,9 @@ public interface ConstantsFeasibility {
     String VARIABLE_REQUEST_RATE_BELOW_LIMIT = "request-rate-below-limit";
     String VARIABLE_REQUESTER_PARENT_ORGANIZATION = "requester-parent-organization";
 
+    String VARIABLE_FEASIBILITY_DISTRIBUTION = "feasibility-distribution";
+    String VARIABLE_FEASIBILITY_DISTRIBUTION_AS_SUBSCRIBER = "feasibility-distribution-as-subscriber";
+
     String CODESYSTEM_FEASIBILITY = "http://medizininformatik-initiative.de/fhir/CodeSystem/feasibility";
     String CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE = "measure-reference";
     String CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE = "measure-report-reference";

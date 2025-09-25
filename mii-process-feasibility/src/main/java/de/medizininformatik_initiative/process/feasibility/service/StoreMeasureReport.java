@@ -36,6 +36,8 @@ public class StoreMeasureReport extends AbstractServiceDelegate implements Initi
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
+        logger.info("doExecute store measure report");
+
         var task = variables.getStartTask();
         MeasureReport measureReport = variables.getResource(VARIABLE_MEASURE_REPORT);
 

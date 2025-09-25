@@ -60,6 +60,8 @@ public class EvaluateCQLMeasure extends AbstractServiceDelegate implements Initi
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
+        logger.info("doExecute evaluate CQL measure");
+
         var requesterParentOrganization = variables.getString(VARIABLE_REQUESTER_PARENT_ORGANIZATION);
         variables.setInteger(VARIABLE_MEASURE_RESULT_CQL,
                 executeEvaluateMeasure(requesterParentOrganization, variables));

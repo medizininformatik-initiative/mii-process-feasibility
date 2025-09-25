@@ -48,6 +48,8 @@ public class EvaluateCCDLMeasure extends AbstractServiceDelegate implements Init
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables)
             throws IOException, InterruptedException {
+        logger.info("doExecute evaluate CCDL measure");
+
         var library = (Library) variables.getResource(VARIABLE_LIBRARY);
         var measureId = ((Measure) variables.getResource(VARIABLE_MEASURE)).getIdElement().getValue();
         var requesterParentOrganization = variables.getString(VARIABLE_REQUESTER_PARENT_ORGANIZATION);

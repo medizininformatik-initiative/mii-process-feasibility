@@ -41,6 +41,9 @@ services:
       dic-2-fhir-frontend:
       dic-3-fhir-frontend:
       dic-4-fhir-frontend:
+      broker-fhir-frontend:
+      broker-dic-5-fhir-frontend:
+      broker-dic-6-fhir-frontend:
       internet:
         aliases:
         - zars
@@ -48,6 +51,9 @@ services:
         - dic-2
         - dic-3
         - dic-4
+        - broker-dic-5
+        - broker-dic-6
+        - broker
     environment:
       TZ: Europe/Berlin
 
@@ -70,11 +76,17 @@ services:
     - dic-2-fhir-backend
     - dic-3-fhir-backend
     - dic-4-fhir-backend
+    - broker-fhir-backend
+    - broker-dic-5-fhir-backend
+    - broker-dic-6-fhir-backend
     - zars-bpe-backend
     - dic-1-bpe-backend
     - dic-2-bpe-backend
     - dic-3-bpe-backend
     - dic-4-bpe-backend
+    - broker-bpe-backend
+    - broker-dic-5-bpe-backend
+    - broker-dic-6-bpe-backend
     secrets:
     - db_liquibase.password
     volumes:
@@ -218,12 +230,13 @@ services:
         condition: service_healthy
         restart: true
       zars-fhir-app:
-        condition:  service_healthy
+        condition: service_healthy
         restart: true
-      dic-1-store:
-        condition: service_healthy
-      dic-2-store:
-        condition: service_healthy
+  #  TODO: Please do not make ZARS dependent on other networks.
+  #      dic-1-store:
+  #        condition: service_healthy
+  #      dic-2-store:
+  #        condition: service_healthy
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
@@ -335,7 +348,7 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_1_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_1_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-1/fhir
-      DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityRequest|0.0
+      DEV_DSF_BPE_PROCESS_EXCLUDED: medizininformatik-initiativede_feasibilityRequest|0.0
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CONFIGURATION_FILE: /run/secrets/feasibility_dic_1.yml
     networks:
       dic-1-bpe-frontend:
@@ -375,7 +388,7 @@ services:
   dic-1-store-fhir-server:
     image: hapiproject/hapi:v8.0.0
     healthcheck:
-      test: [ "CMD", "/opt/bin/curl", "http://localhost:8080"]
+      test: [ "CMD", "/opt/bin/curl", "http://localhost:8080" ]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -526,7 +539,7 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_2_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_2_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-2/fhir
-      DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityRequest|0.0
+      DEV_DSF_BPE_PROCESS_EXCLUDED: medizininformatik-initiativede_feasibilityRequest|0.0
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CONFIGURATION_FILE: /run/secrets/feasibility_dic_2.yml
     networks:
       dic-2-bpe-frontend:
@@ -537,7 +550,7 @@ services:
         condition: service_healthy
         restart: true
       dic-2-fhir-app:
-        condition:  service_healthy
+        condition: service_healthy
         restart: true
       dic-2-store:
         condition: service_healthy
@@ -674,7 +687,7 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_3_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_3_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-3/fhir
-      DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityRequest|0.0
+      DEV_DSF_BPE_PROCESS_EXCLUDED: medizininformatik-initiativede_feasibilityRequest|0.0
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CONFIGURATION_FILE: /run/secrets/feasibility_dic_3.yml
     networks:
       dic-3-bpe-frontend:
@@ -695,9 +708,9 @@ services:
   # ---- DIC-3 - DEDICATED PROXY WITH SELF SIGNED CERT ------------------------
   dic-3-keycloak:
     image: "keycloak/keycloak:26.3.3"
-    command: ["start", "--import-realm"]
+    command: [ "start", "--import-realm" ]
     healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e \"GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3"]
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e \"GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3" ]
       interval: "5s"
       timeout: "5s"
       retries: 3
@@ -713,12 +726,12 @@ services:
       KC_HEALTH_ENABLED: "true"
       KC_LOG_LEVEL: "info"
     volumes:
-    - "./dic-3/keycloak/realm-test.json:/opt/keycloak/data/import/realm-test.json"
+      - "./dic-3/keycloak/realm-test.json:/opt/keycloak/data/import/realm-test.json"
   dic-3-store-proxy:
     image: nginx:1.29.1
     restart: on-failure
     healthcheck:
-      test: ["CMD-SHELL", "curl -ks https://localhost || exit 1"]
+      test: [ "CMD-SHELL", "curl -ks https://localhost || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -881,7 +894,7 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_4_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_4_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-4/fhir
-      DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityRequest|0.0
+      DEV_DSF_BPE_PROCESS_EXCLUDED: medizininformatik-initiativede_feasibilityRequest|0.0
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CONFIGURATION_FILE: /run/secrets/feasibility_dic_4.yml
     networks:
       dic-4-bpe-frontend:
@@ -902,7 +915,7 @@ services:
     ports:
     - "8082:8080"
     healthcheck:
-      test: [ "CMD", "/opt/bin/curl", "http://localhost:8080"]
+      test: [ "CMD", "/opt/bin/curl", "http://localhost:8080" ]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -1069,7 +1082,7 @@ networks:
     ipam:
       driver: default
       config:
-      - subnet: 172.10.0.0/26
+        - subnet: 172.10.0.0/26
   zars-fhir-frontend:
     driver: bridge
     ipam:
@@ -1196,17 +1209,70 @@ networks:
       driver: default
       config:
       - subnet: 172.10.0.224/29
+  # ---- Broker - For more, see file docker-compose.debug.broker.yml ----------------------------------------------
+  broker-fhir-frontend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.232/29
+  broker-fhir-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.0.240/29
+  broker-bpe-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.1.8/29
+  # ---- Broker - For more, see file docker-compose.debug.broker-dic-5.yml ----------------------------------------------
+  broker-dic-5-fhir-frontend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.1.16/29
+  broker-dic-5-fhir-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.1.24/29
+  broker-dic-5-bpe-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.1.40/29
+  # ---- Broker - For more, see file docker-compose.debug.broker-dic-6.yml ----------------------------------------------
+  broker-dic-6-fhir-frontend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.1.48/29
+  broker-dic-6-fhir-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.1.56/29
+  broker-dic-6-bpe-backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.10.1.72/29
+
 
 volumes:
   hapi-curl-binary:
-
   dic-1-store-data:
-
   dic-2-store-data:
-
   dic-3-store-data:
-
   dic-4-store-data:
-
   db-data:
     name: "db-data-mii-dsf-process-feasibility"
