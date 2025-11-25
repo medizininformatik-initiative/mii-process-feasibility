@@ -21,7 +21,7 @@ public interface TestConstantsFeasibility {
     public String TOXIPROXY_VERSION = "2.12.0";
 
     // renovate: image=postgres
-    public String POSTGRES_VERSION = "17-alpine";
+    public String POSTGRES_VERSION = "18-alpine";
 
     // renovate: image=ghcr.io/datasharingframework/fhir
     public String DSF_FHIR_VERSION = "1.8.0";

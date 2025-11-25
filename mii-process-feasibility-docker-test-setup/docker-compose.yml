@@ -52,7 +52,7 @@ services:
       TZ: Europe/Berlin
 
   db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d postgres" ]
@@ -399,7 +399,7 @@ services:
         condition: service_healthy
 
   dic-1-store-db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
       interval: 10s
@@ -945,7 +945,7 @@ services:
         condition: service_healthy
 
   dic-4-store-db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     networks:
       dic-4-bpe-backend:
     restart: always
