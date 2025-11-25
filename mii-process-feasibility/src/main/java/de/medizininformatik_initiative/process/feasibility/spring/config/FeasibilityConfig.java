@@ -2,7 +2,6 @@ package de.medizininformatik_initiative.process.feasibility.spring.config;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProvider;
-import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProviderImpl;
 import de.medizininformatik_initiative.process.feasibility.FeasibilityCachingLaplaceCountObfuscator;
 import de.medizininformatik_initiative.process.feasibility.FeasibilityProcessPluginDeploymentStateListener;
 import de.medizininformatik_initiative.process.feasibility.FeasibilitySettings;
@@ -31,7 +30,6 @@ import de.medizininformatik_initiative.process.feasibility.service.StoreMeasureR
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,11 +51,6 @@ public class FeasibilityConfig {
     @Autowired private ProcessPluginApi api;
 
     public FeasibilityConfig() {
-    }
-
-    @Bean
-    public EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider(@Qualifier("clientProvider") FhirWebserviceClientProvider fhirClientProvider) {
-        return new EnhancedFhirWebserviceClientProviderImpl(fhirClientProvider);
     }
 
     @Bean
@@ -84,7 +77,7 @@ public class FeasibilityConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public DownloadMeasureReport downloadMeasureReport(EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
+    public DownloadMeasureReport downloadMeasureReport(FhirWebserviceClientProvider enhancedFhirClientProvider) {
         return new DownloadMeasureReport(enhancedFhirClientProvider, api);
     }
 

@@ -1,7 +1,7 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProvider;
 import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import dev.dsf.bpe.v1.service.TaskHelper;
 import dev.dsf.bpe.v1.variables.Variables;
 import dev.dsf.fhir.client.FhirWebserviceClient;
@@ -40,7 +40,7 @@ public class DownloadMeasureReportTest {
 
     private static final String MEASURE_REPORT_ID = "id-144911";
 
-    @Mock private EnhancedFhirWebserviceClientProvider clientProvider;
+    @Mock private FhirWebserviceClientProvider clientProvider;
     @Mock private FhirWebserviceClient webserviceClient;
     @Mock private TaskHelper taskHelper;
     @Mock private DelegateExecution execution;
@@ -104,7 +104,7 @@ public class DownloadMeasureReportTest {
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE, Reference.class))
                 .thenReturn(Optional.of(measureReportRef));
-        when(clientProvider.getWebserviceClientByReference(new IdType(measureReportRef.getReference())))
+        when(clientProvider.getWebserviceClient(new IdType(measureReportRef.getReference()).getBaseUrl()))
                 .thenReturn(webserviceClient);
         when(webserviceClient.read(MeasureReport.class, MEASURE_REPORT_ID))
                 .thenReturn(measureReport);
