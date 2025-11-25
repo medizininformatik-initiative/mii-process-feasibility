@@ -15,7 +15,7 @@ public interface TestConstantsFeasibility {
     public String NGINX_VERSION = "1.29.1";
 
     // renovate: image=ubuntu/squid
-    public String SQUID_VERSION = "6.10-24.10_edge";
+    public String SQUID_VERSION = "6.13-25.04_edge";
 
     // renovate: image=ghcr.io/shopify/toxiproxy
     public String TOXIPROXY_VERSION = "2.12.0";
