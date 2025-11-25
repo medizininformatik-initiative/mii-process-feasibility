@@ -24,7 +24,7 @@ public interface TestConstantsFeasibility {
     public String POSTGRES_VERSION = "17-alpine";
 
     // renovate: image=ghcr.io/datasharingframework/fhir
-    public String DSF_FHIR_VERSION = "1.8.0";
+    public String DSF_FHIR_VERSION = "1.9.0";
 
     // renovate: image=ghcr.io/datasharingframework/bpe
     public String DSF_BPE_VERSION = "1.9.0";
