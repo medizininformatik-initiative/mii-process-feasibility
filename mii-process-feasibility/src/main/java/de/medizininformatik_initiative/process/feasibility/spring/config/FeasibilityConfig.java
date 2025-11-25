@@ -1,7 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.spring.config;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProvider;
 import de.medizininformatik_initiative.process.feasibility.FeasibilityCachingLaplaceCountObfuscator;
 import de.medizininformatik_initiative.process.feasibility.FeasibilityProcessPluginDeploymentStateListener;
 import de.medizininformatik_initiative.process.feasibility.FeasibilitySettings;
@@ -77,8 +76,8 @@ public class FeasibilityConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public DownloadMeasureReport downloadMeasureReport(FhirWebserviceClientProvider enhancedFhirClientProvider) {
-        return new DownloadMeasureReport(enhancedFhirClientProvider, api);
+    public DownloadMeasureReport downloadMeasureReport() {
+        return new DownloadMeasureReport(api);
     }
 
     @Bean
@@ -129,9 +128,8 @@ public class FeasibilityConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public DownloadFeasibilityResources downloadFeasibilityResources(
-            EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
-        return new DownloadFeasibilityResources(enhancedFhirClientProvider, api);
+    public DownloadFeasibilityResources downloadFeasibilityResources() {
+        return new DownloadFeasibilityResources(api);
     }
 
     @Bean

@@ -104,6 +104,7 @@ public class DownloadMeasureReportTest {
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REPORT_REFERENCE, Reference.class))
                 .thenReturn(Optional.of(measureReportRef));
+        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
         when(clientProvider.getWebserviceClient(new IdType(measureReportRef.getReference()).getBaseUrl()))
                 .thenReturn(webserviceClient);
         when(webserviceClient.read(MeasureReport.class, MEASURE_REPORT_ID))
