@@ -9,7 +9,7 @@ public interface TestConstantsFeasibility {
     public String FLARE_VERSION = "2.6.0";
 
     // renovate: image=quay.io/keycloak/keycloak
-    public String KEYCLOAK_VERSION = "26.3";
+    public String KEYCLOAK_VERSION = "26.4";
 
     // renovate: image=nginx
     public String NGINX_VERSION = "1.29.1";
