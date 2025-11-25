@@ -1,6 +1,5 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProvider;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
 import dev.dsf.bpe.v1.variables.Variables;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
@@ -24,25 +22,16 @@ import static de.medizininformatik_initiative.process.feasibility.variables.Cons
 public class DownloadMeasureReport extends AbstractServiceDelegate implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadMeasureReport.class);
-    private EnhancedFhirWebserviceClientProvider clientProvider;
 
-    public DownloadMeasureReport(EnhancedFhirWebserviceClientProvider clientProvider, ProcessPluginApi api) {
+    public DownloadMeasureReport(ProcessPluginApi api) {
         super(api);
-        this.clientProvider = clientProvider;
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
-        Objects.requireNonNull(clientProvider, "clientProvider");
     }
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
         var task = variables.getLatestTask();
         var measureReportId = getMeasureReportId(task);
-        var client = clientProvider
-                .getWebserviceClientByReference(measureReportId);
+        var client = api.getFhirWebserviceClientProvider().getWebserviceClient(measureReportId.getBaseUrl());
         var measureReport = downloadMeasureReport(client, measureReportId, task);
         execution.setVariableLocal(VARIABLE_MEASURE_REPORT, measureReport);
     }

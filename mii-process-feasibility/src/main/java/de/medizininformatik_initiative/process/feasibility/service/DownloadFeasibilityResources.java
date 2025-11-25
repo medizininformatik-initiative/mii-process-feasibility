@@ -1,6 +1,5 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProvider;
 import de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static de.medizininformatik_initiative.process.feasibility.variables.ConstantsFeasibility.CODESYSTEM_FEASIBILITY;
@@ -29,17 +27,9 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
         implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadFeasibilityResources.class);
-    private EnhancedFhirWebserviceClientProvider clientProvider;
 
-    public DownloadFeasibilityResources(EnhancedFhirWebserviceClientProvider clientProvider, ProcessPluginApi api) {
+    public DownloadFeasibilityResources(ProcessPluginApi api) {
         super(api);
-        this.clientProvider = clientProvider;
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
-        Objects.requireNonNull(clientProvider, "clientProvider");
     }
 
     @Override
@@ -47,7 +37,7 @@ public class DownloadFeasibilityResources extends AbstractServiceDelegate
         var task = variables.getStartTask();
 
         var measureId = getMeasureId(task);
-        var client = clientProvider.getWebserviceClientByReference(measureId);
+        var client = api.getFhirWebserviceClientProvider().getWebserviceClient(measureId.getBaseUrl());
         var bundle = getMeasureAndLibrary(measureId, client, task);
 
         variables.setResource(ConstantsFeasibility.VARIABLE_MEASURE, bundle.getEntry().get(0).getResource());

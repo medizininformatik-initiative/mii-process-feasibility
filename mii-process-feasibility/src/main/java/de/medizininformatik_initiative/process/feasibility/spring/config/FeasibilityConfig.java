@@ -1,8 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.spring.config;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProvider;
-import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProviderImpl;
 import de.medizininformatik_initiative.process.feasibility.EvaluationSettingsProvider;
 import de.medizininformatik_initiative.process.feasibility.FeasibilityCachingLaplaceCountObfuscator;
 import de.medizininformatik_initiative.process.feasibility.FeasibilityProcessPluginDeploymentStateListener;
@@ -29,7 +27,6 @@ import de.medizininformatik_initiative.process.feasibility.service.StoreLiveResu
 import de.medizininformatik_initiative.process.feasibility.service.StoreMeasureReport;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.documentation.ProcessDocumentation;
-import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,11 +62,6 @@ public class FeasibilityConfig {
     }
 
     @Bean
-    public EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider(@Qualifier("clientProvider") FhirWebserviceClientProvider fhirClientProvider) {
-        return new EnhancedFhirWebserviceClientProviderImpl(fhirClientProvider);
-    }
-
-    @Bean
     public Obfuscator<Integer> feasibilityCountObfuscator() {
         return new FeasibilityCachingLaplaceCountObfuscator(
                 evaluationSettingsProvider.resultObfuscationLaplaceSensitivity(),
@@ -94,8 +86,8 @@ public class FeasibilityConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public DownloadMeasureReport downloadMeasureReport(EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
-        return new DownloadMeasureReport(enhancedFhirClientProvider, api);
+    public DownloadMeasureReport downloadMeasureReport() {
+        return new DownloadMeasureReport(api);
     }
 
     @Bean
@@ -141,9 +133,8 @@ public class FeasibilityConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public DownloadFeasibilityResources downloadFeasibilityResources(
-            EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
-        return new DownloadFeasibilityResources(enhancedFhirClientProvider, api);
+    public DownloadFeasibilityResources downloadFeasibilityResources() {
+        return new DownloadFeasibilityResources(api);
     }
 
     @Bean
