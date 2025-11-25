@@ -12,7 +12,7 @@ public interface TestConstantsFeasibility {
     public String KEYCLOAK_VERSION = "26.4";
 
     // renovate: image=nginx
-    public String NGINX_VERSION = "1.29.1";
+    public String NGINX_VERSION = "1.29.3";
 
     // renovate: image=ubuntu/squid
     public String SQUID_VERSION = "6.13-25.04_edge";
@@ -28,4 +28,7 @@ public interface TestConstantsFeasibility {
 
     // renovate: image=ghcr.io/datasharingframework/bpe
     public String DSF_BPE_VERSION = "1.9.0";
+
+    // renovate: image=uay.io/oauth2-proxy/oauth2-proxy
+    public String OAUTH2_PROXY_VERSION = "v7.13.0";
 }
