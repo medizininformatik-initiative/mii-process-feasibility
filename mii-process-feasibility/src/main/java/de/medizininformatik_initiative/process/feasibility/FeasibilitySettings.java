@@ -49,6 +49,16 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
         return new FeasibilitySettings(Map.of(), Map.of(), new GeneralSettings(DEFAULT_REQUEST_TASK_TIMEOUT));
     }
 
+    static String readFromFile(String file) {
+        try {
+            return Files.readString(Paths.get(file));
+        } catch (IOException e) {
+            throw new IllegalArgumentException(
+                    "Could not read file '%s'.".formatted(file),
+                    e);
+        }
+    }
+
     public static record NetworkSettings(Boolean obfuscate, RateLimitSettings rateLimit,
             @JsonAlias("stores") List<String> storeIds) {
 
@@ -85,13 +95,7 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
         public StoreSettings {
             if ((privateKeyPassword == null || privateKeyPassword.isEmpty()) && privateKeyPasswordFile != null
                     && !privateKeyPasswordFile.isBlank()) {
-                try {
-                    privateKeyPassword = Files.readString(Paths.get(privateKeyPasswordFile));
-                } catch (IOException e) {
-                    throw new IllegalArgumentException(
-                            "Could not read private key password file '%s'.".formatted(privateKeyPasswordFile),
-                            e);
-                }
+                privateKeyPassword = readFromFile(privateKeyPasswordFile);
             }
         }
 
@@ -112,7 +116,8 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
                             "Private key for client certificate '%s' is missing.".formatted(clientCertificate)));
                 }
                 if (privateKeyPassword != null && !privateKeyPassword.isEmpty() && privateKeyPasswordFile != null
-                        && !privateKeyPasswordFile.isBlank()) {
+                        && !privateKeyPasswordFile.isBlank()
+                        && !privateKeyPassword.equals(readFromFile(privateKeyPasswordFile))) {
                     errors.add(new FeasibilitySettingsError(
                             "Store '%s' has privateKeyPassword '***' and privateKeyPasswordFile '%s' set. Only one of these is allowed."
                                     .formatted(storeId, privateKeyPasswordFile)));
@@ -173,12 +178,7 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
 
         public ProxySettings {
             if ((password == null || password.isEmpty()) && passwordFile != null && !passwordFile.isBlank()) {
-                try {
-                    password = Files.readString(Paths.get(passwordFile));
-                } catch (IOException e) {
-                    throw new IllegalArgumentException(
-                            "Could not read password file '%s for proxy.".formatted(passwordFile), e);
-                }
+                password = readFromFile(passwordFile);
             }
         }
 
@@ -209,7 +209,8 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
                 }
                 errors.add(new FeasibilitySettingsError(message));
             }
-            if (password != null && !password.isEmpty() && passwordFile != null && !passwordFile.isBlank()) {
+            if (password != null && !password.isEmpty() && passwordFile != null && !passwordFile.isBlank()
+                    && !password.equals(readFromFile(passwordFile))) {
                 errors.add(new FeasibilitySettingsError(
                         "%s has password '***' and passwordFile '%s' set for proxy. Only one of these is allowed."
                                 .formatted(prefix, passwordFile)));
@@ -226,13 +227,7 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
         public OAuth {
             if ((clientPassword == null || clientPassword.isEmpty()) && clientPasswordFile != null
                     && !clientPasswordFile.isBlank()) {
-                try {
-                    clientPassword = Files.readString(Paths.get(clientPasswordFile));
-                } catch (IOException e) {
-                    throw new IllegalArgumentException(
-                            "Could not read client password file '%s' for oAuth.".formatted(clientPasswordFile),
-                            e);
-                }
+                clientPassword = readFromFile(clientPasswordFile);
             }
         }
 
@@ -262,7 +257,7 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
                 proxy.validate(format("Store '%s' oAuth", storeId)).forEach(errors);
             }
             if (clientPassword != null && !clientPassword.isEmpty() && clientPasswordFile != null
-                    && !clientPasswordFile.isBlank()) {
+                    && !clientPasswordFile.isBlank() && !clientPassword.equals(readFromFile(clientPasswordFile))) {
                 errors.add(new FeasibilitySettingsError(
                         "Store '%s' has clientPassword '***' and clientPasswordFile '%s' set for oAuth. Only one of these is allowed."
                                 .formatted(storeId, clientPasswordFile)));
@@ -276,13 +271,7 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
 
         public BearerAuth {
             if ((token == null || token.isEmpty()) && tokenFile != null && !tokenFile.isBlank()) {
-                try {
-                    token = Files.readString(Paths.get(tokenFile));
-                } catch (IOException e) {
-                    throw new IllegalArgumentException(
-                            "Could not read token file '%s' for bearerAuth.".formatted(tokenFile),
-                            e);
-                }
+                token = readFromFile(tokenFile);
             }
         }
 
@@ -298,7 +287,8 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
                 errors.add(
                         new FeasibilitySettingsError(format("Store '%s' has no token set for bearerAuth.", storeId)));
             }
-            if (token != null && !token.isEmpty() && tokenFile != null && !tokenFile.isBlank()) {
+            if (token != null && !token.isEmpty() && tokenFile != null && !tokenFile.isBlank()
+                    && !token.equals(readFromFile(tokenFile))) {
                 errors.add(new FeasibilitySettingsError(
                         "Store '%s' has token'***' and tokenFile '%s' set for bearerAuth. Only one of these is allowed."
                                 .formatted(storeId, tokenFile)));
@@ -312,13 +302,7 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
 
         public BasicAuth {
             if ((password == null || password.isEmpty()) && passwordFile != null && !passwordFile.isBlank()) {
-                try {
-                    password = Files.readString(Paths.get(passwordFile));
-                } catch (IOException e) {
-                    throw new IllegalArgumentException(
-                            "Could not read password file '%s' for basicAuth.".formatted(passwordFile),
-                            e);
-                }
+                    password = readFromFile(passwordFile);
             }
         }
 
@@ -341,7 +325,8 @@ public record FeasibilitySettings(Map<String, NetworkSettings> networks, Map<Str
                         new FeasibilitySettingsError(
                                 "Store '%s' has no password set for basicAuth.".formatted(storeId)));
             }
-            if (password != null && !password.isEmpty() && passwordFile != null && !passwordFile.isBlank()) {
+            if (password != null && !password.isEmpty() && passwordFile != null && !passwordFile.isBlank()
+                    && !password.equals(readFromFile(passwordFile))) {
                 errors.add(new FeasibilitySettingsError(
                         "Store '%s' has password '***' and passwordFile '%s' set for basicAuth. Only one of these is allowed."
                                 .formatted(storeId, passwordFile)));
