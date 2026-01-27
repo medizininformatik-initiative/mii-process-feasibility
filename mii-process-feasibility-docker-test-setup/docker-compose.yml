@@ -545,7 +545,7 @@ services:
 
   # ---- DIC-2 - FHIR Data Store ----------------------------------------------
   dic-2-store:
-    image: samply/blaze:1.2
+    image: samply/blaze:1.4
     restart: on-failure
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/health" ]
@@ -748,7 +748,7 @@ services:
 
   # ---- DIC-3 - FHIR Data Store ----------------------------------------------
   dic-3-store:
-    image: samply/blaze:1.2.0
+    image: samply/blaze:1.4.1
     restart: on-failure
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/health" ]
