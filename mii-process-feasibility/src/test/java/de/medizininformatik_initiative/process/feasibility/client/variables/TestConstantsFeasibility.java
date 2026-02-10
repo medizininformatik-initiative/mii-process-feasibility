@@ -27,7 +27,7 @@ public interface TestConstantsFeasibility {
     public String DSF_FHIR_VERSION = "1.9.0";
 
     // renovate: image=ghcr.io/datasharingframework/bpe
-    public String DSF_BPE_VERSION = "1.9.0";
+    public String DSF_BPE_VERSION = "2.0.2";
 
     // renovate: image=uay.io/oauth2-proxy/oauth2-proxy
     public String OAUTH2_PROXY_VERSION = "v7.13.0";
