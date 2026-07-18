@@ -8,13 +8,13 @@
     <parent>
         <groupId>de.medizininformatik-initiative</groupId>
         <artifactId>mii-process-feasibility-parent</artifactId>
-        <version>0.0.0.0</version>
+        <version>0.0.0.0-SNAPSHOT</version>
     </parent>
 
     <properties>
         <date>${maven.build.timestamp}</date>
         <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
-        <testSetup.location>../../mii-processes-test-setup</testSetup.location>
+        <miiDevSetup.location>../../mii-processes-dev-setup</miiDevSetup.location>
     </properties>
 
     <name>MII Process Feasibility</name>
@@ -281,7 +281,7 @@
     </build>
     <profiles>
         <profile>
-            <id>copy-to-test-setup</id>
+            <id>copy-to-mii-dev-setup</id>
 
             <build>
                 <plugins>
@@ -290,7 +290,7 @@
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>copy-process-plugin-to-test-setup/dic1</id>
+                                <id>copy-process-plugin-to-docker/dic1</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>copy</goal>
@@ -303,11 +303,11 @@
                                             <version>${project.version}</version>
                                         </artifactItem>
                                     </artifactItems>
-                                    <outputDirectory>${testSetup.location}/docker/dic1/bpe/process</outputDirectory>
+                                    <outputDirectory>${miiDevSetup.location}/docker/dic1/bpe/process</outputDirectory>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>copy-process-plugin-to-test-setup/dic2</id>
+                                <id>copy-process-plugin-to-docker/dic2</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>copy</goal>
@@ -320,11 +320,11 @@
                                             <version>${project.version}</version>
                                         </artifactItem>
                                     </artifactItems>
-                                    <outputDirectory>${testSetup.location}/docker/dic2/bpe/process</outputDirectory>
+                                    <outputDirectory>${miiDevSetup.location}/docker/dic2/bpe/process</outputDirectory>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>copy-process-plugin-to-test-setup/hrp</id>
+                                <id>copy-process-plugin-to-docker/hrp</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>copy</goal>
@@ -337,33 +337,7 @@
                                             <version>${project.version}</version>
                                         </artifactItem>
                                     </artifactItems>
-                                    <outputDirectory>${testSetup.location}/docker/hrp/bpe/process</outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-feasibility-request-bundle</id>
-                                <!-- here the phase you need -->
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${testSetup.location}/bundle</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>src/test/resources/fhir</directory>
-                                            <includes>
-                                                <include>feasibility-request-bundle.json</include>
-                                            </includes>
-                                            <filtering>true</filtering>
-                                        </resource>
-                                    </resources>
+                                    <outputDirectory>${miiDevSetup.location}/docker/hrp/bpe/process</outputDirectory>
                                 </configuration>
                             </execution>
                         </executions>
@@ -374,21 +348,21 @@
                         <configuration>
                             <filesets>
                                 <fileset>
-                                    <directory>${testSetup.location}/docker/dic1/bpe/process</directory>
+                                    <directory>${miiDevSetup.location}/docker/dic1/bpe/process</directory>
                                     <includes>
                                         <include>${project.artifactId}-*.jar</include>
                                     </includes>
                                     <followSymlinks>false</followSymlinks>
                                 </fileset>
                                 <fileset>
-                                    <directory>${testSetup.location}/docker/dic2/bpe/process</directory>
+                                    <directory>${miiDevSetup.location}/docker/dic2/bpe/process</directory>
                                     <includes>
                                         <include>${project.artifactId}-*.jar</include>
                                     </includes>
                                     <followSymlinks>false</followSymlinks>
                                 </fileset>
                                 <fileset>
-                                    <directory>${testSetup.location}/docker/hrp/bpe/process</directory>
+                                    <directory>${miiDevSetup.location}/docker/hrp/bpe/process</directory>
                                     <includes>
                                         <include>${project.artifactId}-*.jar</include>
                                     </includes>

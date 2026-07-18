@@ -79,12 +79,14 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
         var sTReq = "fhir/StructureDefinition/feasibility-task-request.xml";
         var sTResS = "fhir/StructureDefinition/feasibility-task-single-dic-result.xml";
 
+        var tTReq = "fhir/Task/task-feasibility-request.xml";
+
         var vF = "fhir/ValueSet/feasibility.xml";
 
         return Map.of(
                 FEASIBILITY_EXECUTE_PROCESS_ID,
                 Arrays.asList(aExe, sTExe, sTResS, vF, cF, sMeasure, sMeasureReport, sLibrary),
                 FEASIBILITY_REQUEST_PROCESS_ID,
-                Arrays.asList(aReq, sTReq, sTResS, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary));
+                Arrays.asList(aReq, sTReq, sTResS, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary, tTReq));
     }
 }
