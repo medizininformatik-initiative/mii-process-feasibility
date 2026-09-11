@@ -64,9 +64,12 @@ public class SelectRequestTargets extends AbstractServiceDelegate {
                 .collect(Collectors.toList());
         targets.forEach(t -> logger.debug(t.getOrganizationIdentifierValue()));
         variables.setTargets(variables.createTargets(targets));
-        variables.setString("measure-id",
-                api.getFhirWebserviceClientProvider().getLocalWebserviceClient().getBaseUrl()
-                        + getMeasureId(startTask));
+
+        String measureId = getMeasureId(startTask);
+        if (!measureId.startsWith(api.getFhirWebserviceClientProvider().getLocalWebserviceClient().getBaseUrl()))
+                measureId = api.getFhirWebserviceClientProvider().getLocalWebserviceClient().getBaseUrl() + measureId;
+
+        variables.setString("measure-id", measureId);
     }
 
     private Task checkRequestDate(Task task) {

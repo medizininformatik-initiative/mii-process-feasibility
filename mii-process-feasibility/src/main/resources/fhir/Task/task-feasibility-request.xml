@@ -1,0 +1,49 @@
+<Task xmlns="http://hl7.org/fhir">
+  <meta>
+    <profile value="http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-request|#{version}" />
+  </meta>
+  <identifier>
+    <system value="http://dsf.dev/sid/task-identifier"/>
+    <value value="http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest/#{version}/feasibilityRequest"/>
+  </identifier>
+  <instantiatesCanonical value="http://medizininformatik-initiative.de/bpe/Process/feasibilityRequest|#{version}" />
+  <status value="draft" />
+  <intent value="order" />
+  <authoredOn value="#{date}" />
+  <requester>
+    <type value="Organization" />
+    <identifier>
+      <system value="http://dsf.dev/sid/organization-identifier" />
+      <value value="#{organization}" />
+    </identifier>
+  </requester>
+  <restriction>
+    <recipient>
+      <type value="Organization" />
+      <identifier>
+        <system value="http://dsf.dev/sid/organization-identifier" />
+        <value value="#{organization}" />
+      </identifier>
+    </recipient>
+  </restriction>
+  <input>
+    <type>
+      <coding>
+        <system value="http://dsf.dev/fhir/CodeSystem/bpmn-message" />
+        <code value="message-name" />
+      </coding>
+    </type>
+    <valueString value="feasibilityRequestMessage" />
+  </input>
+  <input>
+    <type>
+      <coding>
+        <system value="http://medizininformatik-initiative.de/fhir/CodeSystem/feasibility" />
+        <code value="measure-reference" />
+      </coding>
+    </type>
+    <valueReference>
+      <reference value="https://medizininformatik-initiative.de/fhir/Measure/TO-BE-REPLACED" />
+    </valueReference>
+  </input>
+</Task>
