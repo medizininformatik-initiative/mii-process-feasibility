@@ -1,7 +1,7 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
-import de.medizininformatik_initiative.process.feasibility.EnhancedFhirWebserviceClientProvider;
 import dev.dsf.bpe.v1.ProcessPluginApi;
+import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import dev.dsf.bpe.v1.service.TaskHelper;
 import dev.dsf.bpe.v1.variables.Variables;
 import dev.dsf.fhir.client.FhirWebserviceClient;
@@ -48,7 +48,7 @@ public class DownloadFeasibilityResourcesTest {
 
     private static final String MEASURE_ID = "id-142416";
 
-    @Mock private EnhancedFhirWebserviceClientProvider clientProvider;
+    @Mock private FhirWebserviceClientProvider clientProvider;
     @Mock private FhirWebserviceClient webserviceClient;
     @Mock private PreferReturnMinimalWithRetry minimalReturn;
     @Mock private TaskHelper taskHelper;
@@ -106,7 +106,7 @@ public class DownloadFeasibilityResourcesTest {
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
                 .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClientByReference(measureRefId))
+        when(clientProvider.getWebserviceClient(measureRefId.getBaseUrl()))
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(new Bundle());
@@ -135,7 +135,7 @@ public class DownloadFeasibilityResourcesTest {
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
                 .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClientByReference(measureRefId))
+        when(clientProvider.getWebserviceClient(measureRefId.getBaseUrl()))
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);
@@ -164,7 +164,7 @@ public class DownloadFeasibilityResourcesTest {
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
                 .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClientByReference(measureRefId))
+        when(clientProvider.getWebserviceClient(measureRefId.getBaseUrl()))
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);
@@ -194,7 +194,8 @@ public class DownloadFeasibilityResourcesTest {
         when(taskHelper.getFirstInputParameterValue(task, CODESYSTEM_FEASIBILITY,
                 CODESYSTEM_FEASIBILITY_VALUE_MEASURE_REFERENCE, Reference.class))
                 .thenReturn(Optional.of(measureRef));
-        when(clientProvider.getWebserviceClientByReference(measureRefId))
+        when(api.getFhirWebserviceClientProvider()).thenReturn(clientProvider);
+        when(clientProvider.getWebserviceClient(measureRefId.getBaseUrl()))
                 .thenReturn(webserviceClient);
         when(webserviceClient.searchWithStrictHandling(Measure.class, createSearchQueryParts(MEASURE_ID)))
                 .thenReturn(bundle);

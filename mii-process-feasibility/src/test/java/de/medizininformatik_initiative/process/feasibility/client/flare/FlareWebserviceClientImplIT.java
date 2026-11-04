@@ -611,7 +611,8 @@ public class FlareWebserviceClientImplIT {
         private static URL serverCertKey = getResource("../certs/server_cert_key.pem");
         private static URL trustStoreFile = getResource("../certs/ca.pem");
 
-        @Container public static KeycloakContainer keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:25.0")
+        @Container public static KeycloakContainer keycloak = new KeycloakContainer(
+                "quay.io/keycloak/keycloak:" + TestConstantsFeasibility.KEYCLOAK_VERSION)
                 .withNetwork(DEFAULT_CONTAINER_NETWORK)
                 .withNetworkAliases("keycloak")
                 .withAdminUsername("admin")
@@ -621,7 +622,7 @@ public class FlareWebserviceClientImplIT {
                 .withReuse(true);
 
         @Container public static GenericContainer<?> proxy = new GenericContainer<>(
-                DockerImageName.parse("nginx:1.27.1"))
+                DockerImageName.parse("nginx:" + TestConstantsFeasibility.NGINX_VERSION))
                         .withExposedPorts(8443)
                         .withNetworkAliases("proxy")
                         .withFileSystemBind(nginxConf.getPath(), "/etc/nginx/nginx.conf", READ_ONLY)
@@ -670,7 +671,7 @@ public class FlareWebserviceClientImplIT {
         void sendQuery() throws Exception {
 
             try (GenericContainer<?> oAuth2Proxy = new GenericContainer<>(
-                    DockerImageName.parse("quay.io/oauth2-proxy/oauth2-proxy:v7.7.1"))
+                    DockerImageName.parse("quay.io/oauth2-proxy/oauth2-proxy:" + TestConstantsFeasibility.OAUTH2_PROXY_VERSION))
                             .withNetworkMode("host")
                             .withCopyFileToContainer(MountableFile.forHostPath(trustStoreFile.getPath()),
                                     "/secrets/trusted_cas.pem")

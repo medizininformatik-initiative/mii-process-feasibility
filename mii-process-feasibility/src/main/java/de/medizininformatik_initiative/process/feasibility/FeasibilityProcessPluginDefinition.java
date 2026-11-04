@@ -3,7 +3,6 @@ package de.medizininformatik_initiative.process.feasibility;
 import de.medizininformatik_initiative.process.feasibility.client.flare.FlareWebserviceClientSpringConfig;
 import de.medizininformatik_initiative.process.feasibility.client.store.StoreClientSpringConfig;
 import de.medizininformatik_initiative.process.feasibility.spring.config.BaseConfig;
-import de.medizininformatik_initiative.process.feasibility.spring.config.EnhancedFhirWebserviceClientProviderConfig;
 import de.medizininformatik_initiative.process.feasibility.spring.config.FeasibilityConfig;
 import dev.dsf.bpe.v1.ProcessPluginDefinition;
 
@@ -60,7 +59,7 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
     @Override
     public List<Class<?>> getSpringConfigurations() {
         return List.of(BaseConfig.class, StoreClientSpringConfig.class, FlareWebserviceClientSpringConfig.class,
-                FeasibilityConfig.class, EnhancedFhirWebserviceClientProviderConfig.class);
+                FeasibilityConfig.class);
     }
 
     @Override
@@ -82,12 +81,14 @@ public class FeasibilityProcessPluginDefinition implements ProcessPluginDefiniti
         var sTResDS = "fhir/StructureDefinition/feasibility-task-single-distributed-dic-result.xml";
 
 
+        var tTReq = "fhir/Task/task-feasibility-request.xml";
+
         var vF = "fhir/ValueSet/feasibility.xml";
 
         return Map.of(
                 FEASIBILITY_EXECUTE_PROCESS_ID,
                 Arrays.asList(aExe, sTExe, sTResS, sTResDS, vF, cF, sMeasure, sMeasureReport, sLibrary),
                 FEASIBILITY_REQUEST_PROCESS_ID,
-                Arrays.asList(aReq, sTReq, sTResS, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary));
+                Arrays.asList(aReq, sTReq, sTResS, sExtDic, vF, cF, sMeasure, sMeasureReport, sLibrary, tTReq));
     }
 }

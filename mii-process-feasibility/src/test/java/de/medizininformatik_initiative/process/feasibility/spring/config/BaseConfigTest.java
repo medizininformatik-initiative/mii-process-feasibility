@@ -326,7 +326,7 @@ class BaseConfigTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Configuration could not be parsed.")
                 .hasStackTraceContaining(
-                        "Could not read password file '%s' for basicAuth.".formatted(nonExistingPasswordFile));
+                        "Could not read file '%s'.".formatted(nonExistingPasswordFile));
     }
 
     @Test

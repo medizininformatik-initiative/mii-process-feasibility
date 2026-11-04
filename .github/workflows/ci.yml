@@ -18,7 +18,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Set up JDK 17
       uses: actions/setup-java@v5
@@ -34,7 +34,7 @@ jobs:
         key: maven-repo
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
 
     - name: Build with Maven
       run: mvn -B verify --file pom.xml
@@ -43,7 +43,7 @@ jobs:
         USERNAME: ${{ github.actor }}
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
 
 
   build:
@@ -51,7 +51,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Prepare Version
       id: prep

@@ -13,7 +13,7 @@ services:
 
   # ---- Proxy ----------------------------------------------------------------
   proxy:
-    image: nginx:1.29.1
+    image: nginx:1.29.3
     restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "curl -ks https://localhost || exit 1"]
@@ -58,7 +58,7 @@ services:
       TZ: Europe/Berlin
 
   db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U liquibase_user -d postgres" ]
@@ -100,7 +100,7 @@ services:
 
   # ---- ZARS - FHIR Inbox ----------------------------------------------------
   zars-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.8.0
+    image: ghcr.io/datasharingframework/fhir:1.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -168,7 +168,7 @@ services:
 
   # ---- ZARS - BPE -----------------------------------------------------------
   zars-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.8.0
+    image: ghcr.io/datasharingframework/bpe:1.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -240,7 +240,7 @@ services:
 
   # ---- DIC-1 - FHIR ---------------------------------------------------------
   dic-1-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.8.0
+    image: ghcr.io/datasharingframework/fhir:1.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -305,7 +305,7 @@ services:
 
   # ---- DIC-1 - BPE ----------------------------------------------------------
   dic-1-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.8.0
+    image: ghcr.io/datasharingframework/bpe:1.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -348,7 +348,7 @@ services:
       DEV_DSF_BPE_DB_USER_CAMUNDA_GROUP: dic_1_camunda_users
       DEV_DSF_BPE_DB_USER_CAMUNDA_USERNAME: dic_1_camunda_server_user
       DEV_DSF_BPE_FHIR_SERVER_BASE_URL: https://dic-1/fhir
-      DEV_DSF_BPE_PROCESS_EXCLUDED: medizininformatik-initiativede_feasibilityRequest|0.0
+      DEV_DSF_BPE_PROCESS_EXCLUDED:  medizininformatik-initiativede_feasibilityRequest|0.0
       DE_MEDIZININFORMATIK_INITIATIVE_FEASIBILITY_DSF_PROCESS_CONFIGURATION_FILE: /run/secrets/feasibility_dic_1.yml
     networks:
       dic-1-bpe-frontend:
@@ -412,7 +412,7 @@ services:
         condition: service_healthy
 
   dic-1-store-db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
       interval: 10s
@@ -431,7 +431,7 @@ services:
 
   # ---- DIC-2 - FHIR ---------------------------------------------------------
   dic-2-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.8.0
+    image: ghcr.io/datasharingframework/fhir:1.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -496,7 +496,7 @@ services:
 
   # ---- DIC-2 - BPE ----------------------------------------------------------
   dic-2-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.8.0
+    image: ghcr.io/datasharingframework/bpe:1.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -558,7 +558,7 @@ services:
 
   # ---- DIC-2 - FHIR Data Store ----------------------------------------------
   dic-2-store:
-    image: samply/blaze:1.1
+    image: samply/blaze:1.4
     restart: on-failure
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/health" ]
@@ -581,7 +581,7 @@ services:
 
   # ---- DIC-3 - FHIR ---------------------------------------------------------
   dic-3-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.8.0
+    image: ghcr.io/datasharingframework/fhir:1.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -643,7 +643,7 @@ services:
 
   # ---- DIC-3 - BPE ----------------------------------------------------------
   dic-3-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.8.0
+    image: ghcr.io/datasharingframework/bpe:1.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -707,10 +707,10 @@ services:
 
   # ---- DIC-3 - DEDICATED PROXY WITH SELF SIGNED CERT ------------------------
   dic-3-keycloak:
-    image: "keycloak/keycloak:26.3.3"
-    command: [ "start", "--import-realm" ]
+    image: "keycloak/keycloak:26.5.2"
+    command: ["start", "--import-realm"]
     healthcheck:
-      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e \"GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3" ]
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e \"GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3"]
       interval: "5s"
       timeout: "5s"
       retries: 3
@@ -726,12 +726,12 @@ services:
       KC_HEALTH_ENABLED: "true"
       KC_LOG_LEVEL: "info"
     volumes:
-      - "./dic-3/keycloak/realm-test.json:/opt/keycloak/data/import/realm-test.json"
+    - "./dic-3/keycloak/realm-test.json:/opt/keycloak/data/import/realm-test.json"
   dic-3-store-proxy:
-    image: nginx:1.29.1
+    image: nginx:1.29.3
     restart: on-failure
     healthcheck:
-      test: [ "CMD-SHELL", "curl -ks https://localhost || exit 1" ]
+      test: ["CMD-SHELL", "curl -ks https://localhost || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -761,7 +761,7 @@ services:
 
   # ---- DIC-3 - FHIR Data Store ----------------------------------------------
   dic-3-store:
-    image: samply/blaze:1.1.2
+    image: samply/blaze:1.4.1
     restart: on-failure
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/health" ]
@@ -789,7 +789,7 @@ services:
 
   # ---- DIC-4 - FHIR ---------------------------------------------------------
   dic-4-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.8.0
+    image: ghcr.io/datasharingframework/fhir:1.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -851,7 +851,7 @@ services:
 
   # ---- DIC-4 - BPE ----------------------------------------------------------
   dic-4-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.8.0
+    image: ghcr.io/datasharingframework/bpe:1.9.0
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
@@ -936,7 +936,7 @@ services:
         condition: service_healthy
 
   dic-4-store-init:
-    image: curlimages/curl:8.15.0
+    image: curlimages/curl:8.17.0
     entrypoint:
       - /bin/sh
     command:
@@ -958,7 +958,7 @@ services:
         condition: service_healthy
 
   dic-4-store-db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     networks:
       dic-4-bpe-backend:
     restart: always

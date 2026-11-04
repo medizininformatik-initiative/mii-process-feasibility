@@ -29,7 +29,7 @@
                 <valueString value="Parameter"/>
             </extension>
             <path value="Task.input"/>
-            <min value="3"/>
+            <min value="2"/>
             <max value="3"/>
         </element>
         <element id="Task.input:message-name">
@@ -42,14 +42,6 @@
         <element id="Task.input:message-name.value[x]">
             <path value="Task.input.value[x]"/>
             <fixedString value="feasibilityRequestMessage"/>
-        </element>
-        <element id="Task.input:business-key">
-            <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
-                <valueString value="Parameter"/>
-            </extension>
-            <path value="Task.input"/>
-            <sliceName value="business-key"/>
-            <min value="1"/>
         </element>
         <element id="Task.input:correlation-key">
             <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name">
