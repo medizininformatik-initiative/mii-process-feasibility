@@ -66,7 +66,7 @@ services:
         restart: true
 
   broker-dic-5-fhir-app:
-    image: ghcr.io/datasharingframework/fhir:1.8.0
+    image: ghcr.io/datasharingframework/fhir:2.1.1
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
