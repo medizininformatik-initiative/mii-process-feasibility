@@ -1,6 +1,6 @@
 services:
   broker-dic-6-bpe-app:
-    image: ghcr.io/datasharingframework/bpe:1.8.0
+    image: ghcr.io/datasharingframework/bpe:2.1.1
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL", "./healthcheck.sh" ]
