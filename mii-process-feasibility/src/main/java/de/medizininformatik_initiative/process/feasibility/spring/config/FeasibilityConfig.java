@@ -13,7 +13,6 @@ import de.medizininformatik_initiative.process.feasibility.message.SendDicReques
 import de.medizininformatik_initiative.process.feasibility.message.SendDicResponse;
 import de.medizininformatik_initiative.process.feasibility.service.*;
 import dev.dsf.bpe.v1.ProcessPluginApi;
-import dev.dsf.bpe.v1.service.FhirWebserviceClientProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -41,10 +40,6 @@ public class FeasibilityConfig {
                 DEFAULT_OBFUSCATION_LAPLACE_EPSILON);
     }
 
-    //
-    // process requestFeasibility implementations
-    //
-
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SelectRequestTargets selectRequestTargets(FeasibilitySettings feasibilitySettings) {
@@ -57,11 +52,6 @@ public class FeasibilityConfig {
         return new SendDicRequest(api);
     }
 
-    @Bean
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public DownloadMeasureReport downloadMeasureReport(EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
-        return new DownloadMeasureReport(enhancedFhirClientProvider, api);
-    }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -96,7 +86,7 @@ public class FeasibilityConfig {
     public EvaluateRequestRate requestRateLimiters(FeasibilitySettings feasibilitySettings) {
         return new EvaluateRequestRate(api,
                 feasibilitySettings.networks().entrySet().stream()
-                        .collect(Collectors.toMap(e -> e.getKey(),
+                        .collect(Collectors.toMap(Map.Entry::getKey,
                                 e -> Optional.ofNullable(e.getValue().rateLimit())
                                         .map(r -> new RateLimit(r.count(), r.interval()))
                                         .orElse(new RateLimit(DEFAULT_RATE_LIMIT_COUNT,
@@ -113,13 +103,6 @@ public class FeasibilityConfig {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public SetupEvaluationSettings setupEvaluationSettings(FeasibilitySettings feasibilitySettings) {
         return new SetupEvaluationSettings(feasibilitySettings, api);
-    }
-
-    @Bean
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public DownloadFeasibilityResources downloadFeasibilityResources(
-            EnhancedFhirWebserviceClientProvider enhancedFhirClientProvider) {
-        return new DownloadFeasibilityResources(enhancedFhirClientProvider, api);
     }
 
     @Bean
