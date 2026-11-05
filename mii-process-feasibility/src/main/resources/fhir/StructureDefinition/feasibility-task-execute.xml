@@ -97,7 +97,8 @@
             <path value="Task.input.value[x]"/>
             <type>
                 <code value="Reference"/>
-                <targetProfile value="http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-measure"/>
+                <targetProfile
+                        value="http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-measure"/>
             </type>
         </element>
         <element id="Task.output">

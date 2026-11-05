@@ -43,7 +43,7 @@ public class SetupEvaluationSettingsTest {
         var orgIdentifier = new Identifier();
         var requester = new Organization().setName(orgName).setIdentifier(List.of(orgIdentifier));
         var obfuscate = true;
-        var network = new NetworkSettings(obfuscate, null, null);
+        var network = new NetworkSettings(obfuscate, null, null, null, null);
         var settings = new FeasibilitySettings(Map.of(networkId, network), null, null);
         var service = new SetupEvaluationSettings(settings, api);
         when(api.getVariables(execution)).thenReturn(variables);

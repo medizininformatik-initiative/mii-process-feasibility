@@ -38,6 +38,8 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
+        logger.info("doExecute store live result");
+
         var task = variables.getLatestTask();
 
         var measureReport = (MeasureReport) execution.getVariableLocal(VARIABLE_MEASURE_REPORT);
@@ -45,6 +47,10 @@ public class StoreLiveResult extends AbstractServiceDelegate implements Initiali
 
         var storedMeasureReport = storeMeasureReport(measureReport);
         addMeasureReportReferenceToTaskOutput(task, storedMeasureReport.getIdElement());
+
+        variables.setResource("subMeasure_" + variables.getTarget().getCorrelationKey(),
+                storedMeasureReport);
+
         logger.info("Added measure report {} [task: {}]", storedMeasureReport.getId(), task.getId());
     }
 

@@ -1,5 +1,6 @@
 package de.medizininformatik_initiative.process.feasibility.service;
 
+import de.medizininformatik_initiative.process.feasibility.InitialPopulationExtractor;
 import de.medizininformatik_initiative.process.feasibility.Obfuscator;
 import dev.dsf.bpe.v1.ProcessPluginApi;
 import dev.dsf.bpe.v1.activity.AbstractServiceDelegate;
@@ -8,8 +9,9 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MeasureReport;
-import org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent;
 import org.hl7.fhir.r4.model.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Objects;
@@ -24,7 +26,8 @@ import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.COMPLETE;
 import static org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.SUMMARY;
 
 public class ObfuscateEvaluationResult extends AbstractServiceDelegate
-        implements InitializingBean {
+        implements InitializingBean, InitialPopulationExtractor {
+    private static final Logger logger = LoggerFactory.getLogger(ObfuscateEvaluationResult.class);
 
     private final Obfuscator<Integer> obfuscator;
 
@@ -41,6 +44,8 @@ public class ObfuscateEvaluationResult extends AbstractServiceDelegate
 
     @Override
     protected void doExecute(DelegateExecution execution, Variables variables) {
+        logger.info("doExecute obfuscate evaluation result");
+
         var measureReport = (MeasureReport) variables.getResource(VARIABLE_MEASURE_REPORT);
 
         if (measureReport.getStatus() == COMPLETE) {
@@ -67,16 +72,5 @@ public class ObfuscateEvaluationResult extends AbstractServiceDelegate
                 .setCount(obfuscatedFeasibilityCount);
 
         return obfuscatedMeasureReport;
-    }
-
-    private MeasureReportGroupPopulationComponent extractInitialPopulation(MeasureReport measureReport) {
-        return measureReport.getGroupFirstRep().getPopulation().stream()
-                .filter((p) -> p.getCode().getCoding().stream()
-                        .anyMatch((c) -> c.getSystem().equals(CODESYSTEM_MEASURE_POPULATION) && c.getCode()
-                                .equals(CODESYSTEM_MEASURE_POPULATION_VALUE_INITIAL_POPULATION)))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(
-                        format("Missing population with coding '%s' in measure report (id '%s').",
-                                CODESYSTEM_MEASURE_POPULATION_VALUE_INITIAL_POPULATION, measureReport.getId())));
     }
 }

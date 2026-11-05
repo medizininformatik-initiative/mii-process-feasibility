@@ -32,6 +32,33 @@
             </valueCoding>
         </extension>
     </extension>
+    <extension url="http://dsf.dev/fhir/StructureDefinition/extension-process-authorization">
+        <extension url="message-name">
+            <valueString value="feasibilitySingleDistributedDicResultMessage"/>
+        </extension>
+        <extension url="task-profile">
+            <valueCanonical
+                    value="http://medizininformatik-initiative.de/fhir/StructureDefinition/feasibility-task-single-distributed-dic-result|#{version}"/>
+        </extension>
+        <extension url="requester">
+            <valueCoding>
+                <system value="http://dsf.dev/fhir/CodeSystem/process-authorization"/>
+                <code value="REMOTE_ALL"/>
+            </valueCoding>
+        </extension>
+        <extension url="requester">
+            <valueCoding>
+                <system value="http://dsf.dev/fhir/CodeSystem/process-authorization"/>
+                <code value="LOCAL_ALL"/>
+            </valueCoding>
+        </extension>
+        <extension url="recipient">
+            <valueCoding>
+                <system value="http://dsf.dev/fhir/CodeSystem/process-authorization"/>
+                <code value="LOCAL_ALL"/>
+            </valueCoding>
+        </extension>
+    </extension>
     <url value="http://medizininformatik-initiative.de/bpe/Process/feasibilityExecute"/>
     <!-- version managed by bpe -->
     <version value="#{version}"/>
